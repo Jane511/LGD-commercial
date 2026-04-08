@@ -1,0 +1,10 @@
+sector_key,industry,ebitda_margin_pct_latest,debt_to_ebitda_benchmark,icr_benchmark,ar_days_benchmark,ar_days_stress_benchmark,ar_days_severe_benchmark,ap_days_benchmark,ap_days_stress_benchmark,ap_days_severe_benchmark,inventory_days_benchmark,inventory_days_yoy_change,inventory_stock_build_risk,benchmark_origin
+accommodation and food services,Accommodation And Food Services,11.38,2.7,3.7,25.4,35.0,54.0,25.4,35.0,54.0,6.1,0.0,Low,derived
+agriculture forestry and fishing,"Agriculture, Forestry And Fishing",14.58,2.9,3.6,23.4,35.0,49.0,23.4,35.0,49.0,31.7,,Low,derived
+construction,Construction,6.14,3.3,3.1,28.1,39.0,61.0,28.1,39.0,61.0,6.1,0.0,Low,derived
+health care and social assistance,Health Care and Social Assistance,17.67,2.1,4.5,23.4,33.0,52.0,23.4,33.0,52.0,6.0,0.0,Low,derived
+manufacturing,Manufacturing,9.15,3.2,3.1,33.7,48.0,67.0,33.7,48.0,67.0,52.7,-3.7,Moderate,derived
+professional scientific and technical services,"Professional, Scientific And Technical Services",15.83,2.3,4.3,27.2,38.0,58.0,27.2,38.0,58.0,6.0,0.0,Low,derived
+retail trade,Retail Trade,8.87,3.1,3.2,26.2,37.0,57.0,26.2,37.0,57.0,20.8,3.7,Moderate,derived
+transport postal and warehousing,"Transport, Postal And Warehousing",11.21,2.6,3.8,27.3,38.0,59.0,27.3,38.0,59.0,6.0,0.0,Low,derived
+wholesale trade,Wholesale Trade,6.08,3.5,2.9,29.3,41.0,65.0,29.3,41.0,65.0,46.1,-1.5,Moderate,derived

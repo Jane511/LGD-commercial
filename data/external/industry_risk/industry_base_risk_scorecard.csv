@@ -1,0 +1,10 @@
+industry,classification_risk_score,macro_risk_score,industry_base_risk_score,industry_base_risk_level
+"Agriculture, Forestry And Fishing",3.75,3.2,3.5,Elevated
+Manufacturing,3.75,3.2,3.5,Elevated
+Wholesale Trade,3.5,2.9,3.23,Elevated
+Retail Trade,3.5,2.9,3.23,Elevated
+Accommodation And Food Services,2.5,2.6,2.68,Medium
+Construction,2.75,2.6,2.68,Medium
+Health Care and Social Assistance,2.25,2.2,2.22,Medium
+"Professional, Scientific And Technical Services",2.0,2.4,2.18,Medium
+"Transport, Postal And Warehousing",2.0,2.3,2.14,Medium

@@ -1,0 +1,10 @@
+industry,esg_sensitive_sector,esg_focus_area,credit_policy_overlay,monitoring_expectation,source_note
+Accommodation And Food Services,True,"Labour practices, energy and waste intensity",Restricted appetite or enhanced due diligence,Obligor ESG review at origination and annual review,Prudentially aligned ESG overlay
+"Agriculture, Forestry And Fishing",True,"Climate variability, water stress, land use",Restricted appetite or enhanced due diligence,Obligor ESG review at origination and annual review,Prudentially aligned ESG overlay
+Construction,True,"Site contamination, workplace safety, waste",Restricted appetite or enhanced due diligence,Obligor ESG review at origination and annual review,Prudentially aligned ESG overlay
+Health Care and Social Assistance,False,,Standard credit policy,Standard monitoring,Prudentially aligned ESG overlay
+Manufacturing,True,"Energy intensity, waste, contamination",Restricted appetite or enhanced due diligence,Obligor ESG review at origination and annual review,Prudentially aligned ESG overlay
+"Professional, Scientific And Technical Services",False,,Standard credit policy,Standard monitoring,Prudentially aligned ESG overlay
+Retail Trade,False,,Standard credit policy,Standard monitoring,Prudentially aligned ESG overlay
+"Transport, Postal And Warehousing",True,"Emissions, fuel dependency, road safety",Restricted appetite or enhanced due diligence,Obligor ESG review at origination and annual review,Prudentially aligned ESG overlay
+Wholesale Trade,False,,Standard credit policy,Standard monitoring,Prudentially aligned ESG overlay

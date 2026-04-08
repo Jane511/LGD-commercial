@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \":*)",
+      "Read(//d/Jane/Job Search/Github/credit-risk-portfolio_bank/**)",
+      "Bash(mkdir -p \"8. Financial Statement Analysis — Commercial Cash Flow Lending/src\")",
+      "Bash(mkdir -p \"8. Financial Statement Analysis — Commercial Cash Flow Lending/data\")",
+      "Bash(mkdir -p \"8. Financial Statement Analysis — Commercial Cash Flow Lending/notebooks\")",
+      "Bash(mkdir -p \"8. Financial Statement Analysis — Commercial Cash Flow Lending/outputs/figures\")",
+      "Bash(pip install:*)",
+      "Bash(jupyter nbconvert:*)",
+      "Bash(for nb:*)",
+      "Bash(do echo:*)",
+      "Bash(done)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(python3 -c \"import csv; r=csv.DictReader\\(open\\('D:/Jane/Job Search/Github/Industry Risk Analysis_Australia/output/tables/industry_base_risk_scorecard.csv'\\)\\); [print\\(row['industry'], '|', row['industry_base_risk_score'], '|', row['industry_base_risk_level']\\) for row in r]\")",
+      "Bash(python -c \"import csv; r=csv.DictReader\\(open\\('D:/Jane/Job Search/Github/Industry Risk Analysis_Australia/output/tables/industry_base_risk_scorecard.csv'\\)\\); [print\\(repr\\(row['industry']\\), '|', row['industry_base_risk_score'], '|', row['industry_base_risk_level']\\) for row in r]\")",
+      "Bash(python -c \"import csv; r=csv.DictReader\\(open\\('D:/Jane/Job Search/Github/Industry Risk Analysis_Australia/output/tables/industry_working_capital_risk_metrics.csv'\\)\\); [print\\(repr\\(row['industry']\\), '|', row['working_capital_lgd_overlay_score'], '|', row['working_capital_lgd_overlay_band']\\) for row in r]\")",
+      "Bash(ls -d \"D:/Jane/Job Search/Github/\"*ndustry*)",
+      "Read(//d/Jane/Job Search/**)",
+      "Read(//d/Jane/**)",
+      "Bash(python -c ':*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:api.github.com)",
+      "Bash(python3 -c \"import json; nb=json.load\\(open\\('D:/Jane/Job Search/Github/credit-risk-portfolio_bank/2. APRA LGD Model/notebooks/02_commercial_cashflow_lgd.ipynb'\\)\\); [print\\(c['source'][:200] if c['cell_type']=='code' else c['source'][:150]\\) for c in nb['cells'][:15]]\")",
+      "Bash(python -c \"import json; nb=json.load\\(open\\('D:/Jane/Job Search/Github/credit-risk-portfolio_bank/2. APRA LGD Model/notebooks/02_commercial_cashflow_lgd.ipynb'\\)\\); [print\\(c['source'][:200] if c['cell_type']=='code' else c['source'][:150]\\) for c in nb['cells'][:15]]\")"
+    ]
+  }
+}

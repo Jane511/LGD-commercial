@@ -1,0 +1,2210 @@
+loan_id,product,cashflow_date,days_from_default,cashflow_type,cashflow_category,amount,amount_pv
+1,Commercial,2021-04-13,1020,PPSR Inventory,Recovery,857245.22,745004.2
+1,Commercial,2018-09-26,90,PPSR Receivables Collection,Recovery,771754.67,762257.4
+1,Commercial,2019-05-24,330,PPSR Receivables Collection,Recovery,673877.72,643966.33
+1,Commercial,2019-12-20,540,PPSR Plant & Equipment,Recovery,432517.02,401548.02
+1,Commercial,2020-01-19,570,PPSR Receivables Collection,Recovery,606793.37,561025.47
+1,Commercial,2020-06-17,720,PPSR Inventory,Recovery,1229524.87,1113567.03
+1,Commercial,2020-07-17,750,Director Guarantee,Recovery,908355.22,819298.62
+1,Commercial,2021-06-12,1080,Receiver/Administrator Fee,Cost,419028.46,361170.35
+1,Commercial,2019-05-24,330,Legal Cost,Cost,370146.29,353716.61
+1,Commercial,2018-07-14,16,Valuation Fee,Cost,11189.6,11165.0
+2,Commercial,2021-07-03,360,PPSR Receivables Collection,Recovery,1554263.42,1466611.11
+2,Commercial,2021-08-02,390,PPSR Receivables Collection,Recovery,999437.94,938523.97
+2,Commercial,2021-01-04,180,PPSR Receivables Collection,Recovery,168180.94,163369.86
+2,Commercial,2021-12-30,540,Receiver/Administrator Fee,Cost,696684.71,638589.54
+2,Commercial,2021-05-04,300,Legal Cost,Cost,362573.03,345451.8
+2,Commercial,2020-07-30,22,Valuation Fee,Cost,3562.34,3549.73
+3,Commercial,2019-02-23,180,PPSR Receivables Collection,Recovery,62573.98,60547.66
+3,Commercial,2019-12-20,480,PPSR Receivables Collection,Recovery,300694.28,275423.69
+3,Commercial,2019-10-21,420,PPSR Inventory,Recovery,648910.03,600933.07
+3,Commercial,2020-02-18,540,PPSR Receivables Collection,Recovery,523002.01,473820.67
+3,Commercial,2019-11-20,450,PPSR Plant & Equipment,Recovery,440905.74,406073.48
+3,Commercial,2019-05-24,270,PPSR Plant & Equipment,Recovery,1267406.01,1206343.77
+3,Commercial,2020-07-17,690,Receiver/Administrator Fee,Cost,718586.27,633396.78
+3,Commercial,2019-10-21,420,Legal Cost,Cost,375106.63,347373.23
+3,Commercial,2018-10-02,36,Valuation Fee,Cost,5143.38,5109.62
+3,Commercial,2019-07-23,330,Asset Management Cost,Cost,230563.24,217060.06
+4,Commercial,2020-05-02,780,PPSR Receivables Collection,Recovery,416617.29,365562.2
+4,Commercial,2019-12-04,630,PPSR Plant & Equipment,Recovery,46486.17,41827.92
+4,Commercial,2019-07-07,480,PPSR Receivables Collection,Recovery,172002.62,158706.96
+4,Commercial,2018-12-09,270,PPSR Inventory,Recovery,367292.06,351041.37
+4,Commercial,2020-10-29,960,Receiver/Administrator Fee,Cost,199877.15,170170.78
+4,Commercial,2019-03-09,360,Legal Cost,Cost,106628.19,100384.74
+4,Commercial,2018-04-05,22,Valuation Fee,Cost,13532.26,13482.45
+4,Commercial,2019-07-07,480,Asset Management Cost,Cost,66419.38,61285.22
+5,Commercial,2021-03-05,300,PPSR Receivables Collection,Recovery,983278.6,933009.45
+5,Commercial,2021-11-30,570,PPSR Receivables Collection,Recovery,753194.49,681718.54
+5,Commercial,2022-10-26,900,PPSR Receivables Collection,Recovery,13489.44,11524.5
+5,Commercial,2021-05-04,360,PPSR Receivables Collection,Recovery,365045.66,342766.63
+5,Commercial,2021-10-01,510,PPSR Receivables Collection,Recovery,1006051.61,920187.52
+5,Commercial,2023-03-25,1050,PPSR Receivables Collection,Recovery,251468.79,209274.92
+5,Commercial,2021-03-05,300,Director Guarantee,Recovery,322783.0,306281.04
+5,Commercial,2023-04-24,1080,Receiver/Administrator Fee,Cost,804827.64,666280.24
+5,Commercial,2022-03-30,690,Legal Cost,Cost,295989.12,262335.76
+5,Commercial,2020-07-05,57,Valuation Fee,Cost,10525.45,10421.02
+5,Commercial,2021-10-31,540,Asset Management Cost,Cost,293599.68,267136.11
+6,Commercial,2021-08-04,780,PPSR Plant & Equipment,Recovery,1328063.21,1154285.27
+6,Commercial,2019-11-13,150,PPSR Plant & Equipment,Recovery,762152.44,741872.43
+6,Commercial,2019-12-13,180,PPSR Plant & Equipment,Recovery,871512.38,843759.01
+6,Commercial,2020-07-10,390,PPSR Plant & Equipment,Recovery,1219368.86,1136795.39
+6,Commercial,2022-01-31,960,PPSR Plant & Equipment,Recovery,210123.4,176812.8
+6,Commercial,2022-03-02,990,Receiver/Administrator Fee,Cost,1043923.35,873706.09
+6,Commercial,2021-06-05,720,Legal Cost,Cost,588246.74,516819.61
+6,Commercial,2019-07-13,27,Valuation Fee,Cost,5537.82,5511.0
+7,Commercial,2024-06-07,360,PPSR Receivables Collection,Recovery,1349036.78,1262483.88
+7,Commercial,2023-11-10,150,PPSR Receivables Collection,Recovery,336231.59,327068.99
+7,Commercial,2024-06-07,360,PPSR Receivables Collection,Recovery,1384492.01,1295664.34
+7,Commercial,2023-09-11,90,PPSR Receivables Collection,Recovery,467433.48,459748.51
+7,Commercial,2024-08-06,420,Receiver/Administrator Fee,Cost,555720.39,514349.98
+7,Commercial,2023-11-10,150,Legal Cost,Cost,271718.39,264313.83
+7,Commercial,2023-07-01,18,Valuation Fee,Cost,13731.46,13686.01
+8,Commercial,2023-01-28,120,PPSR Receivables Collection,Recovery,41286.46,40498.99
+8,Commercial,2024-02-22,510,PPSR Receivables Collection,Recovery,717071.97,660721.02
+8,Commercial,2022-12-29,90,PPSR Plant & Equipment,Recovery,908525.12,895497.46
+8,Commercial,2023-09-25,360,PPSR Receivables Collection,Recovery,404477.59,381772.06
+8,Commercial,2024-05-22,600,Director Guarantee,Recovery,156329.5,141978.88
+8,Commercial,2024-07-21,660,Receiver/Administrator Fee,Cost,232691.1,209305.6
+8,Commercial,2023-09-25,360,Legal Cost,Cost,286756.7,270659.49
+8,Commercial,2022-11-07,38,Valuation Fee,Cost,3813.64,3790.45
+8,Commercial,2023-08-26,330,Asset Management Cost,Cost,130081.36,123371.72
+9,Commercial,2024-05-20,570,Property Sale,Recovery,3411591.32,3111393.15
+9,Commercial,2023-07-25,270,Director Guarantee,Recovery,365069.98,349484.37
+9,Commercial,2024-09-17,690,Receiver/Administrator Fee,Cost,280054.6,250506.56
+9,Commercial,2024-06-19,600,Legal Cost,Cost,149716.1,135881.71
+9,Commercial,2022-11-29,32,Valuation Fee,Cost,12297.13,12233.71
+9,Commercial,2023-09-23,330,Asset Management Cost,Cost,54501.47,51671.27
+10,Commercial,2023-10-27,420,PPSR Plant & Equipment,Recovery,11616.8,10830.14
+10,Commercial,2022-12-01,90,PPSR Plant & Equipment,Recovery,936121.27,922160.63
+10,Commercial,2023-05-30,270,PPSR Plant & Equipment,Recovery,542715.46,518794.76
+10,Commercial,2024-08-22,720,PPSR Plant & Equipment,Recovery,62587.25,55498.54
+10,Commercial,2023-06-29,300,Director Guarantee,Recovery,343448.53,326670.47
+10,Commercial,2024-09-21,750,Receiver/Administrator Fee,Cost,162941.92,143765.06
+10,Commercial,2023-03-31,210,Legal Cost,Cost,100964.44,97485.99
+10,Commercial,2022-10-23,51,Valuation Fee,Cost,12112.42,12009.72
+11,Commercial,2023-07-10,450,GSR All-Assets Sweep,Recovery,719392.25,666358.52
+11,Commercial,2023-06-10,420,Director Guarantee,Recovery,501696.25,467089.65
+11,Commercial,2023-07-10,450,Receiver/Administrator Fee,Cost,417898.16,387090.64
+11,Commercial,2022-07-15,90,Legal Cost,Cost,232505.18,228971.32
+11,Commercial,2022-05-06,20,Valuation Fee,Cost,2971.84,2961.75
+11,Commercial,2022-11-12,210,Asset Management Cost,Cost,160238.28,154612.99
+12,Commercial,2023-03-28,150,PPSR Receivables Collection,Recovery,1509039.67,1468243.57
+12,Commercial,2023-12-23,420,PPSR Receivables Collection,Recovery,614632.3,569230.6
+12,Commercial,2023-03-28,150,PPSR Receivables Collection,Recovery,1198783.77,1166375.27
+12,Commercial,2024-07-20,630,Director Guarantee,Recovery,677881.9,604175.8
+12,Commercial,2024-07-20,630,Receiver/Administrator Fee,Cost,663144.41,591040.72
+12,Commercial,2023-09-24,330,Legal Cost,Cost,397000.93,373771.27
+12,Commercial,2022-12-25,57,Valuation Fee,Cost,3741.17,3702.41
+12,Commercial,2023-08-25,300,Asset Management Cost,Cost,132158.34,125109.26
+13,Commercial,2023-02-01,270,PPSR Plant & Equipment,Recovery,444124.42,423500.11
+13,Commercial,2024-07-25,810,PPSR Plant & Equipment,Recovery,4519.55,3918.7
+13,Commercial,2023-07-01,420,PPSR Plant & Equipment,Recovery,667393.54,619809.2
+13,Commercial,2022-11-03,180,PPSR Plant & Equipment,Recovery,89640.41,86843.32
+13,Commercial,2022-09-04,120,PPSR Plant & Equipment,Recovery,302330.43,296008.09
+13,Commercial,2024-03-27,690,PPSR Plant & Equipment,Recovery,66234.39,58655.46
+13,Commercial,2023-01-02,240,PPSR Plant & Equipment,Recovery,202771.64,194379.58
+13,Commercial,2024-05-26,750,Director Guarantee,Recovery,549902.57,481860.69
+13,Commercial,2024-08-24,840,Receiver/Administrator Fee,Cost,123505.15,106521.46
+13,Commercial,2024-01-27,630,Legal Cost,Cost,176409.07,157882.85
+13,Commercial,2022-06-25,49,Valuation Fee,Cost,14054.56,13933.79
+13,Commercial,2023-07-01,420,Asset Management Cost,Cost,62909.31,58423.95
+14,Commercial,2024-12-21,390,PPSR Receivables Collection,Recovery,1829705.18,1714970.23
+14,Commercial,2024-05-25,180,PPSR Receivables Collection,Recovery,1436578.04,1394275.74
+14,Commercial,2025-10-17,690,PPSR Receivables Collection,Recovery,829393.19,739608.13
+14,Commercial,2025-08-18,630,PPSR Receivables Collection,Recovery,1506772.46,1357112.14
+14,Commercial,2024-09-22,300,Director Guarantee,Recovery,1150732.09,1094813.06
+14,Commercial,2025-10-17,690,Receiver/Administrator Fee,Cost,838610.3,747827.45
+14,Commercial,2025-01-20,420,Legal Cost,Cost,494355.53,461053.63
+14,Commercial,2023-12-24,27,Valuation Fee,Cost,2316.24,2305.88
+15,Commercial,2025-02-27,600,GSR All-Assets Sweep,Recovery,111996.3,102910.61
+15,Commercial,2025-03-29,630,Receiver/Administrator Fee,Cost,81496.98,74569.42
+15,Commercial,2024-08-01,390,Legal Cost,Cost,37463.82,35459.18
+15,Commercial,2023-08-04,27,Valuation Fee,Cost,2647.58,2637.52
+15,Commercial,2024-05-03,300,Asset Management Cost,Cost,23788.91,22803.56
+16,Commercial,2022-07-15,210,PPSR Receivables Collection,Recovery,198897.18,193027.95
+16,Commercial,2022-06-15,180,PPSR Receivables Collection,Recovery,30849.83,30067.87
+16,Commercial,2023-04-11,480,PPSR Receivables Collection,Recovery,60059.52,56085.2
+16,Commercial,2022-10-13,300,PPSR Receivables Collection,Recovery,14315.32,13715.68
+16,Commercial,2023-04-11,480,PPSR Receivables Collection,Recovery,205187.34,191609.48
+16,Commercial,2023-01-11,390,PPSR Receivables Collection,Recovery,284325.38,268941.05
+16,Commercial,2022-05-16,150,PPSR Receivables Collection,Recovery,527177.21,516018.04
+16,Commercial,2023-04-11,480,Receiver/Administrator Fee,Cost,311910.43,291270.38
+16,Commercial,2022-11-12,330,Legal Cost,Cost,176171.89,168071.78
+16,Commercial,2022-01-31,45,Valuation Fee,Cost,5337.55,5303.4
+17,Commercial,2023-11-24,540,Property Sale,Recovery,2274505.84,2065915.98
+17,Commercial,2024-09-19,840,Director Guarantee,Recovery,422683.53,363942.63
+17,Commercial,2024-12-18,930,Receiver/Administrator Fee,Cost,249734.59,211608.88
+17,Commercial,2024-04-22,690,Legal Cost,Cost,108054.32,95557.27
+17,Commercial,2022-07-06,34,Valuation Fee,Cost,13392.84,13311.97
+17,Commercial,2023-08-26,450,Asset Management Cost,Cost,58363.46,53867.77
+18,Commercial,2022-07-19,90,PPSR Plant & Equipment,Recovery,421180.05,415489.22
+18,Commercial,2022-07-19,90,PPSR Plant & Equipment,Recovery,1184735.67,1168727.96
+18,Commercial,2023-08-13,480,PPSR Plant & Equipment,Recovery,108290.37,100711.79
+18,Commercial,2022-12-16,240,Director Guarantee,Recovery,797439.28,769029.27
+18,Commercial,2024-03-10,690,Receiver/Administrator Fee,Cost,188322.35,169670.75
+18,Commercial,2023-03-16,330,Legal Cost,Cost,111929.87,106483.72
+18,Commercial,2022-05-31,41,Valuation Fee,Cost,12131.75,12056.8
+18,Commercial,2023-03-16,330,Asset Management Cost,Cost,106099.89,100937.4
+19,Commercial,2020-06-20,120,PPSR Receivables Collection,Recovery,493885.05,484598.44
+19,Commercial,2021-09-13,570,PPSR Receivables Collection,Recovery,241131.45,220341.09
+19,Commercial,2020-06-20,120,PPSR Receivables Collection,Recovery,1577739.02,1548072.52
+19,Commercial,2021-11-12,630,PPSR Receivables Collection,Recovery,101256.83,91652.44
+19,Commercial,2021-07-15,510,PPSR Receivables Collection,Recovery,99335.48,91636.39
+19,Commercial,2021-11-12,630,Director Guarantee,Recovery,822944.81,744887.04
+19,Commercial,2021-11-12,630,Receiver/Administrator Fee,Cost,214930.15,194543.65
+19,Commercial,2020-06-20,120,Legal Cost,Cost,241884.26,237336.06
+19,Commercial,2020-03-22,30,Valuation Fee,Cost,7725.58,7689.01
+20,Commercial,2022-02-27,300,Property Sale,Recovery,1898969.21,1804493.04
+20,Commercial,2022-05-28,390,Director Guarantee,Recovery,132646.39,124132.04
+20,Commercial,2022-07-27,450,Receiver/Administrator Fee,Cost,116438.46,107858.0
+20,Commercial,2021-10-30,180,Legal Cost,Cost,59505.77,57711.38
+20,Commercial,2021-05-28,25,Valuation Fee,Cost,8437.46,8401.66
+20,Commercial,2021-11-29,210,Asset Management Cost,Cost,37600.39,36280.94
+21,Commercial,2019-09-14,390,PPSR Receivables Collection,Recovery,33348.83,31561.72
+21,Commercial,2019-04-17,240,PPSR Receivables Collection,Recovery,245015.5,236850.14
+21,Commercial,2019-09-14,390,PPSR Receivables Collection,Recovery,58637.3,55495.03
+21,Commercial,2019-11-13,450,PPSR Inventory,Recovery,184196.97,172855.28
+21,Commercial,2018-12-18,120,PPSR Inventory,Recovery,38842.88,38190.16
+21,Commercial,2019-07-16,330,PPSR Receivables Collection,Recovery,92193.9,87995.87
+21,Commercial,2019-09-14,390,PPSR Receivables Collection,Recovery,68036.68,64390.72
+21,Commercial,2019-12-13,480,Director Guarantee,Recovery,154088.08,143988.98
+21,Commercial,2020-01-12,510,Receiver/Administrator Fee,Cost,177306.97,164985.59
+21,Commercial,2019-04-17,240,Legal Cost,Cost,59626.3,57639.21
+21,Commercial,2018-09-16,27,Valuation Fee,Cost,6846.65,6820.59
+21,Commercial,2019-04-17,240,Asset Management Cost,Cost,36699.77,35476.72
+22,Commercial,2022-01-21,210,PPSR Receivables Collection,Recovery,241059.29,233039.16
+22,Commercial,2022-08-19,420,PPSR Receivables Collection,Recovery,204810.38,191408.85
+22,Commercial,2022-05-21,330,PPSR Receivables Collection,Recovery,511326.3,484848.46
+22,Commercial,2022-06-20,360,PPSR Receivables Collection,Recovery,366166.94,345531.58
+22,Commercial,2022-07-20,390,PPSR Receivables Collection,Recovery,397759.55,373533.84
+22,Commercial,2022-03-22,270,PPSR Receivables Collection,Recovery,871034.26,833953.23
+22,Commercial,2023-02-15,600,Director Guarantee,Recovery,99237.91,90093.19
+22,Commercial,2023-02-15,600,Receiver/Administrator Fee,Cost,122900.04,111574.87
+22,Commercial,2021-08-24,60,Legal Cost,Cost,157661.66,156144.8
+22,Commercial,2021-08-19,55,Valuation Fee,Cost,2056.76,2038.62
+22,Commercial,2022-04-21,300,Asset Management Cost,Cost,87380.38,83257.07
+23,Commercial,2021-08-25,210,PPSR Inventory,Recovery,1840355.91,1783696.88
+23,Commercial,2022-06-21,510,PPSR Receivables Collection,Recovery,613471.68,568607.6
+23,Commercial,2021-08-25,210,PPSR Receivables Collection,Recovery,658605.67,638329.18
+23,Commercial,2022-02-21,390,PPSR Inventory,Recovery,1193746.57,1126394.99
+23,Commercial,2021-09-24,240,Director Guarantee,Recovery,346670.76,334500.16
+23,Commercial,2022-08-20,570,Receiver/Administrator Fee,Cost,530179.31,487035.58
+23,Commercial,2021-06-26,150,Legal Cost,Cost,264448.93,258607.59
+23,Commercial,2021-03-21,53,Valuation Fee,Cost,10023.68,9944.89
+24,Commercial,2019-07-07,120,PPSR Receivables Collection,Recovery,712036.54,698499.06
+24,Commercial,2020-04-02,390,PPSR Receivables Collection,Recovery,35509.96,33362.36
+24,Commercial,2020-06-01,450,PPSR Receivables Collection,Recovery,410502.69,381992.04
+24,Commercial,2021-03-28,750,PPSR Receivables Collection,Recovery,375636.19,333169.01
+24,Commercial,2020-03-03,360,PPSR Receivables Collection,Recovery,35041.46,33080.56
+24,Commercial,2019-12-04,270,PPSR Receivables Collection,Recovery,1686051.04,1614781.27
+24,Commercial,2020-05-02,420,Director Guarantee,Recovery,286852.49,268213.76
+24,Commercial,2021-05-27,810,Receiver/Administrator Fee,Cost,355098.16,311944.53
+24,Commercial,2020-11-28,630,Legal Cost,Cost,246986.98,223309.75
+24,Commercial,2019-03-31,22,Valuation Fee,Cost,4762.46,4745.73
+24,Commercial,2020-04-02,390,Asset Management Cost,Cost,132445.12,124434.98
+25,Commercial,2018-10-11,240,PPSR Plant & Equipment,Recovery,792137.14,766137.35
+25,Commercial,2018-10-11,240,PPSR Plant & Equipment,Recovery,1554376.19,1503357.93
+25,Commercial,2018-08-12,180,PPSR Plant & Equipment,Recovery,1417369.91,1382333.72
+25,Commercial,2019-04-09,420,PPSR Plant & Equipment,Recovery,66952.21,63154.0
+25,Commercial,2019-04-09,420,Receiver/Administrator Fee,Cost,747565.77,705156.25
+25,Commercial,2018-04-14,60,Legal Cost,Cost,437196.57,433564.09
+25,Commercial,2018-04-10,56,Valuation Fee,Cost,10266.51,10186.87
+26,Commercial,2023-10-19,450,GSR All-Assets Sweep,Recovery,2750835.36,2554100.89
+26,Commercial,2023-04-22,270,Director Guarantee,Recovery,1252902.15,1198343.23
+26,Commercial,2024-01-17,540,Receiver/Administrator Fee,Cost,723057.44,661455.96
+26,Commercial,2022-12-23,150,Legal Cost,Cost,472162.3,460626.72
+26,Commercial,2022-09-16,52,Valuation Fee,Cost,3351.11,3322.5
+27,Commercial,2019-08-04,360,PPSR Receivables Collection,Recovery,148261.86,138745.0
+27,Commercial,2019-08-04,360,PPSR Receivables Collection,Recovery,106343.77,99517.61
+27,Commercial,2020-01-01,510,PPSR Receivables Collection,Recovery,171613.62,156219.27
+27,Commercial,2020-01-01,510,PPSR Receivables Collection,Recovery,352711.58,321072.1
+27,Commercial,2019-08-04,360,PPSR Receivables Collection,Recovery,469798.56,439642.4
+27,Commercial,2020-07-29,720,PPSR Receivables Collection,Recovery,57217.82,50108.0
+27,Commercial,2019-01-06,150,PPSR Receivables Collection,Recovery,444426.39,432309.51
+27,Commercial,2019-03-07,210,Director Guarantee,Recovery,206237.87,198408.99
+27,Commercial,2020-09-27,780,Receiver/Administrator Fee,Cost,309869.28,268381.32
+27,Commercial,2019-09-03,390,Legal Cost,Cost,170010.11,158220.1
+27,Commercial,2018-09-11,33,Valuation Fee,Cost,13973.04,13888.32
+28,Commercial,2023-11-24,390,PPSR Inventory,Recovery,669502.02,626797.3
+28,Commercial,2023-03-29,150,PPSR Receivables Collection,Recovery,123126.73,120044.65
+28,Commercial,2023-03-29,150,PPSR Receivables Collection,Recovery,660522.08,643988.05
+28,Commercial,2024-02-22,480,PPSR Inventory,Recovery,1398679.77,1289697.33
+28,Commercial,2023-05-28,210,Director Guarantee,Recovery,243688.68,235191.72
+28,Commercial,2024-02-22,480,Receiver/Administrator Fee,Cost,662368.26,610757.79
+28,Commercial,2023-05-28,210,Legal Cost,Cost,340297.89,328432.34
+28,Commercial,2022-11-26,27,Valuation Fee,Cost,5612.3,5586.75
+28,Commercial,2023-06-27,240,Asset Management Cost,Cost,179744.39,172599.73
+29,Commercial,2023-07-26,450,PPSR Receivables Collection,Recovery,734453.6,685763.22
+29,Commercial,2022-09-29,150,PPSR Inventory,Recovery,605028.42,591351.52
+29,Commercial,2023-03-28,330,PPSR Plant & Equipment,Recovery,662024.84,629547.0
+29,Commercial,2023-08-25,480,PPSR Receivables Collection,Recovery,840512.59,781210.43
+29,Commercial,2023-01-27,270,PPSR Inventory,Recovery,372636.84,357611.67
+29,Commercial,2023-09-24,510,Receiver/Administrator Fee,Cost,760670.55,703775.92
+29,Commercial,2022-12-28,240,Legal Cost,Cost,535260.82,516032.86
+29,Commercial,2022-06-08,37,Valuation Fee,Cost,14981.19,14896.94
+29,Commercial,2022-12-28,240,Asset Management Cost,Cost,292364.22,281861.74
+30,Commercial,2022-06-24,630,GSR All-Assets Sweep,Recovery,1068760.27,956593.53
+30,Commercial,2022-11-21,780,Receiver/Administrator Fee,Cost,440128.17,383673.09
+30,Commercial,2021-03-01,150,Legal Cost,Cost,295563.48,287862.97
+30,Commercial,2020-11-28,57,Valuation Fee,Cost,10403.35,10299.51
+30,Commercial,2021-10-27,390,Asset Management Cost,Cost,209646.68,195739.77
+31,Commercial,2020-02-12,660,Property Sale,Recovery,3741384.03,3329846.34
+31,Commercial,2020-03-13,690,Director Guarantee,Recovery,1400785.58,1240118.54
+31,Commercial,2020-10-09,900,Receiver/Administrator Fee,Cost,288173.92,245834.96
+31,Commercial,2019-09-15,510,Legal Cost,Cost,276421.71,252618.93
+31,Commercial,2018-06-06,44,Valuation Fee,Cost,5452.27,5410.08
+31,Commercial,2019-07-17,450,Asset Management Cost,Cost,105005.68,96985.6
+32,Commercial,2024-01-13,570,Property Sale,Recovery,13169838.52,12069515.21
+32,Commercial,2024-11-08,870,Director Guarantee,Recovery,1949791.14,1706691.54
+32,Commercial,2024-11-08,870,Receiver/Administrator Fee,Cost,736060.05,644288.22
+32,Commercial,2024-03-13,630,Legal Cost,Cost,336068.78,305175.08
+32,Commercial,2022-08-13,52,Valuation Fee,Cost,5645.59,5600.83
+32,Commercial,2023-08-16,420,Asset Management Cost,Cost,310024.54,290721.17
+33,Commercial,2022-06-11,120,PPSR Receivables Collection,Recovery,1015210.31,993193.01
+33,Commercial,2023-04-07,420,PPSR Receivables Collection,Recovery,61531.42,56986.06
+33,Commercial,2023-05-07,450,PPSR Receivables Collection,Recovery,449295.39,413831.08
+33,Commercial,2022-09-09,210,PPSR Receivables Collection,Recovery,14385.75,13844.22
+33,Commercial,2023-04-07,420,Director Guarantee,Recovery,1453015.89,1345680.92
+33,Commercial,2023-11-03,630,Receiver/Administrator Fee,Cost,242952.84,216535.74
+33,Commercial,2023-07-06,510,Legal Cost,Cost,197243.98,179694.06
+33,Commercial,2022-03-29,46,Valuation Fee,Cost,11813.7,11714.82
+33,Commercial,2022-12-08,300,Asset Management Cost,Cost,102100.14,96654.14
+34,Commercial,2020-04-24,270,PPSR Plant & Equipment,Recovery,71648.61,68716.65
+34,Commercial,2021-06-18,690,PPSR Plant & Equipment,Recovery,628103.61,564493.25
+34,Commercial,2020-10-21,450,PPSR Plant & Equipment,Recovery,1300022.64,1212573.17
+34,Commercial,2021-07-18,720,PPSR Plant & Equipment,Recovery,798274.53,714107.4
+34,Commercial,2022-01-14,900,PPSR Plant & Equipment,Recovery,114322.15,99459.09
+34,Commercial,2020-06-23,330,PPSR Plant & Equipment,Recovery,460050.64,437146.97
+34,Commercial,2021-09-16,780,Director Guarantee,Recovery,2196536.82,1946782.15
+34,Commercial,2022-02-13,930,Receiver/Administrator Fee,Cost,963730.34,834552.01
+34,Commercial,2021-07-18,720,Legal Cost,Cost,510424.35,456607.08
+34,Commercial,2019-08-15,17,Valuation Fee,Cost,5609.99,5595.25
+35,Commercial,2019-07-01,300,Property Sale,Recovery,10074951.31,9587245.38
+35,Commercial,2019-04-02,210,Director Guarantee,Recovery,1544943.66,1492204.23
+35,Commercial,2019-08-30,360,Receiver/Administrator Fee,Cost,360069.61,339255.99
+35,Commercial,2018-12-03,90,Legal Cost,Cost,230236.23,226834.41
+35,Commercial,2018-10-09,35,Valuation Fee,Cost,2486.4,2472.05
+35,Commercial,2019-03-03,180,Asset Management Cost,Cost,156555.27,151963.13
+36,Commercial,2021-02-18,630,PPSR Plant & Equipment,Recovery,795607.97,715821.45
+36,Commercial,2019-08-28,90,PPSR Plant & Equipment,Recovery,2180508.87,2147837.95
+36,Commercial,2021-02-18,630,PPSR Plant & Equipment,Recovery,1655636.36,1489603.0
+36,Commercial,2020-04-24,330,PPSR Plant & Equipment,Recovery,440875.15,417134.1
+36,Commercial,2020-06-23,390,PPSR Plant & Equipment,Recovery,30643.34,28702.87
+36,Commercial,2020-10-21,510,Director Guarantee,Recovery,1878144.17,1724154.99
+36,Commercial,2021-02-18,630,Receiver/Administrator Fee,Cost,896013.26,806157.72
+36,Commercial,2019-12-26,210,Legal Cost,Cost,472263.94,455917.9
+36,Commercial,2019-07-18,49,Valuation Fee,Cost,7198.07,7139.15
+36,Commercial,2020-03-25,300,Asset Management Cost,Cost,361173.78,343448.58
+37,Commercial,2023-05-07,870,PPSR Plant & Equipment,Recovery,55287.63,47931.98
+37,Commercial,2023-06-06,900,PPSR Plant & Equipment,Recovery,852441.64,735400.64
+37,Commercial,2023-02-06,780,PPSR Plant & Equipment,Recovery,35641.36,31359.26
+37,Commercial,2023-02-06,780,PPSR Plant & Equipment,Recovery,46087.69,40550.52
+37,Commercial,2023-10-04,1020,Receiver/Administrator Fee,Cost,113507.35,96013.26
+37,Commercial,2022-08-10,600,Legal Cost,Cost,164649.44,149210.65
+37,Commercial,2021-01-30,43,Valuation Fee,Cost,9273.94,9208.73
+38,Commercial,2022-04-18,360,Property Sale,Recovery,10373833.58,9819858.1
+38,Commercial,2022-01-18,270,Director Guarantee,Recovery,1042370.91,1000337.93
+38,Commercial,2022-04-18,360,Receiver/Administrator Fee,Cost,1072246.19,1014986.92
+38,Commercial,2021-09-20,150,Legal Cost,Cost,290667.23,284096.06
+38,Commercial,2021-05-11,18,Valuation Fee,Cost,13086.54,13050.68
+38,Commercial,2021-10-20,180,Asset Management Cost,Cost,334973.0,325906.31
+39,Commercial,2020-09-14,390,PPSR Inventory,Recovery,356812.61,338194.93
+39,Commercial,2020-11-13,450,PPSR Plant & Equipment,Recovery,462428.47,434701.34
+39,Commercial,2020-01-18,150,PPSR Inventory,Recovery,31412.13,30771.32
+39,Commercial,2020-08-15,360,PPSR Receivables Collection,Recovery,383490.21,364981.97
+39,Commercial,2020-04-17,240,PPSR Plant & Equipment,Recovery,952438.22,921541.51
+39,Commercial,2020-12-13,480,Director Guarantee,Recovery,882672.41,826334.2
+39,Commercial,2021-01-12,510,Receiver/Administrator Fee,Cost,362757.74,338207.02
+39,Commercial,2020-01-18,150,Legal Cost,Cost,171249.35,167755.87
+39,Commercial,2019-09-06,16,Valuation Fee,Cost,7798.91,7781.78
+39,Commercial,2020-04-17,240,Asset Management Cost,Cost,147524.76,142739.11
+40,Commercial,2022-12-03,510,GSR All-Assets Sweep,Recovery,1091927.51,993841.66
+40,Commercial,2022-03-08,240,Director Guarantee,Recovery,896745.62,857893.18
+40,Commercial,2023-05-02,660,Receiver/Administrator Fee,Cost,219503.71,194331.28
+40,Commercial,2021-09-09,60,Legal Cost,Cost,190017.59,187925.1
+40,Commercial,2021-08-01,21,Valuation Fee,Cost,13569.24,13516.75
+41,Commercial,2024-02-12,90,PPSR Receivables Collection,Recovery,35127.79,34627.47
+41,Commercial,2025-04-07,510,PPSR Receivables Collection,Recovery,2387.44,2201.04
+41,Commercial,2024-09-09,300,PPSR Plant & Equipment,Recovery,182375.35,173859.78
+41,Commercial,2024-11-08,360,PPSR Plant & Equipment,Recovery,172644.13,163016.44
+41,Commercial,2024-10-09,330,PPSR Plant & Equipment,Recovery,118062.84,112013.28
+41,Commercial,2025-03-08,480,PPSR Receivables Collection,Recovery,211534.1,195953.57
+41,Commercial,2025-06-06,570,PPSR Plant & Equipment,Recovery,57721.44,52708.4
+41,Commercial,2025-06-06,570,Receiver/Administrator Fee,Cost,105321.52,96174.47
+41,Commercial,2025-03-08,480,Legal Cost,Cost,99079.27,91781.59
+41,Commercial,2023-12-02,18,Valuation Fee,Cost,6248.66,6230.76
+41,Commercial,2024-08-10,270,Asset Management Cost,Cost,50401.45,48278.39
+42,Commercial,2024-04-03,450,Property Sale,Recovery,1724650.46,1598988.28
+42,Commercial,2023-10-06,270,Director Guarantee,Recovery,64856.13,61978.0
+42,Commercial,2025-03-29,810,Receiver/Administrator Fee,Cost,94623.61,82576.99
+42,Commercial,2024-03-04,420,Legal Cost,Cost,50572.51,47124.75
+42,Commercial,2023-02-18,40,Valuation Fee,Cost,11612.87,11535.04
+42,Commercial,2024-02-03,390,Asset Management Cost,Cost,38305.09,35874.13
+43,Commercial,2022-08-25,360,Property Sale,Recovery,1039203.46,988892.99
+43,Commercial,2022-05-27,270,Director Guarantee,Recovery,48219.25,46457.63
+43,Commercial,2022-09-24,390,Receiver/Administrator Fee,Cost,34425.9,32624.06
+43,Commercial,2021-12-28,120,Legal Cost,Cost,48766.45,47966.42
+43,Commercial,2021-09-23,24,Valuation Fee,Cost,9098.85,9068.8
+44,Commercial,2020-10-22,360,PPSR Receivables Collection,Recovery,420109.38,393870.85
+44,Commercial,2021-01-20,450,PPSR Plant & Equipment,Recovery,586582.28,541150.74
+44,Commercial,2020-01-26,90,PPSR Plant & Equipment,Recovery,36845.44,36256.14
+44,Commercial,2020-04-25,180,PPSR Plant & Equipment,Recovery,69869.93,67652.84
+44,Commercial,2020-07-24,270,PPSR Receivables Collection,Recovery,121251.07,115525.85
+44,Commercial,2022-03-16,870,Receiver/Administrator Fee,Cost,180773.54,154684.76
+44,Commercial,2021-02-19,480,Legal Cost,Cost,110572.09,101461.39
+44,Commercial,2019-11-15,18,Valuation Fee,Cost,14812.43,14764.74
+44,Commercial,2020-12-21,420,Asset Management Cost,Cost,31528.28,29243.11
+45,Commercial,2020-06-25,660,PPSR Inventory,Recovery,98114.31,88985.73
+45,Commercial,2019-03-03,180,PPSR Plant & Equipment,Recovery,22076.13,21495.92
+45,Commercial,2019-04-02,210,PPSR Plant & Equipment,Recovery,93617.77,90753.53
+45,Commercial,2019-04-02,210,PPSR Receivables Collection,Recovery,40939.81,39687.26
+45,Commercial,2019-05-02,240,PPSR Inventory,Recovery,77268.09,74572.32
+45,Commercial,2019-11-28,450,PPSR Inventory,Recovery,308045.09,288202.03
+45,Commercial,2020-01-27,510,Director Guarantee,Recovery,209532.93,194302.95
+45,Commercial,2020-07-25,690,Receiver/Administrator Fee,Cost,263841.48,238233.74
+45,Commercial,2019-08-30,360,Legal Cost,Cost,110216.25,104498.92
+45,Commercial,2018-09-24,20,Valuation Fee,Cost,3742.04,3730.98
+46,Commercial,2024-07-13,720,PPSR Receivables Collection,Recovery,564657.63,494608.57
+46,Commercial,2024-09-11,780,PPSR Receivables Collection,Recovery,126148.21,109285.84
+46,Commercial,2024-06-13,690,PPSR Receivables Collection,Recovery,2432314.41,2142362.51
+46,Commercial,2024-10-11,810,Receiver/Administrator Fee,Cost,767581.51,661318.23
+46,Commercial,2024-05-14,660,Legal Cost,Cost,515313.07,456395.36
+46,Commercial,2022-08-14,21,Valuation Fee,Cost,5518.91,5497.63
+46,Commercial,2023-08-18,390,Asset Management Cost,Cost,218711.76,203569.89
+47,Commercial,2021-06-28,570,PPSR Plant & Equipment,Recovery,566972.73,511309.32
+47,Commercial,2020-12-30,390,PPSR Plant & Equipment,Recovery,371553.31,346190.24
+47,Commercial,2020-12-30,390,PPSR Plant & Equipment,Recovery,308706.05,287633.08
+47,Commercial,2021-12-25,750,PPSR Plant & Equipment,Recovery,358572.66,312987.19
+47,Commercial,2021-10-26,690,PPSR Plant & Equipment,Recovery,46509.26,41040.52
+47,Commercial,2021-07-28,600,PPSR Plant & Equipment,Recovery,5499.15,4932.37
+47,Commercial,2020-12-30,390,Director Guarantee,Recovery,331328.33,308711.11
+47,Commercial,2021-12-25,750,Receiver/Administrator Fee,Cost,767926.0,670299.3
+47,Commercial,2020-03-05,90,Legal Cost,Cost,475883.06,468181.42
+47,Commercial,2020-01-14,39,Valuation Fee,Cost,10394.97,10321.74
+47,Commercial,2020-11-30,360,Asset Management Cost,Cost,234341.62,219535.69
+48,Commercial,2024-05-18,360,Property Sale,Recovery,8933293.02,8477103.21
+48,Commercial,2024-03-19,300,Director Guarantee,Recovery,1332561.49,1275607.81
+48,Commercial,2024-05-18,360,Receiver/Administrator Fee,Cost,1172038.43,1112186.82
+48,Commercial,2023-08-22,90,Legal Cost,Cost,327932.34,323663.13
+48,Commercial,2023-06-30,37,Valuation Fee,Cost,5633.83,5603.56
+49,Commercial,2018-12-27,360,PPSR Receivables Collection,Recovery,139323.23,132200.67
+49,Commercial,2018-05-01,120,PPSR Receivables Collection,Recovery,1345556.1,1322224.43
+49,Commercial,2018-12-27,360,PPSR Receivables Collection,Recovery,426308.1,404514.11
+49,Commercial,2018-05-31,150,PPSR Receivables Collection,Recovery,1277648.53,1250016.1
+49,Commercial,2018-06-30,180,Director Guarantee,Recovery,640973.61,624374.56
+49,Commercial,2019-02-25,420,Receiver/Administrator Fee,Cost,174354.34,164000.26
+49,Commercial,2018-05-31,150,Legal Cost,Cost,284681.91,278524.93
+49,Commercial,2018-01-25,24,Valuation Fee,Cost,7364.72,7339.0
+49,Commercial,2018-07-30,210,Asset Management Cost,Cost,107018.9,103792.6
+50,Commercial,2024-08-13,420,Property Sale,Recovery,580150.61,538951.36
+50,Commercial,2023-12-17,180,Director Guarantee,Recovery,46024.25,44593.98
+50,Commercial,2025-02-09,600,Receiver/Administrator Fee,Cost,28264.31,25441.14
+50,Commercial,2024-07-14,390,Legal Cost,Cost,19004.09,17747.66
+50,Commercial,2023-08-14,55,Valuation Fee,Cost,12490.01,12370.1
+50,Commercial,2024-04-15,300,Asset Management Cost,Cost,12823.64,12166.35
+51,Commercial,2025-05-13,450,Property Sale,Recovery,5383741.5,5056045.21
+51,Commercial,2024-12-14,300,Director Guarantee,Recovery,822454.08,788732.06
+51,Commercial,2026-01-08,690,Receiver/Administrator Fee,Cost,323386.77,293699.54
+51,Commercial,2025-09-10,570,Legal Cost,Cost,288087.3,266059.02
+51,Commercial,2024-03-20,31,Valuation Fee,Cost,3048.97,3035.81
+51,Commercial,2025-01-13,330,Asset Management Cost,Cost,175307.73,167417.43
+52,Commercial,2024-07-20,120,PPSR Receivables Collection,Recovery,649353.65,635769.67
+52,Commercial,2026-02-10,690,PPSR Receivables Collection,Recovery,90301.84,79965.58
+52,Commercial,2026-05-11,780,PPSR Receivables Collection,Recovery,690638.0,601964.42
+52,Commercial,2025-12-12,630,PPSR Receivables Collection,Recovery,3288263.93,2942821.21
+52,Commercial,2024-06-20,90,PPSR Receivables Collection,Recovery,1114481.31,1096949.61
+52,Commercial,2025-08-14,510,Director Guarantee,Recovery,1922753.41,1757528.12
+52,Commercial,2026-05-11,780,Receiver/Administrator Fee,Cost,754452.23,657585.3
+52,Commercial,2025-04-16,390,Legal Cost,Cost,371910.56,347215.17
+52,Commercial,2024-05-12,51,Valuation Fee,Cost,13242.83,13124.38
+53,Commercial,2019-07-22,420,Property Sale,Recovery,7915893.64,7459135.43
+53,Commercial,2019-01-23,240,Director Guarantee,Recovery,1519108.59,1468383.22
+53,Commercial,2021-04-12,1050,Receiver/Administrator Fee,Cost,447520.9,385731.12
+53,Commercial,2019-02-22,270,Legal Cost,Cost,269890.34,259773.15
+53,Commercial,2018-07-11,44,Valuation Fee,Cost,7929.11,7879.89
+53,Commercial,2019-10-20,510,Asset Management Cost,Cost,238812.96,222185.34
+54,Commercial,2024-05-22,360,Property Sale,Recovery,10279622.59,9782720.34
+54,Commercial,2024-11-18,540,Receiver/Administrator Fee,Cost,611394.47,567603.69
+54,Commercial,2024-04-22,330,Legal Cost,Cost,359436.09,343476.69
+54,Commercial,2023-07-07,40,Valuation Fee,Cost,5841.28,5809.21
+55,Commercial,2020-09-14,510,PPSR Plant & Equipment,Recovery,1898735.83,1743298.54
+55,Commercial,2019-07-22,90,PPSR Plant & Equipment,Recovery,3134409.11,3087520.84
+55,Commercial,2020-12-13,600,PPSR Plant & Equipment,Recovery,999613.9,904052.65
+55,Commercial,2021-05-12,750,Receiver/Administrator Fee,Cost,471852.29,416157.63
+55,Commercial,2020-06-16,420,Legal Cost,Cost,504794.25,470508.43
+55,Commercial,2019-06-14,52,Valuation Fee,Cost,7927.99,7859.25
+55,Commercial,2020-04-17,360,Asset Management Cost,Cost,112805.94,106205.95
+56,Commercial,2021-06-15,390,GSR All-Assets Sweep,Recovery,227296.17,211790.36
+56,Commercial,2021-09-13,480,Receiver/Administrator Fee,Cost,172358.37,158002.91
+56,Commercial,2020-10-18,150,Legal Cost,Cost,158691.91,154437.41
+56,Commercial,2020-07-06,46,Valuation Fee,Cost,14300.98,14182.29
+56,Commercial,2021-01-16,240,Asset Management Cost,Cost,70942.05,67923.51
+57,Commercial,2019-12-22,540,GSR All-Assets Sweep,Recovery,305657.21,283035.32
+57,Commercial,2019-09-23,450,Director Guarantee,Recovery,1180423.37,1107157.66
+57,Commercial,2019-12-22,540,Receiver/Administrator Fee,Cost,225896.83,209178.06
+57,Commercial,2018-08-29,60,Legal Cost,Cost,175956.23,174459.34
+57,Commercial,2018-08-13,44,Valuation Fee,Cost,11577.7,11505.39
+58,Commercial,2025-02-03,390,Property Sale,Recovery,14127537.8,13308025.95
+58,Commercial,2024-11-05,300,Director Guarantee,Recovery,724424.45,691877.77
+58,Commercial,2025-04-04,450,Receiver/Administrator Fee,Cost,579777.7,541147.84
+58,Commercial,2024-09-06,240,Legal Cost,Cost,463730.53,446986.81
+58,Commercial,2024-02-24,45,Valuation Fee,Cost,13848.86,13753.7
+58,Commercial,2024-08-07,210,Asset Management Cost,Cost,163677.83,158494.88
+59,Commercial,2024-04-23,540,Property Sale,Recovery,13779556.56,12645102.71
+59,Commercial,2025-07-17,990,Receiver/Administrator Fee,Cost,561857.88,479976.01
+59,Commercial,2024-11-19,750,Legal Cost,Cost,331423.28,294143.71
+59,Commercial,2022-12-14,44,Valuation Fee,Cost,13385.22,13291.84
+60,Commercial,2025-05-13,420,PPSR Plant & Equipment,Recovery,220465.31,205143.94
+60,Commercial,2024-10-15,210,PPSR Plant & Equipment,Recovery,75131.88,72474.2
+60,Commercial,2025-09-10,540,PPSR Plant & Equipment,Recovery,1477138.0,1346486.24
+60,Commercial,2025-05-13,420,PPSR Plant & Equipment,Recovery,583212.08,542681.41
+60,Commercial,2026-01-08,660,PPSR Plant & Equipment,Recovery,337271.81,301178.04
+60,Commercial,2025-07-12,480,PPSR Plant & Equipment,Recovery,601298.08,553782.8
+60,Commercial,2026-01-08,660,Director Guarantee,Recovery,1659768.49,1482145.29
+60,Commercial,2026-09-05,900,Receiver/Administrator Fee,Cost,456294.74,391033.12
+60,Commercial,2024-11-14,240,Legal Cost,Cost,611503.39,586845.39
+60,Commercial,2024-04-13,25,Valuation Fee,Cost,2652.29,2640.95
+60,Commercial,2025-06-12,450,Asset Management Cost,Cost,391193.64,362139.44
+61,Commercial,2024-10-05,450,PPSR Inventory,Recovery,386608.07,362193.92
+61,Commercial,2024-11-04,480,PPSR Inventory,Recovery,168445.83,157123.76
+61,Commercial,2024-03-09,240,PPSR Receivables Collection,Recovery,5325052.09,5142977.9
+61,Commercial,2025-10-30,840,PPSR Plant & Equipment,Recovery,669799.64,593010.94
+61,Commercial,2025-03-04,600,PPSR Inventory,Recovery,527921.45,483945.33
+61,Commercial,2024-11-04,480,Director Guarantee,Recovery,376192.59,350906.84
+61,Commercial,2026-01-28,930,Receiver/Administrator Fee,Cost,724486.06,633113.94
+61,Commercial,2025-08-01,750,Legal Cost,Cost,572786.07,513778.82
+61,Commercial,2023-08-26,44,Valuation Fee,Cost,3531.87,3509.41
+61,Commercial,2024-10-05,450,Asset Management Cost,Cost,281970.3,264163.99
+62,Commercial,2022-05-31,720,GSR All-Assets Sweep,Recovery,1844879.41,1675012.55
+62,Commercial,2022-05-31,720,Director Guarantee,Recovery,2279343.54,2069473.5
+62,Commercial,2022-05-31,720,Receiver/Administrator Fee,Cost,783476.16,711337.77
+62,Commercial,2021-01-06,210,Legal Cost,Cost,530586.94,515847.3
+62,Commercial,2020-08-02,53,Valuation Fee,Cost,7484.86,7431.83
+63,Commercial,2024-07-01,150,PPSR Receivables Collection,Recovery,1571804.15,1539403.78
+63,Commercial,2024-09-29,240,PPSR Plant & Equipment,Recovery,1606403.32,1553750.14
+63,Commercial,2024-07-31,180,PPSR Receivables Collection,Recovery,816311.25,796160.68
+63,Commercial,2024-05-02,90,PPSR Receivables Collection,Recovery,1766358.43,1744421.0
+63,Commercial,2024-06-01,120,PPSR Plant & Equipment,Recovery,1189331.35,1169677.57
+63,Commercial,2025-01-27,360,Receiver/Administrator Fee,Cost,982543.6,934634.3
+63,Commercial,2024-09-29,240,Legal Cost,Cost,476616.69,460994.59
+63,Commercial,2024-03-22,49,Valuation Fee,Cost,9806.85,9740.35
+64,Commercial,2020-01-02,510,Property Sale,Recovery,6285880.87,5727074.71
+64,Commercial,2019-05-07,270,Director Guarantee,Recovery,159902.84,152212.49
+64,Commercial,2020-09-28,780,Receiver/Administrator Fee,Cost,216951.57,188158.41
+64,Commercial,2019-05-07,270,Legal Cost,Cost,223305.84,212566.2
+64,Commercial,2018-09-23,44,Valuation Fee,Cost,3074.48,3049.88
+64,Commercial,2019-09-04,390,Asset Management Cost,Cost,88283.8,82216.97
+65,Commercial,2022-03-29,390,Property Sale,Recovery,1319233.29,1250602.76
+65,Commercial,2023-01-23,690,Receiver/Administrator Fee,Cost,105655.43,96126.19
+65,Commercial,2022-05-28,450,Legal Cost,Cost,66417.71,62447.08
+65,Commercial,2021-04-23,50,Valuation Fee,Cost,12374.49,12290.02
+66,Commercial,2022-05-12,810,PPSR Receivables Collection,Recovery,683591.59,613084.16
+66,Commercial,2021-09-14,570,PPSR Receivables Collection,Recovery,312408.91,289370.79
+66,Commercial,2021-04-17,420,PPSR Receivables Collection,Recovery,733313.61,693068.15
+66,Commercial,2020-12-18,300,PPSR Receivables Collection,Recovery,1052827.79,1011224.26
+66,Commercial,2020-08-20,180,PPSR Receivables Collection,Recovery,148942.19,145382.4
+66,Commercial,2021-10-14,600,PPSR Receivables Collection,Recovery,1047298.7,966164.0
+66,Commercial,2022-05-12,810,Director Guarantee,Recovery,1112328.54,997600.05
+66,Commercial,2022-07-11,870,Receiver/Administrator Fee,Cost,351053.0,312315.91
+66,Commercial,2020-10-19,240,Legal Cost,Cost,255318.1,247214.38
+66,Commercial,2020-03-26,33,Valuation Fee,Cost,3471.78,3456.42
+67,Commercial,2021-03-07,780,PPSR Plant & Equipment,Recovery,156139.4,137028.28
+67,Commercial,2020-05-11,480,PPSR Receivables Collection,Recovery,1003585.17,926105.6
+67,Commercial,2020-05-11,480,PPSR Receivables Collection,Recovery,9920.4,9154.52
+67,Commercial,2021-09-03,960,Receiver/Administrator Fee,Cost,125304.26,106703.43
+67,Commercial,2021-05-06,840,Legal Cost,Cost,88723.7,77086.02
+67,Commercial,2019-03-08,50,Valuation Fee,Cost,9342.72,9264.85
+68,Commercial,2020-07-14,480,Property Sale,Recovery,384533.75,354829.95
+68,Commercial,2020-07-14,480,Director Guarantee,Recovery,23440.2,21629.53
+68,Commercial,2022-02-04,1050,Receiver/Administrator Fee,Cost,27462.0,23033.37
+68,Commercial,2020-09-12,540,Legal Cost,Cost,15772.73,14408.82
+68,Commercial,2019-05-03,42,Valuation Fee,Cost,6875.75,6827.55
+69,Commercial,2022-11-24,330,PPSR Plant & Equipment,Recovery,215859.55,205328.02
+69,Commercial,2022-04-28,120,PPSR Plant & Equipment,Recovery,2993366.59,2939413.05
+69,Commercial,2022-05-28,150,PPSR Plant & Equipment,Recovery,377027.98,368552.59
+69,Commercial,2022-11-24,330,PPSR Plant & Equipment,Recovery,198679.03,188985.72
+69,Commercial,2022-06-27,180,PPSR Plant & Equipment,Recovery,75570.97,73537.02
+69,Commercial,2023-01-23,390,Receiver/Administrator Fee,Cost,436480.89,411426.77
+69,Commercial,2022-04-28,120,Legal Cost,Cost,329245.65,323311.2
+69,Commercial,2022-02-26,59,Valuation Fee,Cost,7739.03,7670.13
+69,Commercial,2022-06-27,180,Asset Management Cost,Cost,106632.5,103762.55
+70,Commercial,2019-01-15,360,GSR All-Assets Sweep,Recovery,2662315.32,2495694.48
+70,Commercial,2018-09-17,240,Director Guarantee,Recovery,1533641.42,1468966.12
+70,Commercial,2019-06-14,510,Receiver/Administrator Fee,Cost,616123.64,562218.03
+70,Commercial,2019-01-15,360,Legal Cost,Cost,444332.04,416523.55
+70,Commercial,2018-03-08,47,Valuation Fee,Cost,8663.5,8590.71
+70,Commercial,2018-09-17,240,Asset Management Cost,Cost,198341.94,189977.65
+71,Commercial,2018-06-11,90,PPSR Receivables Collection,Recovery,67307.99,66422.96
+71,Commercial,2019-11-03,600,PPSR Receivables Collection,Recovery,70709.38,64737.25
+71,Commercial,2018-10-09,210,PPSR Receivables Collection,Recovery,889.42,862.37
+71,Commercial,2020-12-27,1020,Director Guarantee,Recovery,31402.35,27027.97
+71,Commercial,2021-01-26,1050,Receiver/Administrator Fee,Cost,17997.87,15422.55
+71,Commercial,2019-08-05,510,Legal Cost,Cost,6597.26,6120.53
+71,Commercial,2018-05-04,52,Valuation Fee,Cost,4601.24,4566.19
+71,Commercial,2019-08-05,510,Asset Management Cost,Cost,7222.04,6700.17
+72,Commercial,2020-10-10,120,PPSR Plant & Equipment,Recovery,304268.04,297735.01
+72,Commercial,2021-02-07,240,PPSR Receivables Collection,Recovery,1042714.87,998418.72
+72,Commercial,2021-07-07,390,PPSR Inventory,Recovery,2345963.36,2186177.12
+72,Commercial,2021-06-07,360,PPSR Plant & Equipment,Recovery,441352.87,413529.68
+72,Commercial,2021-09-05,450,Receiver/Administrator Fee,Cost,490277.79,451952.84
+72,Commercial,2021-06-07,360,Legal Cost,Cost,465083.26,435764.08
+72,Commercial,2020-07-21,39,Valuation Fee,Cost,5549.76,5510.75
+72,Commercial,2021-01-08,210,Asset Management Cost,Cost,403222.08,388193.32
+73,Commercial,2023-09-27,720,Property Sale,Recovery,489123.66,431114.99
+73,Commercial,2024-04-24,930,Receiver/Administrator Fee,Cost,29282.97,24877.04
+73,Commercial,2023-12-26,810,Legal Cost,Cost,19144.5,16609.83
+73,Commercial,2021-10-27,20,Valuation Fee,Cost,9917.84,9883.12
+74,Commercial,2021-03-14,810,Property Sale,Recovery,1791152.98,1596748.49
+74,Commercial,2021-03-14,810,Receiver/Administrator Fee,Cost,138053.97,123070.15
+74,Commercial,2020-03-19,450,Legal Cost,Cost,89670.23,84125.6
+74,Commercial,2019-01-08,14,Valuation Fee,Cost,10257.14,10236.8
+75,Commercial,2021-01-06,330,PPSR Receivables Collection,Recovery,46829.6,44154.46
+75,Commercial,2021-03-07,390,PPSR Receivables Collection,Recovery,261484.79,243924.77
+75,Commercial,2020-10-08,240,PPSR Receivables Collection,Recovery,83338.73,79848.74
+75,Commercial,2021-03-07,390,PPSR Receivables Collection,Recovery,189527.39,176799.66
+75,Commercial,2020-07-10,150,PPSR Receivables Collection,Recovery,335786.02,326927.06
+75,Commercial,2021-01-06,330,Director Guarantee,Recovery,706704.77,666334.32
+75,Commercial,2021-07-05,510,Receiver/Administrator Fee,Cost,414343.06,378338.15
+75,Commercial,2021-03-07,390,Legal Cost,Cost,179435.6,167385.59
+75,Commercial,2020-04-02,51,Valuation Fee,Cost,2017.39,1999.13
+75,Commercial,2020-10-08,240,Asset Management Cost,Cost,66230.05,63456.53
+76,Commercial,2020-10-28,300,Property Sale,Recovery,6567674.03,6248583.92
+76,Commercial,2021-04-26,480,Receiver/Administrator Fee,Cost,299332.01,276404.55
+76,Commercial,2020-12-27,360,Legal Cost,Cost,160194.21,150900.55
+76,Commercial,2020-02-01,30,Valuation Fee,Cost,4302.62,4281.24
+77,Commercial,2019-11-20,150,PPSR Receivables Collection,Recovery,26614.74,25899.46
+77,Commercial,2020-12-14,540,PPSR Receivables Collection,Recovery,272649.21,247178.25
+77,Commercial,2020-04-18,300,PPSR Receivables Collection,Recovery,470397.01,445452.33
+77,Commercial,2020-12-14,540,PPSR Receivables Collection,Recovery,428314.77,388301.5
+77,Commercial,2020-10-15,480,PPSR Receivables Collection,Recovery,554845.18,508522.88
+77,Commercial,2021-03-14,630,PPSR Receivables Collection,Recovery,174890.75,155981.78
+77,Commercial,2019-12-20,180,Director Guarantee,Recovery,592958.03,573886.43
+77,Commercial,2021-03-14,630,Receiver/Administrator Fee,Cost,311298.55,277641.33
+77,Commercial,2020-05-18,330,Legal Cost,Cost,219593.49,206818.7
+77,Commercial,2019-08-03,41,Valuation Fee,Cost,9146.03,9078.17
+77,Commercial,2020-04-18,300,Asset Management Cost,Cost,142560.72,135000.87
+78,Commercial,2021-06-30,750,PPSR Receivables Collection,Recovery,306684.57,274042.26
+78,Commercial,2020-09-03,450,PPSR Receivables Collection,Recovery,16553.77,15472.92
+78,Commercial,2020-02-06,240,PPSR Receivables Collection,Recovery,40355.57,38928.14
+78,Commercial,2020-03-07,270,PPSR Receivables Collection,Recovery,134495.37,129155.39
+78,Commercial,2020-12-02,540,PPSR Receivables Collection,Recovery,48563.5,44783.74
+78,Commercial,2020-07-05,390,Director Guarantee,Recovery,315421.0,297492.43
+78,Commercial,2021-06-30,750,Receiver/Administrator Fee,Cost,163295.87,145915.3
+78,Commercial,2021-03-02,630,Legal Cost,Cost,109072.61,99234.16
+78,Commercial,2019-06-30,19,Valuation Fee,Cost,2150.17,2144.05
+79,Commercial,2023-02-18,180,PPSR Plant & Equipment,Recovery,4067447.35,3934380.66
+79,Commercial,2023-08-17,360,PPSR Plant & Equipment,Recovery,419602.4,392596.87
+79,Commercial,2024-06-12,660,PPSR Plant & Equipment,Recovery,2598010.02,2299713.61
+79,Commercial,2024-08-11,720,Receiver/Administrator Fee,Cost,976853.36,855159.5
+79,Commercial,2023-08-17,360,Legal Cost,Cost,282440.11,264262.32
+79,Commercial,2022-10-19,58,Valuation Fee,Cost,6153.09,6087.5
+80,Commercial,2020-03-30,90,PPSR Receivables Collection,Recovery,3221552.39,3175224.53
+80,Commercial,2020-11-25,330,PPSR Receivables Collection,Recovery,624613.32,592304.63
+80,Commercial,2021-07-23,570,PPSR Receivables Collection,Recovery,1134859.55,1035382.09
+80,Commercial,2020-06-28,180,Director Guarantee,Recovery,1963561.71,1907493.38
+80,Commercial,2021-10-21,660,Receiver/Administrator Fee,Cost,493811.54,444047.07
+80,Commercial,2020-06-28,180,Legal Cost,Cost,478844.1,465171.0
+80,Commercial,2020-01-31,31,Valuation Fee,Cost,11275.64,11219.52
+80,Commercial,2020-11-25,330,Asset Management Cost,Cost,126293.93,119761.26
+81,Commercial,2018-08-14,210,PPSR Plant & Equipment,Recovery,349770.59,337421.31
+81,Commercial,2019-02-10,390,PPSR Inventory,Recovery,64011.43,59877.83
+81,Commercial,2018-08-14,210,PPSR Plant & Equipment,Recovery,99821.47,96297.09
+81,Commercial,2018-06-15,150,PPSR Receivables Collection,Recovery,125210.23,122036.36
+81,Commercial,2018-04-16,90,PPSR Plant & Equipment,Recovery,367786.98,362164.62
+81,Commercial,2018-06-15,150,PPSR Receivables Collection,Recovery,200475.56,195393.85
+81,Commercial,2019-01-11,360,PPSR Inventory,Recovery,1026251.18,964922.26
+81,Commercial,2019-02-10,390,Receiver/Administrator Fee,Cost,465836.42,435754.61
+81,Commercial,2018-08-14,210,Legal Cost,Cost,170992.1,164954.92
+81,Commercial,2018-03-06,49,Valuation Fee,Cost,14740.82,14617.71
+82,Commercial,2023-09-14,360,Property Sale,Recovery,11871587.69,11236339.86
+82,Commercial,2024-09-08,720,Receiver/Administrator Fee,Cost,607307.65,544052.58
+82,Commercial,2022-12-18,90,Legal Cost,Cost,473268.27,466805.97
+82,Commercial,2022-11-08,50,Valuation Fee,Cost,14866.53,14753.41
+82,Commercial,2023-09-14,360,Asset Management Cost,Cost,169723.25,160641.37
+83,Commercial,2023-02-06,660,Property Sale,Recovery,9410369.4,8420118.85
+83,Commercial,2023-08-05,840,Receiver/Administrator Fee,Cost,729781.21,633482.54
+83,Commercial,2021-07-16,90,Legal Cost,Cost,402239.57,396186.8
+83,Commercial,2021-05-11,24,Valuation Fee,Cost,6672.72,6645.79
+84,Commercial,2025-05-06,450,PPSR Receivables Collection,Recovery,428836.7,397621.61
+84,Commercial,2025-03-07,390,PPSR Receivables Collection,Recovery,661446.18,619510.69
+84,Commercial,2025-03-07,390,PPSR Receivables Collection,Recovery,242973.4,227568.96
+84,Commercial,2025-07-05,510,PPSR Receivables Collection,Recovery,1036436.86,951359.41
+84,Commercial,2025-01-06,330,PPSR Receivables Collection,Recovery,75762.54,71677.87
+84,Commercial,2026-04-01,780,PPSR Receivables Collection,Recovery,155039.83,136004.06
+84,Commercial,2026-01-31,720,PPSR Receivables Collection,Recovery,78191.73,69286.03
+84,Commercial,2025-08-04,540,Director Guarantee,Recovery,1045156.78,954542.09
+84,Commercial,2026-05-01,810,Receiver/Administrator Fee,Cost,391233.05,341472.7
+84,Commercial,2025-10-03,600,Legal Cost,Cost,205940.8,186200.04
+84,Commercial,2024-04-03,52,Valuation Fee,Cost,2067.55,2049.57
+85,Commercial,2021-06-04,450,Property Sale,Recovery,2514344.98,2329643.91
+85,Commercial,2020-10-07,210,Director Guarantee,Recovery,290256.12,280103.31
+85,Commercial,2021-06-04,450,Receiver/Administrator Fee,Cost,77677.32,71971.23
+85,Commercial,2020-09-07,180,Legal Cost,Cost,73244.36,71042.8
+85,Commercial,2020-04-22,42,Valuation Fee,Cost,10551.01,10476.14
+85,Commercial,2020-10-07,210,Asset Management Cost,Cost,64079.89,61838.46
+86,Commercial,2024-06-03,330,Property Sale,Recovery,11938905.83,11257411.91
+86,Commercial,2025-05-29,690,Receiver/Administrator Fee,Cost,693987.9,613732.92
+86,Commercial,2023-09-07,60,Legal Cost,Cost,353464.18,349707.0
+86,Commercial,2023-08-19,41,Valuation Fee,Cost,13072.58,12977.46
+86,Commercial,2024-06-03,330,Asset Management Cost,Cost,206384.63,194603.83
+87,Commercial,2024-06-05,300,PPSR Receivables Collection,Recovery,82049.25,78606.08
+87,Commercial,2024-05-06,270,PPSR Receivables Collection,Recovery,113614.12,109313.98
+87,Commercial,2024-07-05,330,PPSR Receivables Collection,Recovery,529114.07,504741.49
+87,Commercial,2024-03-07,210,PPSR Receivables Collection,Recovery,91368.28,88667.11
+87,Commercial,2024-09-03,390,PPSR Receivables Collection,Recovery,2344766.09,2217662.88
+87,Commercial,2024-05-06,270,PPSR Receivables Collection,Recovery,60504.14,58214.14
+87,Commercial,2024-06-05,300,PPSR Receivables Collection,Recovery,56509.8,54138.39
+87,Commercial,2024-12-02,480,Director Guarantee,Recovery,805663.46,752253.35
+87,Commercial,2024-12-02,480,Receiver/Administrator Fee,Cost,439315.4,410191.73
+87,Commercial,2024-07-05,330,Legal Cost,Cost,199276.24,190096.98
+87,Commercial,2023-08-28,18,Valuation Fee,Cost,7176.01,7157.57
+87,Commercial,2024-04-06,240,Asset Management Cost,Cost,246610.9,238296.41
+88,Commercial,2019-07-24,420,GSR All-Assets Sweep,Recovery,1229032.88,1155645.18
+88,Commercial,2019-03-26,300,Director Guarantee,Recovery,845171.97,808808.68
+88,Commercial,2019-08-23,450,Receiver/Administrator Fee,Cost,669523.71,626782.76
+88,Commercial,2019-03-26,300,Legal Cost,Cost,274083.27,262290.92
+88,Commercial,2018-07-19,50,Valuation Fee,Cost,11990.56,11902.99
+88,Commercial,2018-12-26,210,Asset Management Cost,Cost,146894.55,142441.39
+89,Commercial,2023-11-11,480,GSR All-Assets Sweep,Recovery,1490982.19,1387351.63
+89,Commercial,2023-07-14,360,Director Guarantee,Recovery,1365513.11,1293693.64
+89,Commercial,2024-06-08,690,Receiver/Administrator Fee,Cost,410210.37,369856.4
+89,Commercial,2023-01-15,180,Legal Cost,Cost,286222.03,278593.41
+89,Commercial,2022-08-24,36,Valuation Fee,Cost,7289.24,7249.97
+90,Commercial,2022-10-17,150,PPSR Plant & Equipment,Recovery,421481.67,410038.21
+90,Commercial,2022-09-17,120,PPSR Plant & Equipment,Recovery,755991.61,739526.06
+90,Commercial,2023-10-12,510,PPSR Plant & Equipment,Recovery,648081.66,590180.55
+90,Commercial,2023-04-15,330,PPSR Plant & Equipment,Recovery,946620.35,890996.98
+90,Commercial,2022-11-16,180,PPSR Plant & Equipment,Recovery,1195258.43,1156422.61
+90,Commercial,2023-09-12,480,Director Guarantee,Recovery,457296.18,418739.18
+90,Commercial,2023-10-12,510,Receiver/Administrator Fee,Cost,557127.26,507352.22
+90,Commercial,2023-01-15,240,Legal Cost,Cost,395293.78,378262.24
+90,Commercial,2022-06-07,18,Valuation Fee,Cost,8644.65,8616.14
+91,Commercial,2021-04-15,570,Property Sale,Recovery,11385265.69,10264989.56
+91,Commercial,2022-03-11,900,Receiver/Administrator Fee,Cost,437179.97,371220.41
+91,Commercial,2021-10-12,750,Legal Cost,Cost,523230.96,456565.51
+91,Commercial,2019-11-08,46,Valuation Fee,Cost,14469.83,14349.38
+92,Commercial,2019-09-19,450,GSR All-Assets Sweep,Recovery,959905.1,890475.32
+92,Commercial,2020-02-16,600,Director Guarantee,Recovery,344364.65,311561.18
+92,Commercial,2020-08-14,780,Receiver/Administrator Fee,Cost,237398.5,208429.98
+92,Commercial,2018-12-23,180,Legal Cost,Cost,140847.45,136680.46
+92,Commercial,2018-08-04,39,Valuation Fee,Cost,3590.08,3566.79
+92,Commercial,2019-07-21,390,Asset Management Cost,Cost,67538.46,63283.76
+93,Commercial,2020-12-12,300,Property Sale,Recovery,3547205.77,3367298.17
+93,Commercial,2021-09-08,570,Director Guarantee,Recovery,726596.28,658179.02
+93,Commercial,2022-07-05,870,Receiver/Administrator Fee,Cost,173071.09,148823.18
+93,Commercial,2020-09-13,210,Legal Cost,Cost,211298.68,203738.65
+93,Commercial,2020-03-26,39,Valuation Fee,Cost,6693.66,6648.52
+94,Commercial,2020-04-01,120,PPSR Receivables Collection,Recovery,385726.32,378437.71
+94,Commercial,2020-08-29,270,PPSR Receivables Collection,Recovery,2076760.23,1989506.68
+94,Commercial,2022-08-19,990,PPSR Plant & Equipment,Recovery,1557182.69,1330421.93
+94,Commercial,2021-11-22,720,Director Guarantee,Recovery,1283808.12,1144961.55
+94,Commercial,2022-08-19,990,Receiver/Administrator Fee,Cost,465638.67,397831.22
+94,Commercial,2021-01-26,420,Legal Cost,Cost,599520.62,560798.81
+94,Commercial,2020-01-22,50,Valuation Fee,Cost,12037.96,11942.66
+94,Commercial,2021-03-27,480,Asset Management Cost,Cost,392073.84,363269.05
+95,Commercial,2023-03-22,690,PPSR Receivables Collection,Recovery,103959.16,92237.53
+95,Commercial,2023-08-19,840,PPSR Plant & Equipment,Recovery,1243391.35,1074875.57
+95,Commercial,2021-12-27,240,PPSR Plant & Equipment,Recovery,323505.61,310320.52
+95,Commercial,2022-02-25,300,PPSR Plant & Equipment,Recovery,54918.16,52134.69
+95,Commercial,2021-12-27,240,PPSR Receivables Collection,Recovery,189527.31,181802.76
+95,Commercial,2023-05-21,750,Director Guarantee,Recovery,929068.56,815783.4
+95,Commercial,2024-03-16,1050,Receiver/Administrator Fee,Cost,382388.65,318744.67
+95,Commercial,2023-05-21,750,Legal Cost,Cost,210541.71,184869.49
+95,Commercial,2021-05-19,18,Valuation Fee,Cost,11861.87,11824.91
+95,Commercial,2022-09-23,510,Asset Management Cost,Cost,166969.19,152839.2
+96,Commercial,2023-12-21,240,PPSR Inventory,Recovery,16669.01,15959.24
+96,Commercial,2025-06-13,780,PPSR Inventory,Recovery,593264.29,515028.02
+96,Commercial,2025-12-10,960,PPSR Receivables Collection,Recovery,336923.16,283100.27
+96,Commercial,2024-07-18,450,PPSR Receivables Collection,Recovery,45284.78,41736.8
+96,Commercial,2026-03-10,1050,PPSR Plant & Equipment,Recovery,25457.59,21044.57
+96,Commercial,2025-06-13,780,PPSR Plant & Equipment,Recovery,198815.97,172597.26
+96,Commercial,2025-10-11,900,PPSR Receivables Collection,Recovery,506702.29,430414.3
+96,Commercial,2025-06-13,780,Director Guarantee,Recovery,386344.09,335395.26
+96,Commercial,2026-03-10,1050,Receiver/Administrator Fee,Cost,248406.38,205345.67
+96,Commercial,2025-11-10,930,Legal Cost,Cost,184294.99,155698.76
+96,Commercial,2023-06-18,54,Valuation Fee,Cost,6082.25,6022.99
+96,Commercial,2024-09-16,510,Asset Management Cost,Cost,193849.75,176728.97
+97,Commercial,2020-02-13,690,PPSR Plant & Equipment,Recovery,255707.68,231927.36
+97,Commercial,2020-01-14,660,PPSR Plant & Equipment,Recovery,115942.5,105607.31
+97,Commercial,2020-02-13,690,PPSR Inventory,Recovery,1443044.39,1308844.02
+97,Commercial,2018-07-23,120,PPSR Plant & Equipment,Recovery,1763148.8,1733470.59
+97,Commercial,2020-09-10,900,Receiver/Administrator Fee,Cost,651731.81,573819.45
+97,Commercial,2020-02-13,690,Legal Cost,Cost,564621.27,512112.57
+97,Commercial,2018-04-19,25,Valuation Fee,Cost,13579.26,13531.32
+97,Commercial,2019-06-18,450,Asset Management Cost,Cost,308068.47,289068.28
+98,Commercial,2025-07-18,750,Property Sale,Recovery,7838452.9,7041343.31
+98,Commercial,2026-01-14,930,Receiver/Administrator Fee,Cost,316370.84,276976.97
+98,Commercial,2024-01-25,210,Legal Cost,Cost,399875.87,388046.93
+98,Commercial,2023-08-21,53,Valuation Fee,Cost,11837.44,11748.07
+99,Commercial,2022-07-07,570,PPSR Inventory,Recovery,159027.6,145160.5
+99,Commercial,2021-05-13,150,PPSR Receivables Collection,Recovery,3756849.53,3667722.08
+99,Commercial,2021-11-09,330,PPSR Receivables Collection,Recovery,792290.88,751526.71
+99,Commercial,2023-03-04,810,PPSR Receivables Collection,Recovery,347170.86,304954.76
+99,Commercial,2022-03-09,450,PPSR Inventory,Recovery,188768.55,175649.73
+99,Commercial,2022-06-07,540,PPSR Plant & Equipment,Recovery,367825.01,337367.07
+99,Commercial,2022-08-06,600,Director Guarantee,Recovery,2552310.87,2318590.45
+99,Commercial,2023-08-01,960,Receiver/Administrator Fee,Cost,622109.09,533496.17
+99,Commercial,2022-12-04,720,Legal Cost,Cost,467104.28,416257.83
+99,Commercial,2021-01-22,39,Valuation Fee,Cost,13279.58,13196.94
+100,Commercial,2024-05-14,390,Property Sale,Recovery,665148.09,619296.51
+100,Commercial,2024-05-14,390,Director Guarantee,Recovery,72285.93,67302.95
+100,Commercial,2024-05-14,390,Receiver/Administrator Fee,Cost,38562.55,35904.26
+100,Commercial,2023-09-17,150,Legal Cost,Cost,15406.65,14989.17
+100,Commercial,2023-05-26,36,Valuation Fee,Cost,14986.72,14888.23
+100,Commercial,2023-10-17,180,Asset Management Cost,Cost,10442.69,10104.06
+101,Commercial,2023-08-01,660,PPSR Plant & Equipment,Recovery,180886.63,163868.64
+101,Commercial,2022-08-06,300,PPSR Plant & Equipment,Recovery,246644.61,235812.49
+101,Commercial,2023-01-03,450,PPSR Plant & Equipment,Recovery,2947192.74,2755188.41
+101,Commercial,2023-07-02,630,PPSR Plant & Equipment,Recovery,154691.94,140769.17
+101,Commercial,2022-02-07,120,PPSR Plant & Equipment,Recovery,9255.73,9090.94
+101,Commercial,2022-04-08,180,PPSR Plant & Equipment,Recovery,177016.42,172310.07
+101,Commercial,2023-01-03,450,PPSR Plant & Equipment,Recovery,22968.0,21471.68
+101,Commercial,2022-12-04,420,Director Guarantee,Recovery,915001.05,859240.7
+101,Commercial,2023-08-31,690,Receiver/Administrator Fee,Cost,725748.38,654523.1
+101,Commercial,2022-03-09,150,Legal Cost,Cost,451562.04,441534.88
+101,Commercial,2021-12-04,55,Valuation Fee,Cost,5686.41,5639.78
+101,Commercial,2022-09-05,330,Asset Management Cost,Cost,190002.25,180843.72
+102,Commercial,2020-02-07,330,Property Sale,Recovery,3973003.26,3755278.59
+102,Commercial,2021-05-02,780,Director Guarantee,Recovery,732515.74,641154.65
+102,Commercial,2021-05-02,780,Receiver/Administrator Fee,Cost,270570.11,236823.97
+102,Commercial,2020-03-08,360,Legal Cost,Cost,151231.59,142213.42
+102,Commercial,2019-04-09,26,Valuation Fee,Cost,5664.64,5639.54
+102,Commercial,2020-04-07,390,Asset Management Cost,Cost,62397.83,58377.08
+103,Commercial,2024-07-04,90,PPSR Plant & Equipment,Recovery,1421619.45,1404482.49
+103,Commercial,2024-09-02,150,PPSR Inventory,Recovery,1402903.37,1374831.2
+103,Commercial,2025-04-30,390,PPSR Plant & Equipment,Recovery,224341.51,212855.98
+103,Commercial,2025-09-27,540,PPSR Receivables Collection,Recovery,347492.6,323104.79
+103,Commercial,2025-06-29,450,PPSR Inventory,Recovery,1206570.96,1135579.98
+103,Commercial,2026-02-24,690,PPSR Inventory,Recovery,28997.92,26423.26
+103,Commercial,2026-04-25,750,Receiver/Administrator Fee,Cost,931060.72,841561.98
+103,Commercial,2025-03-01,330,Legal Cost,Cost,558117.17,533842.26
+103,Commercial,2024-05-16,41,Valuation Fee,Cost,14939.49,14857.18
+103,Commercial,2025-03-31,360,Asset Management Cost,Cost,169720.81,161683.98
+104,Commercial,2022-08-30,480,Property Sale,Recovery,8519018.79,7829878.92
+104,Commercial,2023-02-26,660,Receiver/Administrator Fee,Cost,792120.47,705372.89
+104,Commercial,2021-10-04,150,Legal Cost,Cost,499420.79,486427.73
+104,Commercial,2021-06-06,30,Valuation Fee,Cost,12823.24,12755.81
+104,Commercial,2022-04-02,330,Asset Management Cost,Cost,125985.52,118887.01
+105,Commercial,2021-05-13,570,PPSR Receivables Collection,Recovery,2393.25,2211.43
+105,Commercial,2020-06-17,240,PPSR Receivables Collection,Recovery,938452.27,907744.29
+105,Commercial,2020-08-16,300,PPSR Receivables Collection,Recovery,39566.51,37954.82
+105,Commercial,2020-06-17,240,PPSR Receivables Collection,Recovery,6137.14,5936.32
+105,Commercial,2020-08-16,300,PPSR Receivables Collection,Recovery,555066.18,532456.26
+105,Commercial,2021-11-09,750,Director Guarantee,Recovery,175023.98,157741.32
+105,Commercial,2022-03-09,870,Receiver/Administrator Fee,Cost,236130.67,209303.26
+105,Commercial,2021-03-14,510,Legal Cost,Cost,98840.71,92094.24
+105,Commercial,2019-11-20,30,Valuation Fee,Cost,13845.9,13788.44
+105,Commercial,2020-12-14,420,Asset Management Cost,Cost,56030.97,52861.93
+106,Commercial,2023-01-03,450,PPSR Plant & Equipment,Recovery,126525.32,116561.73
+106,Commercial,2022-05-08,210,PPSR Plant & Equipment,Recovery,39664.34,38174.81
+106,Commercial,2022-08-06,300,PPSR Plant & Equipment,Recovery,76110.72,72060.66
+106,Commercial,2022-02-07,120,PPSR Inventory,Recovery,18821.45,18414.25
+106,Commercial,2023-01-03,450,Director Guarantee,Recovery,210254.81,193697.71
+106,Commercial,2023-05-03,570,Receiver/Administrator Fee,Cost,105094.77,94724.12
+106,Commercial,2021-12-09,60,Legal Cost,Cost,38204.48,37788.95
+106,Commercial,2021-10-25,15,Valuation Fee,Cost,9986.63,9959.37
+107,Commercial,2025-10-03,810,PPSR Plant & Equipment,Recovery,1109144.72,970235.34
+107,Commercial,2024-12-07,510,PPSR Plant & Equipment,Recovery,2180227.4,2004071.94
+107,Commercial,2025-09-03,780,PPSR Plant & Equipment,Recovery,146013.91,128361.67
+107,Commercial,2024-12-07,510,Director Guarantee,Recovery,215029.7,197655.98
+107,Commercial,2026-05-01,1020,Receiver/Administrator Fee,Cost,252343.06,213213.35
+107,Commercial,2024-03-12,240,Legal Cost,Cost,301727.92,289999.59
+107,Commercial,2023-09-10,56,Valuation Fee,Cost,10416.4,10320.48
+107,Commercial,2024-12-07,510,Asset Management Cost,Cost,152318.12,140011.3
+108,Commercial,2023-03-27,630,Property Sale,Recovery,847108.74,753851.7
+108,Commercial,2023-10-23,840,Director Guarantee,Recovery,42285.67,36195.58
+108,Commercial,2023-12-22,900,Receiver/Administrator Fee,Cost,70091.53,59334.02
+108,Commercial,2023-05-26,690,Legal Cost,Cost,37688.62,33169.04
+108,Commercial,2021-08-24,50,Valuation Fee,Cost,10033.15,9940.71
+108,Commercial,2022-09-28,450,Asset Management Cost,Cost,26572.94,24448.87
+109,Commercial,2021-02-26,390,Property Sale,Recovery,6301894.35,5868802.77
+109,Commercial,2022-08-20,930,Director Guarantee,Recovery,423829.07,357647.02
+109,Commercial,2022-08-20,930,Receiver/Administrator Fee,Cost,434589.79,366727.43
+109,Commercial,2020-07-31,180,Legal Cost,Cost,259847.44,251447.28
+109,Commercial,2020-03-20,47,Valuation Fee,Cost,11193.7,11098.06
+109,Commercial,2021-04-27,450,Asset Management Cost,Cost,179635.89,165468.12
+110,Commercial,2022-08-17,900,PPSR Plant & Equipment,Recovery,427532.85,369073.49
+110,Commercial,2021-04-24,420,PPSR Plant & Equipment,Recovery,581930.65,543339.73
+110,Commercial,2021-10-21,600,PPSR Plant & Equipment,Recovery,1495872.39,1356199.1
+110,Commercial,2020-10-26,240,PPSR Plant & Equipment,Recovery,144635.11,139073.79
+110,Commercial,2022-12-15,1020,Receiver/Administrator Fee,Cost,411870.59,348650.21
+110,Commercial,2022-06-18,840,Legal Cost,Cost,295664.17,257750.29
+110,Commercial,2020-03-23,23,Valuation Fee,Cost,4098.8,4083.43
+111,Commercial,2019-12-19,510,Property Sale,Recovery,1402273.88,1277840.06
+111,Commercial,2019-08-21,390,Director Guarantee,Recovery,213057.9,198443.51
+111,Commercial,2020-09-14,780,Receiver/Administrator Fee,Cost,129181.71,112067.47
+111,Commercial,2020-04-17,630,Legal Cost,Cost,83563.18,74501.15
+111,Commercial,2018-09-16,51,Valuation Fee,Cost,7964.93,7891.26
+111,Commercial,2019-08-21,390,Asset Management Cost,Cost,44379.11,41334.99
+112,Commercial,2018-12-24,210,PPSR Inventory,Recovery,801651.77,776900.35
+112,Commercial,2018-08-26,90,PPSR Inventory,Recovery,2126262.79,2097875.0
+112,Commercial,2019-01-23,240,PPSR Receivables Collection,Recovery,321222.5,309912.97
+112,Commercial,2019-02-22,270,Director Guarantee,Recovery,1000986.07,961426.39
+112,Commercial,2019-05-23,360,Receiver/Administrator Fee,Cost,589715.19,558847.09
+112,Commercial,2018-10-25,150,Legal Cost,Cost,300287.85,293635.72
+112,Commercial,2018-07-25,58,Valuation Fee,Cost,10963.41,10868.85
+113,Commercial,2023-10-31,330,Property Sale,Recovery,3270829.21,3095918.13
+113,Commercial,2023-10-31,330,Director Guarantee,Recovery,332868.46,315067.96
+113,Commercial,2023-12-30,390,Receiver/Administrator Fee,Cost,218941.4,205172.8
+113,Commercial,2023-07-03,210,Legal Cost,Cost,164476.41,158823.46
+113,Commercial,2022-12-26,21,Valuation Fee,Cost,7664.66,7637.9
+114,Commercial,2019-06-21,150,PPSR Receivables Collection,Recovery,2294596.89,2246576.21
+114,Commercial,2019-06-21,150,PPSR Receivables Collection,Recovery,931130.44,911644.01
+114,Commercial,2020-01-17,360,PPSR Receivables Collection,Recovery,598827.4,569189.75
+114,Commercial,2019-05-22,120,PPSR Receivables Collection,Recovery,897526.1,882467.84
+114,Commercial,2020-09-13,600,Receiver/Administrator Fee,Cost,430586.2,395657.24
+114,Commercial,2019-04-22,90,Legal Cost,Cost,346877.96,342503.93
+114,Commercial,2019-02-20,29,Valuation Fee,Cost,10979.62,10934.82
+115,Commercial,2024-09-23,300,Property Sale,Recovery,7394405.34,7032313.7
+115,Commercial,2024-12-22,390,Receiver/Administrator Fee,Cost,309644.42,290079.29
+115,Commercial,2024-09-23,300,Legal Cost,Cost,289453.38,275279.33
+115,Commercial,2023-12-21,23,Valuation Fee,Cost,14488.42,14432.75
+116,Commercial,2021-09-16,360,Property Sale,Recovery,548757.41,522777.57
+116,Commercial,2022-11-10,780,Receiver/Administrator Fee,Cost,28592.54,25740.4
+116,Commercial,2021-08-17,330,Legal Cost,Cost,25693.15,24575.89
+116,Commercial,2020-11-15,55,Valuation Fee,Cost,12169.05,12079.21
+116,Commercial,2021-10-16,390,Asset Management Cost,Cost,16089.15,15265.61
+117,Commercial,2023-01-23,900,PPSR Receivables Collection,Recovery,298244.95,261843.99
+117,Commercial,2021-07-02,330,PPSR Plant & Equipment,Recovery,81143.22,77361.41
+117,Commercial,2021-05-03,270,PPSR Receivables Collection,Recovery,35076.04,33732.72
+117,Commercial,2023-04-23,990,PPSR Inventory,Recovery,129560.42,112276.49
+117,Commercial,2021-02-02,180,PPSR Receivables Collection,Recovery,30974.54,30178.58
+117,Commercial,2022-02-27,570,PPSR Inventory,Recovery,43501.24,40058.9
+117,Commercial,2023-06-22,1050,Receiver/Administrator Fee,Cost,225923.99,194093.11
+117,Commercial,2020-10-05,60,Legal Cost,Cost,127567.26,126465.05
+117,Commercial,2020-10-03,58,Valuation Fee,Cost,13374.06,13262.34
+117,Commercial,2021-12-29,510,Asset Management Cost,Cost,64029.47,59476.58
+118,Commercial,2025-09-26,480,PPSR Inventory,Recovery,433284.18,404065.36
+118,Commercial,2026-03-25,660,PPSR Receivables Collection,Recovery,81353.03,73906.41
+118,Commercial,2024-10-31,150,PPSR Inventory,Recovery,243988.85,238723.19
+118,Commercial,2024-11-30,180,PPSR Plant & Equipment,Recovery,154672.3,150675.31
+118,Commercial,2024-10-31,150,PPSR Inventory,Recovery,189404.04,185316.4
+118,Commercial,2025-12-25,570,PPSR Plant & Equipment,Recovery,231478.52,213061.15
+118,Commercial,2025-05-29,360,PPSR Plant & Equipment,Recovery,63511.46,60271.39
+118,Commercial,2026-08-22,810,Receiver/Administrator Fee,Cost,148663.37,132140.8
+118,Commercial,2024-11-30,180,Legal Cost,Cost,58446.0,56935.66
+118,Commercial,2024-07-30,57,Valuation Fee,Cost,9385.46,9307.97
+118,Commercial,2025-06-28,390,Asset Management Cost,Cost,37498.25,35430.31
+119,Commercial,2019-06-27,120,PPSR Plant & Equipment,Recovery,23146.31,22641.77
+119,Commercial,2020-02-22,360,PPSR Receivables Collection,Recovery,180525.9,168976.17
+119,Commercial,2019-09-25,210,PPSR Inventory,Recovery,20350.89,19580.94
+119,Commercial,2020-01-23,330,PPSR Plant & Equipment,Recovery,43670.56,41102.43
+119,Commercial,2019-09-25,210,PPSR Receivables Collection,Recovery,16071.23,15463.19
+119,Commercial,2019-08-26,180,PPSR Plant & Equipment,Recovery,78674.94,76116.6
+119,Commercial,2019-07-27,150,PPSR Plant & Equipment,Recovery,16906.61,16447.22
+119,Commercial,2020-01-23,330,Director Guarantee,Recovery,173354.22,163159.81
+119,Commercial,2020-02-22,360,Receiver/Administrator Fee,Cost,121031.16,113287.8
+119,Commercial,2019-07-27,150,Legal Cost,Cost,39789.64,38708.45
+119,Commercial,2019-04-05,37,Valuation Fee,Cost,8644.1,8585.56
+120,Commercial,2023-10-31,330,Property Sale,Recovery,10114934.79,9555238.96
+120,Commercial,2023-06-03,180,Director Guarantee,Recovery,677571.26,656856.5
+120,Commercial,2023-12-30,390,Receiver/Administrator Fee,Cost,703253.0,657499.21
+120,Commercial,2023-06-03,180,Legal Cost,Cost,392575.11,380573.28
+120,Commercial,2022-12-28,23,Valuation Fee,Cost,9154.52,9118.27
+121,Commercial,2025-03-30,600,GSR All-Assets Sweep,Recovery,188968.38,171463.77
+121,Commercial,2026-03-25,960,Receiver/Administrator Fee,Cost,52786.54,45183.14
+121,Commercial,2024-11-30,480,Legal Cost,Cost,58413.16,54042.73
+121,Commercial,2023-08-29,21,Valuation Fee,Cost,12774.84,12731.45
+121,Commercial,2024-11-30,480,Asset Management Cost,Cost,43252.74,40016.6
+122,Commercial,2024-08-10,810,GSR All-Assets Sweep,Recovery,1050711.13,931318.99
+122,Commercial,2023-05-18,360,Director Guarantee,Recovery,671384.86,636340.23
+122,Commercial,2024-08-10,810,Receiver/Administrator Fee,Cost,497760.02,441199.63
+122,Commercial,2022-08-21,90,Legal Cost,Cost,147797.66,145830.05
+122,Commercial,2022-07-09,47,Valuation Fee,Cost,10662.55,10588.18
+122,Commercial,2023-06-17,390,Asset Management Cost,Cost,175607.12,165698.96
+123,Commercial,2022-12-13,780,GSR All-Assets Sweep,Recovery,2074950.57,1868433.4
+123,Commercial,2022-08-15,660,Director Guarantee,Recovery,537062.56,491472.68
+123,Commercial,2023-07-11,990,Receiver/Administrator Fee,Cost,615924.93,539187.16
+123,Commercial,2023-01-12,810,Legal Cost,Cost,216218.82,193915.36
+123,Commercial,2020-12-08,45,Valuation Fee,Cost,10250.97,10189.16
+124,Commercial,2023-06-05,630,PPSR Plant & Equipment,Recovery,1370601.87,1241170.09
+124,Commercial,2023-02-05,510,PPSR Plant & Equipment,Recovery,499215.0,460694.82
+124,Commercial,2022-07-10,300,PPSR Plant & Equipment,Recovery,337608.17,322031.72
+124,Commercial,2022-06-10,270,PPSR Plant & Equipment,Recovery,1314063.05,1259369.99
+124,Commercial,2022-10-08,390,PPSR Plant & Equipment,Recovery,430397.28,404763.12
+124,Commercial,2021-12-12,90,PPSR Plant & Equipment,Recovery,532411.43,524919.95
+124,Commercial,2022-10-08,390,PPSR Plant & Equipment,Recovery,412793.51,388207.82
+124,Commercial,2023-03-07,540,Director Guarantee,Recovery,1188018.9,1091183.07
+124,Commercial,2023-09-03,720,Receiver/Administrator Fee,Cost,960624.83,857668.58
+124,Commercial,2023-05-06,600,Legal Cost,Cost,611025.23,555943.37
+124,Commercial,2021-10-10,27,Valuation Fee,Cost,3084.33,3071.24
+125,Commercial,2020-01-03,360,GSR All-Assets Sweep,Recovery,442620.94,418968.16
+125,Commercial,2020-01-03,360,Director Guarantee,Recovery,133351.03,126225.01
+125,Commercial,2020-01-03,360,Receiver/Administrator Fee,Cost,84934.48,80395.75
+125,Commercial,2019-06-07,150,Legal Cost,Cost,58920.75,57587.78
+125,Commercial,2019-02-10,33,Valuation Fee,Cost,9241.76,9195.35
+126,Commercial,2023-09-29,330,PPSR Plant & Equipment,Recovery,1634324.86,1544457.56
+126,Commercial,2023-07-01,240,PPSR Plant & Equipment,Recovery,1670431.45,1603116.52
+126,Commercial,2023-07-01,240,PPSR Plant & Equipment,Recovery,182828.68,175461.06
+126,Commercial,2024-05-26,570,PPSR Plant & Equipment,Recovery,1600948.27,1451948.88
+126,Commercial,2025-04-21,900,Receiver/Administrator Fee,Cost,889039.45,761960.84
+126,Commercial,2024-11-22,750,Legal Cost,Cost,247126.63,217318.1
+126,Commercial,2023-01-01,59,Valuation Fee,Cost,3034.13,3003.6
+127,Commercial,2023-03-21,480,GSR All-Assets Sweep,Recovery,2406175.15,2244556.53
+127,Commercial,2024-02-14,810,Director Guarantee,Recovery,690920.76,614428.47
+127,Commercial,2024-06-13,930,Receiver/Administrator Fee,Cost,620848.36,542599.58
+127,Commercial,2022-03-26,120,Legal Cost,Cost,368832.96,362477.08
+127,Commercial,2021-12-23,27,Valuation Fee,Cost,5968.73,5945.43
+128,Commercial,2025-01-13,480,PPSR Inventory,Recovery,1208563.99,1106869.5
+128,Commercial,2024-03-19,180,PPSR Plant & Equipment,Recovery,511449.36,494866.07
+128,Commercial,2024-11-14,420,PPSR Receivables Collection,Recovery,615751.29,570169.2
+128,Commercial,2025-09-10,720,PPSR Inventory,Recovery,539287.08,472672.32
+128,Commercial,2025-11-09,780,PPSR Inventory,Recovery,94662.98,82063.24
+128,Commercial,2025-04-13,570,PPSR Receivables Collection,Recovery,35968.49,32403.46
+128,Commercial,2024-01-19,120,PPSR Plant & Equipment,Recovery,449186.31,439423.42
+128,Commercial,2025-01-13,480,Director Guarantee,Recovery,2886584.12,2643692.8
+128,Commercial,2025-12-09,810,Receiver/Administrator Fee,Cost,811599.44,699720.2
+128,Commercial,2024-10-15,390,Legal Cost,Cost,609460.85,567453.22
+128,Commercial,2023-11-18,58,Valuation Fee,Cost,11574.04,11451.76
+128,Commercial,2024-10-15,390,Asset Management Cost,Cost,193011.56,179708.07
+129,Commercial,2025-03-17,810,PPSR Plant & Equipment,Recovery,1208300.58,1045893.11
+129,Commercial,2024-07-20,570,PPSR Inventory,Recovery,501555.81,453112.15
+129,Commercial,2024-04-21,480,PPSR Inventory,Recovery,55826.89,51250.16
+129,Commercial,2023-08-25,240,PPSR Plant & Equipment,Recovery,1894221.81,1814916.73
+129,Commercial,2025-02-15,780,PPSR Inventory,Recovery,1935052.72,1683941.06
+129,Commercial,2024-05-21,510,PPSR Inventory,Recovery,1457345.41,1330737.75
+129,Commercial,2024-09-18,630,Director Guarantee,Recovery,1611905.59,1440729.72
+129,Commercial,2025-03-17,810,Receiver/Administrator Fee,Cost,557218.15,482322.56
+129,Commercial,2024-11-17,690,Legal Cost,Cost,627234.83,554663.45
+129,Commercial,2023-02-16,50,Valuation Fee,Cost,3478.2,3447.35
+129,Commercial,2024-01-22,390,Asset Management Cost,Cost,258222.49,240885.75
+130,Commercial,2020-12-03,570,PPSR Receivables Collection,Recovery,322397.74,293706.02
+130,Commercial,2019-10-10,150,PPSR Receivables Collection,Recovery,639117.72,623632.09
+130,Commercial,2020-10-04,510,PPSR Receivables Collection,Recovery,43354.61,39885.69
+130,Commercial,2019-09-10,120,PPSR Receivables Collection,Recovery,1385982.3,1359051.01
+130,Commercial,2020-04-07,330,Director Guarantee,Recovery,1645897.29,1559435.57
+130,Commercial,2021-02-01,630,Receiver/Administrator Fee,Cost,695372.64,627303.18
+130,Commercial,2019-08-11,90,Legal Cost,Cost,412198.46,406176.62
+130,Commercial,2019-06-18,36,Valuation Fee,Cost,8957.27,8904.7
+130,Commercial,2020-03-08,300,Asset Management Cost,Cost,219559.83,209048.99
+131,Commercial,2024-05-15,210,PPSR Receivables Collection,Recovery,800047.7,772637.41
+131,Commercial,2024-05-15,210,PPSR Receivables Collection,Recovery,724964.44,700126.57
+131,Commercial,2024-08-13,300,PPSR Receivables Collection,Recovery,949410.09,903285.56
+131,Commercial,2024-09-12,330,PPSR Plant & Equipment,Recovery,165923.71,157078.51
+131,Commercial,2024-02-15,120,PPSR Inventory,Recovery,777814.79,762473.38
+131,Commercial,2024-09-12,330,Director Guarantee,Recovery,1217150.52,1152265.69
+131,Commercial,2024-11-11,390,Receiver/Administrator Fee,Cost,336113.91,315042.45
+131,Commercial,2023-12-17,60,Legal Cost,Cost,237351.63,234999.24
+131,Commercial,2023-12-06,49,Valuation Fee,Cost,10502.37,10417.28
+131,Commercial,2024-04-15,180,Asset Management Cost,Cost,188421.83,182874.83
+132,Commercial,2024-05-11,90,PPSR Plant & Equipment,Recovery,58927.34,58065.99
+132,Commercial,2025-02-05,360,PPSR Plant & Equipment,Recovery,575787.32,542852.59
+132,Commercial,2024-08-09,180,PPSR Receivables Collection,Recovery,778197.25,755613.32
+132,Commercial,2026-01-31,720,PPSR Plant & Equipment,Recovery,127833.56,113627.78
+132,Commercial,2026-01-01,690,Director Guarantee,Recovery,1038015.95,927204.11
+132,Commercial,2026-12-27,1050,Receiver/Administrator Fee,Cost,555030.7,467420.92
+132,Commercial,2026-01-31,720,Legal Cost,Cost,234102.99,208087.79
+132,Commercial,2024-03-15,33,Valuation Fee,Cost,10977.41,10918.3
+132,Commercial,2025-07-05,510,Asset Management Cost,Cost,242331.4,222931.33
+133,Commercial,2023-10-05,270,PPSR Receivables Collection,Recovery,1005152.77,965098.67
+133,Commercial,2024-11-28,690,PPSR Plant & Equipment,Recovery,709746.84,639692.78
+133,Commercial,2023-08-06,210,PPSR Receivables Collection,Recovery,157538.37,152633.73
+133,Commercial,2024-04-02,450,PPSR Plant & Equipment,Recovery,109222.05,102064.89
+133,Commercial,2025-06-26,900,Receiver/Administrator Fee,Cost,250526.61,218769.11
+133,Commercial,2023-03-09,60,Legal Cost,Cost,163392.76,161922.91
+133,Commercial,2023-02-03,26,Valuation Fee,Cost,9540.83,9503.54
+133,Commercial,2024-04-02,450,Asset Management Cost,Cost,74731.06,69834.05
+134,Commercial,2022-11-18,360,Property Sale,Recovery,953735.14,898768.7
+134,Commercial,2024-10-08,1050,Receiver/Administrator Fee,Cost,50535.53,42501.63
+134,Commercial,2023-04-17,510,Legal Cost,Cost,49379.5,45396.8
+134,Commercial,2021-12-08,15,Valuation Fee,Cost,5049.39,5036.92
+134,Commercial,2023-04-17,510,Asset Management Cost,Cost,33567.53,30860.14
+135,Commercial,2024-02-05,300,Property Sale,Recovery,1569124.06,1485221.48
+135,Commercial,2024-03-06,330,Director Guarantee,Recovery,122522.54,115335.58
+135,Commercial,2024-07-04,450,Receiver/Administrator Fee,Cost,113422.43,104447.93
+135,Commercial,2024-04-05,360,Legal Cost,Cost,86019.15,80529.66
+135,Commercial,2023-05-27,46,Valuation Fee,Cost,14398.33,14277.51
+135,Commercial,2023-11-07,210,Asset Management Cost,Cost,18836.21,18125.38
+136,Commercial,2023-11-02,870,Property Sale,Recovery,12685630.97,11186868.01
+136,Commercial,2022-04-11,300,Director Guarantee,Recovery,1842314.94,1764148.18
+136,Commercial,2024-01-31,960,Receiver/Administrator Fee,Cost,645741.83,562091.11
+136,Commercial,2023-06-05,720,Legal Cost,Cost,569093.13,512854.52
+136,Commercial,2021-07-29,44,Valuation Fee,Cost,7572.51,7524.52
+136,Commercial,2022-10-08,480,Asset Management Cost,Cost,249976.94,233224.33
+137,Commercial,2025-10-14,810,Property Sale,Recovery,4309916.59,3781465.86
+137,Commercial,2024-01-23,180,Director Guarantee,Recovery,715402.0,694905.9
+137,Commercial,2025-11-13,840,Receiver/Administrator Fee,Cost,264235.42,230716.33
+137,Commercial,2024-07-21,360,Legal Cost,Cost,228752.69,215833.03
+137,Commercial,2023-08-27,31,Valuation Fee,Cost,13157.9,13092.19
+138,Commercial,2019-10-11,120,PPSR Receivables Collection,Recovery,718263.37,705968.08
+138,Commercial,2020-11-04,510,PPSR Receivables Collection,Recovery,624068.1,579912.82
+138,Commercial,2020-08-06,420,PPSR Receivables Collection,Recovery,799022.04,752165.62
+138,Commercial,2021-04-03,660,Director Guarantee,Recovery,484526.67,440631.05
+138,Commercial,2021-05-03,690,Receiver/Administrator Fee,Cost,237146.41,214733.25
+138,Commercial,2020-07-07,390,Legal Cost,Cost,260308.79,246103.74
+138,Commercial,2019-07-23,40,Valuation Fee,Cost,11930.99,11862.52
+138,Commercial,2020-05-08,330,Asset Management Cost,Cost,61112.97,58279.0
+139,Commercial,2019-11-05,390,Property Sale,Recovery,6764455.35,6337077.19
+139,Commercial,2019-06-08,240,Director Guarantee,Recovery,1312197.1,1260540.23
+139,Commercial,2021-02-27,870,Receiver/Administrator Fee,Cost,593939.05,513467.92
+139,Commercial,2019-06-08,240,Legal Cost,Cost,276732.84,265838.78
+139,Commercial,2018-11-22,42,Valuation Fee,Cost,11542.78,11461.94
+139,Commercial,2019-12-05,420,Asset Management Cost,Cost,216689.63,201982.62
+140,Commercial,2020-04-15,690,PPSR Receivables Collection,Recovery,629930.19,571988.16
+140,Commercial,2018-10-23,150,PPSR Receivables Collection,Recovery,65429.67,64071.49
+140,Commercial,2020-05-15,720,PPSR Receivables Collection,Recovery,1926268.94,1741765.01
+140,Commercial,2018-09-23,120,PPSR Receivables Collection,Recovery,1403075.82,1379727.26
+140,Commercial,2019-01-21,240,PPSR Receivables Collection,Recovery,103434.72,100020.85
+140,Commercial,2020-07-14,780,PPSR Receivables Collection,Recovery,825778.81,740444.35
+140,Commercial,2020-11-11,900,Receiver/Administrator Fee,Cost,495122.83,436569.86
+140,Commercial,2018-08-24,90,Legal Cost,Cost,201112.29,198597.0
+140,Commercial,2018-06-30,35,Valuation Fee,Cost,13368.7,13303.42
+140,Commercial,2019-08-19,450,Asset Management Cost,Cost,125623.28,117961.56
+141,Commercial,2025-02-15,330,Property Sale,Recovery,5437997.05,5131430.31
+141,Commercial,2025-08-14,510,Director Guarantee,Recovery,1249238.04,1142086.3
+141,Commercial,2026-04-11,750,Receiver/Administrator Fee,Cost,484337.34,424496.4
+141,Commercial,2025-09-13,540,Legal Cost,Cost,269988.99,245532.41
+141,Commercial,2024-04-10,19,Valuation Fee,Cost,14028.27,13981.48
+141,Commercial,2025-03-17,360,Asset Management Cost,Cost,191069.74,179349.6
+142,Commercial,2024-05-04,390,PPSR Inventory,Recovery,640896.53,600431.26
+142,Commercial,2024-02-04,300,PPSR Inventory,Recovery,2352236.16,2237137.88
+142,Commercial,2024-05-04,390,PPSR Receivables Collection,Recovery,557730.0,522515.75
+142,Commercial,2024-06-03,420,Receiver/Administrator Fee,Cost,623092.87,580830.41
+142,Commercial,2023-09-07,150,Legal Cost,Cost,212092.07,206838.01
+142,Commercial,2023-04-27,17,Valuation Fee,Cost,7390.97,7369.99
+143,Commercial,2020-09-26,630,GSR All-Assets Sweep,Recovery,1768974.06,1619614.27
+143,Commercial,2020-08-27,600,Director Guarantee,Recovery,814892.21,749228.99
+143,Commercial,2021-01-24,750,Receiver/Administrator Fee,Cost,521111.95,469163.31
+143,Commercial,2019-03-06,60,Legal Cost,Cost,459106.44,455265.59
+143,Commercial,2019-02-27,53,Valuation Fee,Cost,9166.16,9098.39
+144,Commercial,2021-03-12,300,Property Sale,Recovery,1881835.49,1800418.07
+144,Commercial,2022-09-03,840,Director Guarantee,Recovery,110311.84,97462.81
+144,Commercial,2023-03-02,1020,Receiver/Administrator Fee,Cost,112260.86,96587.33
+144,Commercial,2020-07-15,60,Legal Cost,Cost,46299.67,45891.92
+144,Commercial,2020-07-08,53,Valuation Fee,Cost,8304.5,8239.87
+144,Commercial,2021-10-08,510,Asset Management Cost,Cost,56747.77,52637.43
+145,Commercial,2020-03-09,720,Property Sale,Recovery,3627795.73,3211958.09
+145,Commercial,2018-10-16,210,Director Guarantee,Recovery,532597.7,514017.62
+145,Commercial,2020-11-04,960,Receiver/Administrator Fee,Cost,133181.93,113226.49
+145,Commercial,2018-07-18,120,Legal Cost,Cost,181785.86,178134.46
+145,Commercial,2018-05-13,54,Valuation Fee,Cost,9660.69,9572.88
+146,Commercial,2023-04-06,450,PPSR Plant & Equipment,Recovery,641.48,595.09
+146,Commercial,2022-05-11,120,PPSR Plant & Equipment,Recovery,28203.26,27644.26
+146,Commercial,2022-08-09,210,PPSR Plant & Equipment,Recovery,82911.86,80057.46
+146,Commercial,2023-11-02,660,PPSR Plant & Equipment,Recovery,66920.75,59943.58
+146,Commercial,2024-05-30,870,Receiver/Administrator Fee,Cost,33796.49,29230.66
+146,Commercial,2024-03-01,780,Legal Cost,Cost,18624.47,16352.03
+146,Commercial,2022-02-19,39,Valuation Fee,Cost,13365.66,13278.98
+146,Commercial,2023-03-07,420,Asset Management Cost,Cost,6946.57,6476.51
+147,Commercial,2021-06-06,450,PPSR Receivables Collection,Recovery,202949.14,186877.18
+147,Commercial,2021-08-05,510,PPSR Inventory,Recovery,1351978.92,1231293.32
+147,Commercial,2022-08-30,900,PPSR Inventory,Recovery,266100.33,225623.08
+147,Commercial,2020-08-10,150,PPSR Receivables Collection,Recovery,503411.27,489755.46
+147,Commercial,2022-01-02,660,PPSR Inventory,Recovery,512934.99,454475.3
+147,Commercial,2022-02-01,690,PPSR Receivables Collection,Recovery,528916.28,466064.65
+147,Commercial,2020-07-11,120,PPSR Receivables Collection,Recovery,482578.09,472076.83
+147,Commercial,2022-09-29,930,Director Guarantee,Recovery,1454362.38,1226371.44
+147,Commercial,2022-12-28,1020,Receiver/Administrator Fee,Cost,741267.84,614834.69
+147,Commercial,2021-09-04,540,Legal Cost,Cost,461786.38,418257.75
+147,Commercial,2020-04-26,44,Valuation Fee,Cost,3498.79,3470.67
+148,Commercial,2024-07-08,180,PPSR Inventory,Recovery,66896.2,65178.55
+148,Commercial,2024-06-08,150,PPSR Receivables Collection,Recovery,1541190.56,1508142.51
+148,Commercial,2024-10-06,270,PPSR Inventory,Recovery,127327.64,122455.29
+148,Commercial,2025-04-04,450,PPSR Inventory,Recovery,289893.43,271641.73
+148,Commercial,2024-11-05,300,PPSR Inventory,Recovery,614745.36,588663.82
+148,Commercial,2024-10-06,270,PPSR Inventory,Recovery,157214.35,151198.35
+148,Commercial,2025-04-04,450,PPSR Plant & Equipment,Recovery,282742.68,264941.19
+148,Commercial,2025-01-04,360,Director Guarantee,Recovery,641283.52,608774.68
+148,Commercial,2025-04-04,450,Receiver/Administrator Fee,Cost,405565.22,380030.83
+148,Commercial,2024-03-10,60,Legal Cost,Cost,460514.67,456539.01
+148,Commercial,2024-02-21,42,Valuation Fee,Cost,3963.13,3939.14
+148,Commercial,2024-08-07,210,Asset Management Cost,Cost,202442.37,196391.13
+149,Commercial,2022-10-26,480,PPSR Plant & Equipment,Recovery,83418.01,78026.92
+149,Commercial,2023-03-25,630,PPSR Plant & Equipment,Recovery,48209.41,44162.04
+149,Commercial,2022-09-26,450,PPSR Plant & Equipment,Recovery,68159.9,64021.67
+149,Commercial,2023-01-24,570,PPSR Plant & Equipment,Recovery,446249.78,412213.52
+149,Commercial,2023-05-24,690,PPSR Plant & Equipment,Recovery,226667.19,205910.76
+149,Commercial,2023-02-23,600,PPSR Plant & Equipment,Recovery,41655.36,38317.9
+149,Commercial,2023-01-24,570,Director Guarantee,Recovery,239562.85,221290.97
+149,Commercial,2024-06-17,1080,Receiver/Administrator Fee,Cost,163905.68,141029.31
+149,Commercial,2023-03-25,630,Legal Cost,Cost,178663.93,163664.38
+149,Commercial,2021-08-09,37,Valuation Fee,Cost,13676.26,13606.01
+150,Commercial,2022-08-01,660,PPSR Receivables Collection,Recovery,590302.2,531379.3
+150,Commercial,2022-05-03,570,PPSR Plant & Equipment,Recovery,70049.69,63968.2
+150,Commercial,2022-01-03,450,PPSR Receivables Collection,Recovery,85999.29,80049.09
+150,Commercial,2023-01-28,840,PPSR Inventory,Recovery,2144235.73,1875630.82
+150,Commercial,2023-06-27,990,Receiver/Administrator Fee,Cost,626464.05,535046.46
+150,Commercial,2021-04-08,180,Legal Cost,Cost,359716.62,349546.63
+150,Commercial,2020-11-25,46,Valuation Fee,Cost,12949.66,12855.09
+151,Commercial,2022-07-05,450,Property Sale,Recovery,7525458.85,6995162.76
+151,Commercial,2022-10-03,540,Director Guarantee,Recovery,1338756.46,1226363.98
+151,Commercial,2023-06-30,810,Receiver/Administrator Fee,Cost,424777.19,372424.2
+151,Commercial,2022-10-03,540,Legal Cost,Cost,243865.91,223392.66
+151,Commercial,2021-05-01,20,Valuation Fee,Cost,9383.49,9353.06
+151,Commercial,2022-05-06,390,Asset Management Cost,Cost,161181.04,151289.98
+152,Commercial,2025-02-12,780,Property Sale,Recovery,9585834.58,8347389.61
+152,Commercial,2025-02-12,780,Receiver/Administrator Fee,Cost,439618.9,382822.2
+152,Commercial,2023-12-20,360,Legal Cost,Cost,451654.9,423718.91
+152,Commercial,2023-01-30,36,Valuation Fee,Cost,4829.87,4799.13
+152,Commercial,2024-01-19,390,Asset Management Cost,Cost,153586.75,143322.42
+153,Commercial,2023-10-08,690,Property Sale,Recovery,7954974.99,7195552.35
+153,Commercial,2023-11-07,720,Director Guarantee,Recovery,1258271.68,1133196.41
+153,Commercial,2024-08-03,990,Receiver/Administrator Fee,Cost,929471.47,804851.71
+153,Commercial,2023-11-07,720,Legal Cost,Cost,555611.27,500382.16
+153,Commercial,2021-12-12,25,Valuation Fee,Cost,12044.95,12001.24
+153,Commercial,2023-03-12,480,Asset Management Cost,Cost,130724.02,121910.91
+154,Commercial,2019-02-27,360,PPSR Inventory,Recovery,736000.62,694951.35
+154,Commercial,2020-06-21,840,PPSR Plant & Equipment,Recovery,219250.51,191771.97
+154,Commercial,2020-07-21,870,PPSR Inventory,Recovery,840486.3,731641.22
+154,Commercial,2018-06-02,90,PPSR Plant & Equipment,Recovery,668865.84,659337.94
+154,Commercial,2018-09-30,210,PPSR Inventory,Recovery,62414.65,60359.78
+154,Commercial,2019-05-28,450,PPSR Plant & Equipment,Recovery,809553.16,753512.82
+154,Commercial,2020-01-23,690,Director Guarantee,Recovery,1825236.07,1635115.59
+154,Commercial,2021-01-17,1050,Receiver/Administrator Fee,Cost,785340.39,664298.95
+154,Commercial,2018-11-29,270,Legal Cost,Cost,508323.71,486908.7
+154,Commercial,2018-04-06,33,Valuation Fee,Cost,4892.88,4867.21
+154,Commercial,2019-07-27,510,Asset Management Cost,Cost,285367.37,263084.72
+155,Commercial,2024-10-04,780,PPSR Plant & Equipment,Recovery,16689.69,14702.42
+155,Commercial,2023-02-12,180,PPSR Plant & Equipment,Recovery,14618.74,14197.24
+155,Commercial,2024-06-06,660,PPSR Plant & Equipment,Recovery,42744.64,38396.6
+155,Commercial,2023-01-13,150,PPSR Plant & Equipment,Recovery,30379.39,29647.68
+155,Commercial,2022-12-14,120,PPSR Plant & Equipment,Recovery,28245.8,27700.21
+155,Commercial,2024-10-04,780,PPSR Plant & Equipment,Recovery,95634.66,84247.25
+155,Commercial,2024-03-08,570,PPSR Plant & Equipment,Recovery,129182.01,117751.44
+155,Commercial,2023-03-14,210,Director Guarantee,Recovery,51018.85,49306.82
+155,Commercial,2024-12-03,840,Receiver/Administrator Fee,Cost,74790.52,65245.66
+155,Commercial,2023-01-13,150,Legal Cost,Cost,31566.79,30806.48
+155,Commercial,2022-09-17,32,Valuation Fee,Cost,7926.89,7885.77
+155,Commercial,2023-10-10,420,Asset Management Cost,Cost,20972.49,19588.56
+156,Commercial,2020-03-21,420,PPSR Plant & Equipment,Recovery,630435.16,585334.02
+156,Commercial,2020-01-21,360,PPSR Plant & Equipment,Recovery,1534535.84,1439944.03
+156,Commercial,2020-01-21,360,PPSR Plant & Equipment,Recovery,1993846.27,1870941.65
+156,Commercial,2020-05-20,480,Director Guarantee,Recovery,626367.65,575423.27
+156,Commercial,2020-05-20,480,Receiver/Administrator Fee,Cost,1000860.72,919457.68
+156,Commercial,2020-01-21,360,Legal Cost,Cost,587622.53,551400.32
+156,Commercial,2019-03-10,43,Valuation Fee,Cost,4933.93,4896.57
+157,Commercial,2024-10-18,510,PPSR Plant & Equipment,Recovery,736632.84,685526.18
+157,Commercial,2024-02-21,270,PPSR Plant & Equipment,Recovery,461760.89,444513.74
+157,Commercial,2025-04-16,690,PPSR Plant & Equipment,Recovery,462366.54,419505.9
+157,Commercial,2025-10-13,870,PPSR Plant & Equipment,Recovery,453257.14,400935.97
+157,Commercial,2025-02-15,630,PPSR Plant & Equipment,Recovery,143354.41,131170.6
+157,Commercial,2024-05-21,360,PPSR Plant & Equipment,Recovery,743120.76,706344.86
+157,Commercial,2025-03-17,660,PPSR Plant & Equipment,Recovery,143409.67,130667.32
+157,Commercial,2024-02-21,270,Director Guarantee,Recovery,1463414.29,1408754.57
+157,Commercial,2025-12-12,930,Receiver/Administrator Fee,Cost,837445.67,734536.25
+157,Commercial,2023-09-24,120,Legal Cost,Cost,563678.47,554222.19
+157,Commercial,2023-07-23,57,Valuation Fee,Cost,14289.17,14174.8
+158,Commercial,2023-01-13,570,PPSR Receivables Collection,Recovery,158946.04,147011.78
+158,Commercial,2023-01-13,570,PPSR Plant & Equipment,Recovery,549127.85,507897.3
+158,Commercial,2023-07-12,750,PPSR Inventory,Recovery,697927.49,629808.11
+158,Commercial,2023-03-14,630,PPSR Receivables Collection,Recovery,777918.87,713622.58
+158,Commercial,2023-09-10,810,Receiver/Administrator Fee,Cost,535333.86,479131.25
+158,Commercial,2022-10-15,480,Legal Cost,Cost,301990.46,282779.49
+158,Commercial,2021-07-13,21,Valuation Fee,Cost,13594.3,13555.26
+158,Commercial,2022-07-17,390,Asset Management Cost,Cost,121099.41,114801.87
+159,Commercial,2026-05-31,750,PPSR Receivables Collection,Recovery,26766.29,23664.99
+159,Commercial,2025-09-03,480,PPSR Receivables Collection,Recovery,70402.88,65067.19
+159,Commercial,2024-08-09,90,PPSR Receivables Collection,Recovery,134620.69,132645.95
+159,Commercial,2024-09-08,120,PPSR Receivables Collection,Recovery,1885364.35,1848579.78
+159,Commercial,2025-09-03,480,Director Guarantee,Recovery,391708.05,362021.3
+159,Commercial,2026-06-30,780,Receiver/Administrator Fee,Cost,359676.77,316439.93
+159,Commercial,2025-06-05,390,Legal Cost,Cost,246075.08,230811.31
+159,Commercial,2024-06-02,22,Valuation Fee,Cost,2306.47,2298.15
+160,Commercial,2024-05-09,750,PPSR Inventory,Recovery,2780203.7,2436364.67
+160,Commercial,2023-05-15,390,PPSR Plant & Equipment,Recovery,1376064.37,1284768.56
+160,Commercial,2024-08-07,840,PPSR Receivables Collection,Recovery,201078.79,173441.02
+160,Commercial,2023-05-15,390,Director Guarantee,Recovery,1696629.91,1584066.0
+160,Commercial,2024-12-05,960,Receiver/Administrator Fee,Cost,852925.97,720316.56
+160,Commercial,2023-05-15,390,Legal Cost,Cost,349303.49,326128.75
+160,Commercial,2022-06-18,59,Valuation Fee,Cost,11052.57,10938.37
+160,Commercial,2023-08-13,480,Asset Management Cost,Cost,377881.33,347265.36
+161,Commercial,2021-06-09,180,PPSR Receivables Collection,Recovery,1164245.91,1132916.14
+161,Commercial,2023-03-01,810,PPSR Receivables Collection,Recovery,484518.25,428547.37
+161,Commercial,2022-03-06,450,PPSR Inventory,Recovery,565551.34,528268.41
+161,Commercial,2021-04-10,120,PPSR Receivables Collection,Recovery,2057412.5,2020335.07
+161,Commercial,2021-05-10,150,PPSR Receivables Collection,Recovery,182637.94,178533.02
+161,Commercial,2022-10-02,660,PPSR Plant & Equipment,Recovery,97562.71,88276.48
+161,Commercial,2022-04-05,480,Director Guarantee,Recovery,756262.38,703202.83
+161,Commercial,2023-04-30,870,Receiver/Administrator Fee,Cost,724058.85,634619.73
+161,Commercial,2021-12-06,360,Legal Cost,Cost,621776.81,588763.13
+161,Commercial,2021-01-30,50,Valuation Fee,Cost,7193.7,7139.4
+161,Commercial,2022-02-04,420,Asset Management Cost,Cost,302714.16,284046.76
+162,Commercial,2020-05-06,780,Property Sale,Recovery,972673.61,862435.08
+162,Commercial,2019-06-11,450,Director Guarantee,Recovery,77674.13,72466.54
+162,Commercial,2020-06-05,810,Receiver/Administrator Fee,Cost,48156.86,42501.88
+162,Commercial,2019-03-13,360,Legal Cost,Cost,64229.4,60760.7
+162,Commercial,2018-04-19,32,Valuation Fee,Cost,7791.78,7753.42
+162,Commercial,2019-04-12,390,Asset Management Cost,Cost,23121.91,21772.25
+163,Commercial,2021-11-23,510,PPSR Inventory,Recovery,213536.4,194440.37
+163,Commercial,2020-10-29,120,PPSR Inventory,Recovery,7784.97,7615.25
+163,Commercial,2021-10-24,480,PPSR Inventory,Recovery,212763.33,194807.0
+163,Commercial,2021-02-26,240,PPSR Inventory,Recovery,20889.15,19988.24
+163,Commercial,2021-05-27,330,PPSR Plant & Equipment,Recovery,44009.33,41420.83
+163,Commercial,2021-09-24,450,PPSR Inventory,Recovery,1424747.65,1311713.51
+163,Commercial,2021-11-23,510,Director Guarantee,Recovery,301964.76,274960.8
+163,Commercial,2021-12-23,540,Receiver/Administrator Fee,Cost,403433.77,365336.86
+163,Commercial,2020-11-28,150,Legal Cost,Cost,225308.51,219185.23
+163,Commercial,2020-07-31,30,Valuation Fee,Cost,7079.59,7040.68
+163,Commercial,2021-03-28,270,Asset Management Cost,Cost,208818.71,198714.71
+164,Commercial,2022-08-30,690,PPSR Inventory,Recovery,1854228.25,1643024.13
+164,Commercial,2021-07-06,270,PPSR Receivables Collection,Recovery,1230605.99,1173729.48
+164,Commercial,2022-06-01,600,PPSR Receivables Collection,Recovery,980760.55,882864.54
+164,Commercial,2021-08-05,300,PPSR Inventory,Recovery,631473.21,599129.18
+164,Commercial,2021-06-06,240,Director Guarantee,Recovery,1752281.57,1680104.63
+164,Commercial,2022-12-28,810,Receiver/Administrator Fee,Cost,861092.77,747131.25
+164,Commercial,2022-03-03,510,Legal Cost,Cost,419727.61,383838.88
+164,Commercial,2020-10-26,17,Valuation Fee,Cost,6304.77,6286.01
+165,Commercial,2024-03-05,960,Property Sale,Recovery,9541518.49,8075875.12
+165,Commercial,2022-06-14,330,Director Guarantee,Recovery,856704.2,808972.59
+165,Commercial,2024-07-03,1080,Receiver/Administrator Fee,Cost,701097.45,581161.72
+165,Commercial,2024-04-04,990,Legal Cost,Cost,215019.6,181045.1
+165,Commercial,2021-08-14,26,Valuation Fee,Cost,10340.16,10293.56
+165,Commercial,2023-01-10,540,Asset Management Cost,Cost,302665.71,275564.03
+166,Commercial,2019-02-01,390,Property Sale,Recovery,8143733.63,7718822.69
+166,Commercial,2019-03-03,420,Director Guarantee,Recovery,1899534.73,1793017.59
+166,Commercial,2019-05-02,480,Receiver/Administrator Fee,Cost,520883.61,487638.09
+166,Commercial,2018-05-07,120,Legal Cost,Cost,520628.83,512114.94
+166,Commercial,2018-02-17,41,Valuation Fee,Cost,11744.47,11678.49
+167,Commercial,2019-01-17,360,GSR All-Assets Sweep,Recovery,989250.68,932898.18
+167,Commercial,2019-01-17,360,Director Guarantee,Recovery,933517.25,880339.6
+167,Commercial,2019-02-16,390,Receiver/Administrator Fee,Cost,441370.5,414198.5
+167,Commercial,2018-03-23,60,Legal Cost,Cost,376310.15,372649.53
+167,Commercial,2018-02-14,23,Valuation Fee,Cost,14509.6,14455.33
+167,Commercial,2018-07-21,180,Asset Management Cost,Cost,172451.03,167467.19
+168,Commercial,2024-09-27,840,Property Sale,Recovery,5328155.42,4758134.69
+168,Commercial,2024-10-27,870,Director Guarantee,Recovery,724408.0,644299.92
+168,Commercial,2025-02-24,990,Receiver/Administrator Fee,Cost,354628.45,310354.75
+168,Commercial,2024-07-29,780,Legal Cost,Cost,189438.8,170544.92
+168,Commercial,2022-08-05,56,Valuation Fee,Cost,8225.02,8163.21
+169,Commercial,2020-02-25,390,Property Sale,Recovery,6009100.14,5676650.32
+169,Commercial,2021-01-20,720,Receiver/Administrator Fee,Cost,402491.6,362347.18
+169,Commercial,2020-07-24,540,Legal Cost,Cost,226735.1,209553.45
+169,Commercial,2019-03-20,48,Valuation Fee,Cost,6603.03,6556.94
+170,Commercial,2022-12-03,510,GSR All-Assets Sweep,Recovery,958293.89,883782.97
+170,Commercial,2022-08-05,390,Director Guarantee,Recovery,304462.2,286188.12
+170,Commercial,2023-07-01,720,Receiver/Administrator Fee,Cost,449176.09,400671.76
+170,Commercial,2022-11-03,480,Legal Cost,Cost,541426.06,501711.31
+170,Commercial,2021-08-22,42,Valuation Fee,Cost,13950.26,13857.58
+171,Commercial,2020-04-10,300,Property Sale,Recovery,9181165.57,8712252.63
+171,Commercial,2020-12-06,540,Director Guarantee,Recovery,2823692.78,2569426.48
+171,Commercial,2021-03-06,630,Receiver/Administrator Fee,Cost,604902.71,541843.76
+171,Commercial,2019-08-14,60,Legal Cost,Cost,382788.81,378796.33
+171,Commercial,2019-08-05,51,Valuation Fee,Cost,14139.09,14013.64
+171,Commercial,2020-04-10,300,Asset Management Cost,Cost,276062.05,261962.64
+172,Commercial,2020-12-06,210,PPSR Plant & Equipment,Recovery,342184.91,331263.15
+172,Commercial,2020-11-06,180,PPSR Plant & Equipment,Recovery,20979.21,20403.93
+172,Commercial,2021-05-05,360,PPSR Plant & Equipment,Recovery,108076.3,102230.4
+172,Commercial,2021-01-05,240,PPSR Plant & Equipment,Recovery,144939.36,139664.52
+172,Commercial,2021-01-05,240,PPSR Plant & Equipment,Recovery,666580.74,642321.56
+172,Commercial,2021-02-04,270,PPSR Plant & Equipment,Recovery,200820.32,192617.11
+172,Commercial,2021-08-03,450,Director Guarantee,Recovery,834410.64,778380.31
+172,Commercial,2021-12-01,570,Receiver/Administrator Fee,Cost,187780.33,171953.88
+172,Commercial,2020-08-08,90,Legal Cost,Cost,139168.33,137246.99
+172,Commercial,2020-07-07,58,Valuation Fee,Cost,14853.72,14721.24
+173,Commercial,2023-08-17,270,PPSR Receivables Collection,Recovery,947088.39,903805.62
+173,Commercial,2023-08-17,270,PPSR Plant & Equipment,Recovery,934882.13,892157.2
+173,Commercial,2023-09-16,300,PPSR Inventory,Recovery,612607.31,581579.95
+173,Commercial,2023-06-18,210,Director Guarantee,Recovery,550911.57,531228.01
+173,Commercial,2023-11-15,360,Receiver/Administrator Fee,Cost,466519.38,438311.02
+173,Commercial,2023-08-17,270,Legal Cost,Cost,153788.61,146760.33
+173,Commercial,2022-12-24,34,Valuation Fee,Cost,4600.09,4573.07
+173,Commercial,2023-05-19,180,Asset Management Cost,Cost,143484.89,139079.31
+174,Commercial,2023-07-28,180,PPSR Inventory,Recovery,65687.53,63654.18
+174,Commercial,2025-01-18,720,PPSR Inventory,Recovery,770378.09,679328.84
+174,Commercial,2024-11-19,660,PPSR Plant & Equipment,Recovery,229036.65,204095.34
+174,Commercial,2025-07-17,900,Receiver/Administrator Fee,Cost,359983.91,307611.99
+174,Commercial,2023-04-29,90,Legal Cost,Cost,170416.63,167758.29
+174,Commercial,2023-02-17,19,Valuation Fee,Cost,14510.0,14461.92
+174,Commercial,2024-04-23,450,Asset Management Cost,Cost,155745.28,143970.99
+175,Commercial,2020-09-28,690,Property Sale,Recovery,2611792.33,2370165.86
+175,Commercial,2020-05-31,570,Director Guarantee,Recovery,250899.69,231564.71
+175,Commercial,2021-09-23,1050,Receiver/Administrator Fee,Cost,235301.7,202987.21
+175,Commercial,2021-05-26,930,Legal Cost,Cost,129350.51,113486.43
+175,Commercial,2018-12-24,46,Valuation Fee,Cost,12469.83,12389.39
+176,Commercial,2020-07-06,180,PPSR Receivables Collection,Recovery,94801.52,92001.15
+176,Commercial,2021-01-02,360,PPSR Receivables Collection,Recovery,341340.36,321472.28
+176,Commercial,2020-09-04,240,PPSR Receivables Collection,Recovery,44849.08,43091.42
+176,Commercial,2020-10-04,270,Director Guarantee,Recovery,74074.61,70816.8
+176,Commercial,2021-01-02,360,Receiver/Administrator Fee,Cost,46637.33,43922.75
+176,Commercial,2020-06-06,150,Legal Cost,Cost,37129.22,36212.97
+176,Commercial,2020-02-19,42,Valuation Fee,Cost,13588.69,13493.95
+176,Commercial,2020-07-06,180,Asset Management Cost,Cost,9208.64,8936.63
+177,Commercial,2022-01-31,120,PPSR Receivables Collection,Recovery,189969.64,186118.61
+177,Commercial,2022-05-01,210,PPSR Receivables Collection,Recovery,1815813.93,1751887.17
+177,Commercial,2022-01-01,90,PPSR Plant & Equipment,Recovery,809659.7,797318.27
+177,Commercial,2022-08-29,330,PPSR Plant & Equipment,Recovery,1902732.23,1798531.53
+177,Commercial,2022-08-29,330,PPSR Receivables Collection,Recovery,114176.8,107924.05
+177,Commercial,2022-01-31,120,PPSR Plant & Equipment,Recovery,187845.21,184037.25
+177,Commercial,2022-08-29,330,Director Guarantee,Recovery,1273381.2,1203646.11
+177,Commercial,2022-11-27,420,Receiver/Administrator Fee,Cost,508082.97,472938.01
+177,Commercial,2022-04-01,180,Legal Cost,Cost,659075.99,639136.89
+177,Commercial,2021-11-28,56,Valuation Fee,Cost,7155.78,7087.72
+178,Commercial,2020-04-17,330,PPSR Plant & Equipment,Recovery,194696.54,184963.64
+178,Commercial,2020-08-15,450,PPSR Inventory,Recovery,60331.68,56256.76
+178,Commercial,2019-12-19,210,PPSR Receivables Collection,Recovery,94795.59,91751.92
+178,Commercial,2020-06-16,390,PPSR Inventory,Recovery,283630.5,266951.05
+178,Commercial,2020-10-14,510,PPSR Inventory,Recovery,682158.58,630180.85
+178,Commercial,2020-03-18,300,PPSR Plant & Equipment,Recovery,135838.36,129650.82
+178,Commercial,2020-01-18,240,Director Guarantee,Recovery,412761.46,397650.4
+178,Commercial,2021-09-09,840,Receiver/Administrator Fee,Cost,176099.48,154548.96
+178,Commercial,2020-04-17,330,Legal Cost,Cost,242817.02,230678.57
+178,Commercial,2019-07-07,45,Valuation Fee,Cost,10413.0,10340.44
+178,Commercial,2020-07-16,420,Asset Management Cost,Cost,100135.8,93808.76
+179,Commercial,2018-06-22,90,PPSR Plant & Equipment,Recovery,1387244.27,1370327.53
+179,Commercial,2019-10-15,570,PPSR Plant & Equipment,Recovery,375228.7,347175.07
+179,Commercial,2018-11-19,240,PPSR Plant & Equipment,Recovery,3149306.94,3047933.66
+179,Commercial,2020-02-12,690,Director Guarantee,Recovery,329920.74,300301.4
+179,Commercial,2021-01-07,1020,Receiver/Administrator Fee,Cost,933752.48,812533.88
+179,Commercial,2019-12-14,630,Legal Cost,Cost,571155.27,524148.44
+179,Commercial,2018-05-20,57,Valuation Fee,Cost,7332.87,7276.11
+180,Commercial,2022-09-20,450,Property Sale,Recovery,4059078.44,3795684.33
+180,Commercial,2021-12-24,180,Director Guarantee,Recovery,198385.44,193132.27
+180,Commercial,2023-05-18,690,Receiver/Administrator Fee,Cost,201849.65,182117.1
+180,Commercial,2022-05-23,330,Legal Cost,Cost,191779.06,182571.84
+180,Commercial,2021-08-23,57,Valuation Fee,Cost,6792.62,6735.14
+180,Commercial,2022-05-23,330,Asset Management Cost,Cost,126465.45,120393.91
+181,Commercial,2021-07-07,540,PPSR Inventory,Recovery,675193.57,618317.16
+181,Commercial,2022-01-03,720,PPSR Inventory,Recovery,137409.62,122197.17
+181,Commercial,2021-12-04,690,PPSR Inventory,Recovery,820914.17,733609.45
+181,Commercial,2022-04-03,810,Receiver/Administrator Fee,Cost,282891.39,247910.11
+181,Commercial,2021-03-09,420,Legal Cost,Cost,314215.43,293429.1
+181,Commercial,2020-03-06,52,Valuation Fee,Cost,2942.37,2917.54
+181,Commercial,2021-02-07,390,Asset Management Cost,Cost,119894.51,112511.81
+182,Commercial,2026-01-02,750,PPSR Plant & Equipment,Recovery,46823.43,41183.0
+182,Commercial,2025-10-04,660,PPSR Plant & Equipment,Recovery,28048.83,25052.95
+182,Commercial,2024-03-13,90,PPSR Plant & Equipment,Recovery,144777.96,142565.04
+182,Commercial,2024-12-08,360,PPSR Plant & Equipment,Recovery,34224.68,32179.68
+182,Commercial,2024-11-08,330,PPSR Plant & Equipment,Recovery,48788.02,46108.96
+182,Commercial,2025-09-04,630,PPSR Plant & Equipment,Recovery,71389.42,64092.6
+182,Commercial,2024-06-11,180,PPSR Plant & Equipment,Recovery,94269.28,91409.5
+182,Commercial,2025-09-04,630,Director Guarantee,Recovery,186030.31,167015.87
+182,Commercial,2026-02-01,780,Receiver/Administrator Fee,Cost,158638.65,138814.23
+182,Commercial,2024-12-08,360,Legal Cost,Cost,68591.41,64492.92
+182,Commercial,2023-12-29,15,Valuation Fee,Cost,2917.55,2910.07
+183,Commercial,2022-12-08,240,PPSR Receivables Collection,Recovery,24337.37,23564.66
+183,Commercial,2023-05-07,390,PPSR Receivables Collection,Recovery,50821.99,48226.02
+183,Commercial,2023-01-07,270,PPSR Receivables Collection,Recovery,13470.94,12990.74
+183,Commercial,2023-06-06,420,PPSR Receivables Collection,Recovery,27325.41,25825.27
+183,Commercial,2023-03-08,330,Director Guarantee,Recovery,74459.62,71228.48
+183,Commercial,2023-07-06,450,Receiver/Administrator Fee,Cost,16131.89,15184.9
+183,Commercial,2022-09-09,150,Legal Cost,Cost,10552.93,10342.26
+183,Commercial,2022-05-29,47,Valuation Fee,Cost,11864.34,11789.61
+183,Commercial,2022-11-08,210,Asset Management Cost,Cost,11514.73,11194.2
+184,Commercial,2021-11-29,510,PPSR Receivables Collection,Recovery,72540.62,67708.9
+184,Commercial,2021-01-03,180,PPSR Receivables Collection,Recovery,270487.83,263986.83
+184,Commercial,2021-10-30,480,PPSR Receivables Collection,Recovery,747227.72,700290.73
+184,Commercial,2021-02-02,210,PPSR Receivables Collection,Recovery,440870.7,428533.57
+184,Commercial,2021-01-03,180,PPSR Receivables Collection,Recovery,2533679.59,2472784.22
+184,Commercial,2021-12-29,540,Director Guarantee,Recovery,568560.03,528542.49
+184,Commercial,2022-03-29,630,Receiver/Administrator Fee,Cost,295261.18,271160.98
+184,Commercial,2021-01-03,180,Legal Cost,Cost,268109.78,261665.93
+184,Commercial,2020-08-23,47,Valuation Fee,Cost,10932.6,10863.38
+185,Commercial,2023-01-11,510,Property Sale,Recovery,9412614.2,8592664.02
+185,Commercial,2023-06-10,660,Director Guarantee,Recovery,226088.32,200934.18
+185,Commercial,2023-06-10,660,Receiver/Administrator Fee,Cost,269575.46,239583.02
+185,Commercial,2022-11-12,450,Legal Cost,Cost,239921.31,221382.43
+185,Commercial,2021-09-28,40,Valuation Fee,Cost,14292.41,14190.61
+185,Commercial,2022-07-15,330,Asset Management Cost,Cost,195785.55,184573.13
+186,Commercial,2023-02-25,300,PPSR Plant & Equipment,Recovery,73364.17,70208.11
+186,Commercial,2022-09-28,150,PPSR Plant & Equipment,Recovery,9807.59,9594.32
+186,Commercial,2024-12-16,960,PPSR Inventory,Recovery,167534.09,145543.81
+186,Commercial,2023-09-23,510,PPSR Receivables Collection,Recovery,316770.66,293954.8
+186,Commercial,2023-04-26,360,Director Guarantee,Recovery,191795.81,181937.85
+186,Commercial,2025-01-15,990,Receiver/Administrator Fee,Cost,61873.05,53515.84
+186,Commercial,2022-09-28,150,Legal Cost,Cost,64182.31,62786.61
+186,Commercial,2022-05-23,22,Valuation Fee,Cost,10320.17,10286.94
+187,Commercial,2022-05-17,360,GSR All-Assets Sweep,Recovery,269568.3,255583.19
+187,Commercial,2023-03-13,660,Director Guarantee,Recovery,52970.11,48041.21
+187,Commercial,2023-03-13,660,Receiver/Administrator Fee,Cost,66326.1,60154.41
+187,Commercial,2021-12-18,210,Legal Cost,Cost,29116.66,28225.74
+187,Commercial,2021-06-21,30,Valuation Fee,Cost,9616.19,9573.59
+187,Commercial,2022-04-17,330,Asset Management Cost,Cost,42144.58,40135.92
+188,Commercial,2024-12-01,510,GSR All-Assets Sweep,Recovery,1040961.18,960253.72
+188,Commercial,2024-03-06,240,Director Guarantee,Recovery,1211926.7,1166763.74
+188,Commercial,2025-05-30,690,Receiver/Administrator Fee,Cost,443375.64,397514.73
+188,Commercial,2024-12-31,540,Legal Cost,Cost,506362.06,464890.8
+188,Commercial,2023-08-31,52,Valuation Fee,Cost,10921.96,10832.46
+189,Commercial,2022-11-25,420,Property Sale,Recovery,3558356.61,3312252.39
+189,Commercial,2023-02-23,510,Director Guarantee,Recovery,214356.88,196490.48
+189,Commercial,2023-12-20,810,Receiver/Administrator Fee,Cost,231275.63,201419.29
+189,Commercial,2023-08-22,690,Legal Cost,Cost,306291.57,272269.75
+189,Commercial,2021-11-06,36,Valuation Fee,Cost,13477.5,13394.96
+190,Commercial,2022-11-17,120,PPSR Plant & Equipment,Recovery,147149.61,144469.37
+190,Commercial,2023-02-15,210,PPSR Inventory,Recovery,380203.78,368167.64
+190,Commercial,2023-06-15,330,PPSR Inventory,Recovery,348612.16,331427.38
+190,Commercial,2023-07-15,360,Receiver/Administrator Fee,Cost,59697.24,56494.25
+190,Commercial,2022-12-17,150,Legal Cost,Cost,54099.97,52871.05
+190,Commercial,2022-09-15,57,Valuation Fee,Cost,11565.47,11464.92
+190,Commercial,2023-01-16,180,Asset Management Cost,Cost,37999.82,36966.35
+191,Commercial,2020-02-06,120,PPSR Receivables Collection,Recovery,395749.55,388371.43
+191,Commercial,2021-03-02,510,PPSR Receivables Collection,Recovery,12890.89,11900.0
+191,Commercial,2020-04-06,180,PPSR Receivables Collection,Recovery,701227.74,681709.51
+191,Commercial,2020-04-06,180,PPSR Receivables Collection,Recovery,955541.74,928944.83
+191,Commercial,2020-10-03,360,PPSR Receivables Collection,Recovery,810518.93,766026.32
+191,Commercial,2020-12-02,420,PPSR Receivables Collection,Recovery,275847.43,258263.41
+191,Commercial,2021-01-31,480,PPSR Receivables Collection,Recovery,379984.53,352430.33
+191,Commercial,2021-08-29,690,Director Guarantee,Recovery,2336484.0,2096848.98
+191,Commercial,2022-03-27,900,Receiver/Administrator Fee,Cost,495097.6,429924.44
+191,Commercial,2021-06-30,630,Legal Cost,Cost,524203.47,474887.58
+191,Commercial,2019-12-01,53,Valuation Fee,Cost,12048.04,11948.32
+191,Commercial,2021-01-01,450,Asset Management Cost,Cost,433609.51,404063.35
+192,Commercial,2023-12-15,360,GSR All-Assets Sweep,Recovery,283001.84,265714.67
+192,Commercial,2023-09-16,270,Director Guarantee,Recovery,165075.39,157453.39
+192,Commercial,2024-02-13,420,Receiver/Administrator Fee,Cost,84900.92,78881.72
+192,Commercial,2023-02-18,60,Legal Cost,Cost,51164.19,50629.52
+192,Commercial,2023-02-08,50,Valuation Fee,Cost,11660.07,11558.44
+193,Commercial,2023-11-07,630,Property Sale,Recovery,7995996.61,7286670.6
+193,Commercial,2022-09-13,210,Director Guarantee,Recovery,255118.46,247339.83
+193,Commercial,2023-11-07,630,Receiver/Administrator Fee,Cost,511488.21,466114.02
+193,Commercial,2023-01-11,330,Legal Cost,Cost,204132.77,194437.69
+193,Commercial,2022-03-09,22,Valuation Fee,Cost,9344.24,9313.98
+193,Commercial,2022-12-12,300,Asset Management Cost,Cost,169800.53,162453.05
+194,Commercial,2023-06-26,570,Property Sale,Recovery,6417725.41,5850978.48
+194,Commercial,2022-06-01,180,Director Guarantee,Recovery,324594.75,315254.8
+194,Commercial,2023-12-23,750,Receiver/Administrator Fee,Cost,214940.74,190320.83
+194,Commercial,2022-11-28,360,Legal Cost,Cost,250752.38,236529.61
+194,Commercial,2022-01-05,33,Valuation Fee,Cost,10001.25,9947.86
+194,Commercial,2022-11-28,360,Asset Management Cost,Cost,106844.64,100784.37
+195,Commercial,2022-07-24,390,GSR All-Assets Sweep,Recovery,662363.03,624492.75
+195,Commercial,2023-03-21,630,Receiver/Administrator Fee,Cost,663136.89,602975.85
+195,Commercial,2022-06-24,360,Legal Cost,Cost,268498.26,254296.05
+195,Commercial,2021-08-13,45,Valuation Fee,Cost,3820.5,3794.63
+195,Commercial,2022-04-25,300,Asset Management Cost,Cost,260343.96,248816.56
+196,Commercial,2023-01-07,90,PPSR Receivables Collection,Recovery,362525.45,356730.66
+196,Commercial,2023-10-04,360,PPSR Receivables Collection,Recovery,115628.31,108410.64
+196,Commercial,2024-04-01,540,PPSR Receivables Collection,Recovery,504795.36,458275.82
+196,Commercial,2023-10-04,360,PPSR Receivables Collection,Recovery,87903.16,82416.13
+196,Commercial,2023-12-03,420,PPSR Receivables Collection,Recovery,59769.5,55439.84
+196,Commercial,2024-01-02,450,PPSR Receivables Collection,Recovery,550679.6,508052.56
+196,Commercial,2023-02-06,120,PPSR Receivables Collection,Recovery,89906.35,87995.33
+196,Commercial,2025-05-26,960,Director Guarantee,Recovery,337549.95,284244.44
+196,Commercial,2025-09-23,1080,Receiver/Administrator Fee,Cost,244517.19,201526.69
+196,Commercial,2024-01-02,450,Legal Cost,Cost,178186.24,164393.19
+196,Commercial,2022-11-03,25,Valuation Fee,Cost,12507.83,12451.97
+197,Commercial,2023-07-19,840,GSR All-Assets Sweep,Recovery,676431.99,594909.1
+197,Commercial,2023-10-17,930,Receiver/Administrator Fee,Cost,228624.56,198323.24
+197,Commercial,2023-07-19,840,Legal Cost,Cost,74093.38,65163.72
+197,Commercial,2021-04-26,26,Valuation Fee,Cost,13292.17,13239.44
+197,Commercial,2022-06-24,450,Asset Management Cost,Cost,55918.94,52201.18
+198,Commercial,2023-01-03,510,GSR All-Assets Sweep,Recovery,719553.69,666423.26
+198,Commercial,2022-06-07,300,Director Guarantee,Recovery,96258.58,92011.8
+198,Commercial,2024-04-27,990,Receiver/Administrator Fee,Cost,258950.64,223126.15
+198,Commercial,2022-01-08,150,Legal Cost,Cost,94469.79,92362.35
+198,Commercial,2021-09-06,26,Valuation Fee,Cost,11279.83,11235.81
+198,Commercial,2022-12-04,480,Asset Management Cost,Cost,117604.57,109413.46
+199,Commercial,2023-09-02,330,Property Sale,Recovery,12489255.32,11763620.73
+199,Commercial,2024-03-30,540,Director Guarantee,Recovery,1125407.55,1020402.9
+199,Commercial,2024-07-28,660,Receiver/Administrator Fee,Cost,638123.75,566126.97
+199,Commercial,2023-03-06,150,Legal Cost,Cost,314558.6,306115.56
+199,Commercial,2022-11-30,54,Valuation Fee,Cost,7694.48,7619.48
+200,Commercial,2021-01-09,360,PPSR Plant & Equipment,Recovery,609437.15,575175.34
+200,Commercial,2020-08-12,210,PPSR Plant & Equipment,Recovery,239568.82,231617.79
+200,Commercial,2020-08-12,210,PPSR Plant & Equipment,Recovery,159992.48,154682.5
+200,Commercial,2021-06-08,510,PPSR Plant & Equipment,Recovery,30358.14,27968.95
+200,Commercial,2021-10-06,630,PPSR Plant & Equipment,Recovery,130665.54,118082.6
+200,Commercial,2021-01-09,360,PPSR Plant & Equipment,Recovery,35930.91,33910.91
+200,Commercial,2021-05-09,480,PPSR Plant & Equipment,Recovery,135806.9,125723.65
+200,Commercial,2021-03-10,420,Director Guarantee,Recovery,787844.35,736416.74
+200,Commercial,2021-10-06,630,Receiver/Administrator Fee,Cost,321493.53,290534.08
+200,Commercial,2021-02-08,390,Legal Cost,Cost,157852.73,148261.84
+200,Commercial,2020-02-03,19,Valuation Fee,Cost,4580.93,4566.96
+200,Commercial,2020-11-10,300,Asset Management Cost,Cost,128053.31,122025.4
+201,Commercial,2024-01-24,420,PPSR Plant & Equipment,Recovery,40720.87,38243.11
+201,Commercial,2023-03-30,120,PPSR Plant & Equipment,Recovery,596516.59,585912.63
+201,Commercial,2023-05-29,180,PPSR Plant & Equipment,Recovery,158939.8,154720.61
+201,Commercial,2023-11-25,360,PPSR Plant & Equipment,Recovery,880418.59,834296.06
+201,Commercial,2023-02-28,90,PPSR Plant & Equipment,Recovery,599553.73,591542.37
+201,Commercial,2023-06-28,210,PPSR Plant & Equipment,Recovery,595415.74,577016.7
+201,Commercial,2023-09-26,300,Director Guarantee,Recovery,713616.35,682323.95
+201,Commercial,2024-01-24,420,Receiver/Administrator Fee,Cost,318730.82,299336.87
+201,Commercial,2023-01-29,60,Legal Cost,Cost,276574.15,274104.87
+201,Commercial,2023-01-11,42,Valuation Fee,Cost,14179.64,14090.9
+202,Commercial,2019-08-03,420,GSR All-Assets Sweep,Recovery,2344695.43,2171555.67
+202,Commercial,2018-12-06,180,Director Guarantee,Recovery,1625773.99,1573193.39
+202,Commercial,2019-10-02,480,Receiver/Administrator Fee,Cost,745417.05,682848.72
+202,Commercial,2019-04-05,300,Legal Cost,Cost,361105.49,341851.37
+202,Commercial,2018-06-23,14,Valuation Fee,Cost,8008.15,7987.69
+203,Commercial,2020-07-10,630,Property Sale,Recovery,4175668.18,3742077.46
+203,Commercial,2020-05-11,570,Director Guarantee,Recovery,189570.83,171669.4
+203,Commercial,2020-12-07,780,Receiver/Administrator Fee,Cost,243718.65,212784.05
+203,Commercial,2019-08-15,300,Legal Cost,Cost,178900.31,169800.18
+203,Commercial,2018-12-17,59,Valuation Fee,Cost,11744.22,11624.26
+203,Commercial,2019-11-13,390,Asset Management Cost,Cost,106380.61,99400.28
+204,Commercial,2022-12-13,510,Property Sale,Recovery,5688561.04,5196428.92
+204,Commercial,2022-09-14,420,Director Guarantee,Recovery,202483.99,187943.84
+204,Commercial,2023-10-09,810,Receiver/Administrator Fee,Cost,398692.89,345322.54
+204,Commercial,2022-06-16,330,Legal Cost,Cost,136481.18,128719.7
+204,Commercial,2021-08-14,24,Valuation Fee,Cost,7061.39,7031.38
+204,Commercial,2022-08-15,390,Asset Management Cost,Cost,92983.56,86767.12
+205,Commercial,2021-11-09,600,Property Sale,Recovery,3730572.43,3340544.5
+205,Commercial,2022-01-08,660,Director Guarantee,Recovery,226519.4,200609.44
+205,Commercial,2022-05-08,780,Receiver/Administrator Fee,Cost,265859.08,230306.3
+205,Commercial,2020-09-15,180,Legal Cost,Cost,178329.77,172518.78
+205,Commercial,2020-04-25,37,Valuation Fee,Cost,13375.13,13284.36
+206,Commercial,2024-06-09,150,PPSR Plant & Equipment,Recovery,2777.71,2707.73
+206,Commercial,2025-04-05,450,PPSR Plant & Equipment,Recovery,198964.89,184301.83
+206,Commercial,2024-10-07,270,PPSR Plant & Equipment,Recovery,206094.96,196842.69
+206,Commercial,2024-09-07,240,PPSR Plant & Equipment,Recovery,176333.55,169279.09
+206,Commercial,2025-06-04,510,PPSR Plant & Equipment,Recovery,151581.83,138984.84
+206,Commercial,2025-02-04,390,PPSR Plant & Equipment,Recovery,990846.37,927240.58
+206,Commercial,2025-08-03,570,Receiver/Administrator Fee,Cost,303838.96,275759.73
+206,Commercial,2025-05-05,480,Legal Cost,Cost,319448.02,294399.42
+206,Commercial,2024-02-11,31,Valuation Fee,Cost,10122.44,10069.19
+206,Commercial,2024-10-07,270,Asset Management Cost,Cost,136532.18,130402.81
+207,Commercial,2022-08-08,120,PPSR Receivables Collection,Recovery,33172.49,32472.11
+207,Commercial,2023-04-05,360,PPSR Inventory,Recovery,398651.83,373930.82
+207,Commercial,2022-10-07,180,PPSR Inventory,Recovery,4988596.53,4831446.0
+207,Commercial,2023-02-04,300,Director Guarantee,Recovery,2550398.0,2417904.86
+207,Commercial,2023-04-05,360,Receiver/Administrator Fee,Cost,743739.8,697619.35
+207,Commercial,2022-08-08,120,Legal Cost,Cost,664230.37,650206.38
+207,Commercial,2022-05-26,46,Valuation Fee,Cost,9787.69,9707.95
+207,Commercial,2022-10-07,180,Asset Management Cost,Cost,159053.65,154043.15
+208,Commercial,2027-01-13,930,PPSR Receivables Collection,Recovery,582712.57,508947.82
+208,Commercial,2024-10-25,120,PPSR Receivables Collection,Recovery,114936.82,112946.96
+208,Commercial,2027-02-12,960,PPSR Receivables Collection,Recovery,78329.49,68115.82
+208,Commercial,2026-03-19,630,PPSR Receivables Collection,Recovery,39788.35,36302.49
+208,Commercial,2025-12-19,540,PPSR Receivables Collection,Recovery,178430.86,164944.94
+208,Commercial,2025-04-23,300,PPSR Receivables Collection,Recovery,231118.23,221244.53
+208,Commercial,2025-08-21,420,PPSR Receivables Collection,Recovery,438128.34,412149.74
+208,Commercial,2027-05-13,1050,Receiver/Administrator Fee,Cost,629718.63,540481.4
+208,Commercial,2025-03-24,270,Legal Cost,Cost,250076.36,240440.24
+208,Commercial,2024-07-30,33,Valuation Fee,Cost,11659.44,11603.58
+208,Commercial,2025-11-19,510,Asset Management Cost,Cost,152661.38,141740.64
+209,Commercial,2024-06-28,420,GSR All-Assets Sweep,Recovery,1354745.26,1275038.88
+209,Commercial,2023-12-01,210,Director Guarantee,Recovery,274212.36,266023.45
+209,Commercial,2024-09-26,510,Receiver/Administrator Fee,Cost,502899.01,467200.74
+209,Commercial,2023-11-01,180,Legal Cost,Cost,148323.68,144518.82
+209,Commercial,2023-07-03,59,Valuation Fee,Cost,5326.12,5280.95
+209,Commercial,2023-12-31,240,Asset Management Cost,Cost,185631.83,179309.92
+210,Commercial,2023-01-22,300,PPSR Inventory,Recovery,353989.13,339344.27
+210,Commercial,2023-11-18,600,PPSR Inventory,Recovery,258356.94,237422.19
+210,Commercial,2024-07-15,840,PPSR Plant & Equipment,Recovery,202791.23,180165.17
+210,Commercial,2022-08-25,150,PPSR Inventory,Recovery,385410.17,377353.57
+210,Commercial,2024-07-15,840,Receiver/Administrator Fee,Cost,186039.98,165282.91
+210,Commercial,2023-08-20,510,Legal Cost,Cost,157830.4,146891.5
+210,Commercial,2022-05-22,55,Valuation Fee,Cost,14408.62,14297.44
+211,Commercial,2022-02-10,360,GSR All-Assets Sweep,Recovery,1845275.73,1757640.88
+211,Commercial,2021-10-13,240,Director Guarantee,Recovery,1265898.33,1225494.62
+211,Commercial,2022-08-09,540,Receiver/Administrator Fee,Cost,666277.97,619382.27
+211,Commercial,2021-06-15,120,Legal Cost,Cost,383250.9,377085.19
+211,Commercial,2021-03-23,36,Valuation Fee,Cost,5410.18,5383.92
+211,Commercial,2021-11-12,270,Asset Management Cost,Cost,255259.05,246112.01
+212,Commercial,2022-09-20,360,Property Sale,Recovery,8027211.54,7549713.96
+212,Commercial,2022-06-22,270,Director Guarantee,Recovery,350121.21,334381.9
+212,Commercial,2022-12-19,450,Receiver/Administrator Fee,Cost,255417.49,236569.02
+212,Commercial,2022-09-20,360,Legal Cost,Cost,234519.23,220568.88
+212,Commercial,2021-11-04,40,Valuation Fee,Cost,8230.04,8174.15
+213,Commercial,2025-07-14,450,Property Sale,Recovery,2298856.77,2140929.82
+213,Commercial,2026-04-10,720,Receiver/Administrator Fee,Cost,169568.18,151317.51
+213,Commercial,2024-11-16,210,Legal Cost,Cost,88489.22,85598.46
+213,Commercial,2024-05-27,37,Valuation Fee,Cost,14900.74,14813.8
+213,Commercial,2025-04-15,360,Asset Management Cost,Cost,34666.76,32748.07
+214,Commercial,2024-05-20,360,Property Sale,Recovery,5706139.56,5412917.81
+214,Commercial,2024-05-20,360,Director Guarantee,Recovery,699132.54,663206.17
+214,Commercial,2026-01-10,960,Receiver/Administrator Fee,Cost,372842.54,323913.9
+214,Commercial,2023-08-24,90,Legal Cost,Cost,302055.11,298097.58
+214,Commercial,2023-07-11,46,Valuation Fee,Cost,10039.3,9971.85
+214,Commercial,2024-09-17,480,Asset Management Cost,Cost,180542.71,168279.81
+215,Commercial,2024-06-25,360,Property Sale,Recovery,6001898.97,5665152.88
+215,Commercial,2026-03-17,990,Receiver/Administrator Fee,Cost,468411.69,399637.14
+215,Commercial,2025-11-17,870,Legal Cost,Cost,275908.71,239973.1
+215,Commercial,2023-08-15,45,Valuation Fee,Cost,5745.82,5704.49
+216,Commercial,2023-07-21,420,GSR All-Assets Sweep,Recovery,1849464.49,1726222.92
+216,Commercial,2023-02-21,270,Director Guarantee,Recovery,707159.55,676494.71
+216,Commercial,2024-02-16,630,Receiver/Administrator Fee,Cost,497293.31,448424.09
+216,Commercial,2022-12-23,210,Legal Cost,Cost,493476.8,476751.62
+216,Commercial,2022-07-24,58,Valuation Fee,Cost,11194.8,11088.69
+217,Commercial,2025-01-24,600,GSR All-Assets Sweep,Recovery,577082.57,524169.33
+217,Commercial,2024-10-26,510,Director Guarantee,Recovery,638687.43,588554.88
+217,Commercial,2025-02-23,630,Receiver/Administrator Fee,Cost,333833.0,301768.98
+217,Commercial,2024-10-26,510,Legal Cost,Cost,275530.33,253903.11
+217,Commercial,2023-07-13,39,Valuation Fee,Cost,10039.84,9977.28
+217,Commercial,2024-03-30,300,Asset Management Cost,Cost,140941.21,134324.37
+218,Commercial,2022-12-05,420,GSR All-Assets Sweep,Recovery,2465750.77,2306761.76
+218,Commercial,2023-03-05,510,Director Guarantee,Recovery,2279327.37,2102119.81
+218,Commercial,2023-07-03,630,Receiver/Administrator Fee,Cost,966727.28,874750.75
+218,Commercial,2022-06-08,240,Legal Cost,Cost,330703.12,318344.59
+218,Commercial,2021-10-28,17,Valuation Fee,Cost,3955.86,3945.2
+219,Commercial,2024-12-11,570,PPSR Plant & Equipment,Recovery,856773.03,784896.92
+219,Commercial,2024-11-11,540,PPSR Plant & Equipment,Recovery,821746.49,756288.49
+219,Commercial,2025-01-10,600,PPSR Plant & Equipment,Recovery,508868.41,464033.71
+219,Commercial,2023-08-19,90,PPSR Plant & Equipment,Recovery,1569470.38,1547906.52
+219,Commercial,2023-12-17,210,PPSR Plant & Equipment,Recovery,146149.84,141507.27
+219,Commercial,2024-08-13,450,PPSR Plant & Equipment,Recovery,93474.47,87227.02
+219,Commercial,2024-08-13,450,PPSR Plant & Equipment,Recovery,13772.11,12851.63
+219,Commercial,2024-04-15,330,Director Guarantee,Recovery,819886.4,779332.71
+219,Commercial,2025-01-10,600,Receiver/Administrator Fee,Cost,721771.05,658178.21
+219,Commercial,2024-10-12,510,Legal Cost,Cost,519423.32,480257.19
+219,Commercial,2023-06-09,19,Valuation Fee,Cost,6623.68,6604.37
+219,Commercial,2024-03-16,300,Asset Management Cost,Cost,232517.42,222038.11
+220,Commercial,2023-01-17,420,PPSR Receivables Collection,Recovery,2300107.38,2128184.67
+220,Commercial,2023-02-16,450,PPSR Plant & Equipment,Recovery,74500.98,68550.92
+220,Commercial,2024-03-12,840,PPSR Plant & Equipment,Recovery,74013.65,63362.78
+220,Commercial,2024-02-11,810,Director Guarantee,Recovery,1550250.64,1334548.11
+220,Commercial,2024-03-12,840,Receiver/Administrator Fee,Cost,572255.01,489905.15
+220,Commercial,2022-11-18,360,Legal Cost,Cost,366129.81,342543.81
+220,Commercial,2021-12-16,23,Valuation Fee,Cost,14177.42,14117.24
+221,Commercial,2022-11-06,450,Property Sale,Recovery,5161486.13,4762695.19
+221,Commercial,2022-06-09,300,Director Guarantee,Recovery,949659.53,900091.4
+221,Commercial,2022-11-06,450,Receiver/Administrator Fee,Cost,331437.09,305829.33
+221,Commercial,2022-05-10,270,Legal Cost,Cost,245737.27,234162.77
+221,Commercial,2021-08-30,17,Valuation Fee,Cost,9481.62,9452.86
+221,Commercial,2022-03-11,210,Asset Management Cost,Cost,141737.49,136517.34
+222,Commercial,2020-05-03,300,PPSR Receivables Collection,Recovery,442174.92,418820.12
+222,Commercial,2021-04-28,660,PPSR Plant & Equipment,Recovery,662953.98,588351.59
+222,Commercial,2021-02-27,600,PPSR Receivables Collection,Recovery,548149.39,491774.26
+222,Commercial,2020-05-03,300,PPSR Inventory,Recovery,531842.73,503751.85
+222,Commercial,2019-12-05,150,PPSR Receivables Collection,Recovery,633563.76,616605.0
+222,Commercial,2019-11-05,120,PPSR Inventory,Recovery,2061075.76,2016820.88
+222,Commercial,2021-01-28,570,PPSR Plant & Equipment,Recovery,589426.99,531683.93
+222,Commercial,2020-01-04,180,Director Guarantee,Recovery,1593328.97,1542288.12
+222,Commercial,2021-07-27,750,Receiver/Administrator Fee,Cost,789034.23,688936.87
+222,Commercial,2020-08-31,420,Legal Cost,Cost,262960.39,243723.35
+222,Commercial,2019-08-29,52,Valuation Fee,Cost,10124.3,10029.52
+223,Commercial,2019-10-31,180,PPSR Plant & Equipment,Recovery,507217.63,494952.8
+223,Commercial,2020-01-29,270,PPSR Plant & Equipment,Recovery,754631.39,727426.35
+223,Commercial,2021-01-23,630,PPSR Plant & Equipment,Recovery,1253284.36,1150383.59
+223,Commercial,2019-09-01,120,PPSR Plant & Equipment,Recovery,336676.98,331227.5
+223,Commercial,2019-12-30,240,Director Guarantee,Recovery,890081.7,861501.02
+223,Commercial,2022-02-17,1020,Receiver/Administrator Fee,Cost,475733.65,414117.96
+223,Commercial,2020-07-27,450,Legal Cost,Cost,437243.27,411288.67
+223,Commercial,2019-07-02,59,Valuation Fee,Cost,12038.72,11942.51
+224,Commercial,2023-02-07,600,PPSR Receivables Collection,Recovery,72336.28,66621.29
+224,Commercial,2022-05-13,330,PPSR Inventory,Recovery,250272.14,239195.94
+224,Commercial,2021-12-14,180,PPSR Plant & Equipment,Recovery,174311.79,170060.65
+224,Commercial,2021-10-15,120,PPSR Plant & Equipment,Recovery,313438.85,308321.78
+224,Commercial,2022-07-12,390,PPSR Plant & Equipment,Recovery,277031.9,262601.23
+224,Commercial,2022-06-12,360,Director Guarantee,Recovery,755950.51,719527.68
+224,Commercial,2023-09-05,810,Receiver/Administrator Fee,Cost,450962.45,403540.57
+224,Commercial,2021-09-15,90,Legal Cost,Cost,270751.19,267429.25
+224,Commercial,2021-07-08,21,Valuation Fee,Cost,13039.27,13001.76
+224,Commercial,2022-07-12,390,Asset Management Cost,Cost,119650.02,113417.42
+225,Commercial,2022-11-02,450,Property Sale,Recovery,2751861.61,2559721.87
+225,Commercial,2023-12-27,870,Receiver/Administrator Fee,Cost,245038.7,213040.73
+225,Commercial,2021-10-08,60,Legal Cost,Cost,151196.44,149744.33
+225,Commercial,2021-08-26,17,Valuation Fee,Cost,3036.17,3027.87
+226,Commercial,2023-03-17,540,PPSR Plant & Equipment,Recovery,990933.47,899722.82
+226,Commercial,2022-11-17,420,PPSR Inventory,Recovery,79357.68,73616.01
+226,Commercial,2022-04-21,210,PPSR Receivables Collection,Recovery,394907.78,380353.43
+226,Commercial,2022-03-22,180,PPSR Receivables Collection,Recovery,335938.04,325297.4
+226,Commercial,2022-06-20,270,PPSR Inventory,Recovery,174953.71,166707.55
+226,Commercial,2022-10-18,390,PPSR Receivables Collection,Recovery,201768.21,188176.68
+226,Commercial,2022-11-17,420,PPSR Plant & Equipment,Recovery,1352245.85,1254408.41
+226,Commercial,2022-09-18,360,Director Guarantee,Recovery,1351432.73,1267176.94
+226,Commercial,2023-08-14,690,Receiver/Administrator Fee,Cost,608314.21,537704.13
+226,Commercial,2022-12-17,450,Legal Cost,Cost,210665.31,194377.75
+226,Commercial,2021-11-14,52,Valuation Fee,Cost,11152.65,11049.43
+226,Commercial,2022-08-19,330,Asset Management Cost,Cost,174350.06,164359.46
+227,Commercial,2020-10-19,480,Property Sale,Recovery,5443697.29,5103464.84
+227,Commercial,2021-09-14,810,Receiver/Administrator Fee,Cost,627521.52,562768.72
+227,Commercial,2020-01-23,210,Legal Cost,Cost,257061.69,249904.88
+227,Commercial,2019-08-05,39,Valuation Fee,Cost,13788.26,13716.14
+228,Commercial,2022-03-19,420,Property Sale,Recovery,3236701.18,3036774.19
+228,Commercial,2023-07-12,900,Receiver/Administrator Fee,Cost,343720.3,299825.96
+228,Commercial,2021-10-20,270,Legal Cost,Cost,126806.06,121713.64
+228,Commercial,2021-03-20,56,Valuation Fee,Cost,12847.61,12738.85
+228,Commercial,2022-04-18,450,Asset Management Cost,Cost,122065.94,114005.69
+229,Commercial,2026-02-15,660,PPSR Receivables Collection,Recovery,785290.71,695943.04
+229,Commercial,2026-06-15,780,PPSR Receivables Collection,Recovery,2584336.35,2240550.19
+229,Commercial,2025-03-22,330,PPSR Receivables Collection,Recovery,79139.64,74501.62
+229,Commercial,2024-10-23,180,Director Guarantee,Recovery,1598750.74,1546943.2
+229,Commercial,2026-10-13,900,Receiver/Administrator Fee,Cost,837325.12,710169.74
+229,Commercial,2025-01-21,270,Legal Cost,Cost,343740.1,327167.84
+229,Commercial,2024-05-30,34,Valuation Fee,Cost,12339.04,12262.5
+229,Commercial,2025-07-20,450,Asset Management Cost,Cost,166808.72,153621.77
+230,Commercial,2025-01-28,330,Property Sale,Recovery,996362.12,943471.04
+230,Commercial,2024-08-31,180,Director Guarantee,Recovery,82717.05,80292.31
+230,Commercial,2025-02-27,360,Receiver/Administrator Fee,Cost,64898.69,61149.62
+230,Commercial,2024-08-31,180,Legal Cost,Cost,27550.95,26743.33
+230,Commercial,2024-03-20,16,Valuation Fee,Cost,6410.98,6394.04
+230,Commercial,2024-08-31,180,Asset Management Cost,Cost,15657.57,15198.59
+231,Commercial,2024-06-26,540,PPSR Receivables Collection,Recovery,1632212.18,1480186.29
+231,Commercial,2023-10-30,300,PPSR Receivables Collection,Recovery,474928.29,449820.27
+231,Commercial,2024-08-25,600,PPSR Receivables Collection,Recovery,105609.15,94737.85
+231,Commercial,2024-03-28,450,PPSR Receivables Collection,Recovery,382239.81,352332.24
+231,Commercial,2024-08-25,600,PPSR Receivables Collection,Recovery,262376.06,235367.32
+231,Commercial,2025-05-22,870,PPSR Receivables Collection,Recovery,160103.4,136770.49
+231,Commercial,2024-06-26,540,Director Guarantee,Recovery,276529.84,250773.57
+231,Commercial,2025-08-20,960,Receiver/Administrator Fee,Cost,658678.16,553590.21
+231,Commercial,2024-06-26,540,Legal Cost,Cost,303987.03,275673.37
+231,Commercial,2023-02-21,49,Valuation Fee,Cost,12015.31,11909.18
+231,Commercial,2024-04-27,480,Asset Management Cost,Cost,151847.23,139208.08
+232,Commercial,2024-10-10,690,PPSR Plant & Equipment,Recovery,1104170.42,994468.05
+232,Commercial,2023-04-19,150,PPSR Inventory,Recovery,48885.68,47786.17
+232,Commercial,2025-03-09,840,PPSR Receivables Collection,Recovery,406081.33,357510.12
+232,Commercial,2024-01-14,420,PPSR Inventory,Recovery,45111.03,42327.28
+232,Commercial,2023-06-18,210,PPSR Plant & Equipment,Recovery,434003.16,420399.05
+232,Commercial,2025-07-07,960,Receiver/Administrator Fee,Cost,461355.83,398848.36
+232,Commercial,2023-02-18,90,Legal Cost,Cost,264882.29,261291.49
+232,Commercial,2022-12-06,16,Valuation Fee,Cost,4468.98,4458.15
+233,Commercial,2024-11-05,420,Property Sale,Recovery,10353851.63,9786222.81
+233,Commercial,2025-04-04,570,Receiver/Administrator Fee,Cost,736460.93,682209.21
+233,Commercial,2024-03-10,180,Legal Cost,Cost,335550.01,327538.9
+233,Commercial,2023-10-23,41,Valuation Fee,Cost,10488.64,10431.07
+233,Commercial,2024-06-08,270,Asset Management Cost,Cost,254239.58,245189.37
+234,Commercial,2020-05-01,420,Property Sale,Recovery,11394122.73,10691895.37
+234,Commercial,2020-07-30,510,Director Guarantee,Recovery,1330888.52,1231957.1
+234,Commercial,2021-02-25,720,Receiver/Administrator Fee,Cost,951342.42,853056.26
+234,Commercial,2019-06-06,90,Legal Cost,Cost,361275.94,356384.78
+234,Commercial,2019-05-05,58,Valuation Fee,Cost,3060.57,3033.8
+234,Commercial,2020-03-02,360,Asset Management Cost,Cost,190023.36,179939.87
+235,Commercial,2024-03-03,540,PPSR Plant & Equipment,Recovery,42208.08,38549.05
+235,Commercial,2022-12-09,90,PPSR Receivables Collection,Recovery,1743492.82,1717340.93
+235,Commercial,2023-09-05,360,PPSR Plant & Equipment,Recovery,843336.27,793864.19
+235,Commercial,2023-05-08,240,PPSR Plant & Equipment,Recovery,177458.37,170448.6
+235,Commercial,2023-12-04,450,Director Guarantee,Recovery,656766.67,608965.79
+235,Commercial,2025-07-26,1050,Receiver/Administrator Fee,Cost,435640.05,365217.84
+235,Commercial,2023-11-04,420,Legal Cost,Cost,361972.24,337322.21
+235,Commercial,2022-10-14,34,Valuation Fee,Cost,12490.26,12419.15
+235,Commercial,2024-02-02,510,Asset Management Cost,Cost,116725.01,107144.51
+236,Commercial,2020-07-14,480,GSR All-Assets Sweep,Recovery,1812722.47,1664760.13
+236,Commercial,2020-04-15,390,Director Guarantee,Recovery,834435.29,778657.9
+236,Commercial,2020-07-14,480,Receiver/Administrator Fee,Cost,511265.34,469533.63
+236,Commercial,2019-09-18,180,Legal Cost,Cost,336251.01,325683.85
+236,Commercial,2019-04-26,35,Valuation Fee,Cost,14544.71,14454.69
+236,Commercial,2019-11-17,240,Asset Management Cost,Cost,227895.46,218396.59
+237,Commercial,2024-11-24,630,Property Sale,Recovery,3630370.98,3333602.79
+237,Commercial,2025-06-22,840,Receiver/Administrator Fee,Cost,260394.44,232406.8
+237,Commercial,2023-09-01,180,Legal Cost,Cost,126257.68,123218.45
+237,Commercial,2023-03-31,26,Valuation Fee,Cost,11144.98,11105.82
+238,Commercial,2022-07-11,360,GSR All-Assets Sweep,Recovery,381193.43,362506.75
+238,Commercial,2023-11-03,840,Receiver/Administrator Fee,Cost,272909.96,242708.13
+238,Commercial,2022-02-11,210,Legal Cost,Cost,182186.41,176922.15
+238,Commercial,2021-08-19,34,Valuation Fee,Cost,12788.08,12727.52
+238,Commercial,2022-09-09,420,Asset Management Cost,Cost,94802.94,89403.45
+239,Commercial,2019-12-18,630,Property Sale,Recovery,13186871.15,11848895.77
+239,Commercial,2020-02-16,690,Director Guarantee,Recovery,343237.46,305285.14
+239,Commercial,2021-03-12,1080,Receiver/Administrator Fee,Cost,778108.16,647720.44
+239,Commercial,2019-12-18,630,Legal Cost,Cost,342281.57,307552.76
+239,Commercial,2018-04-25,28,Valuation Fee,Cost,9247.79,9203.92
+239,Commercial,2019-09-19,540,Asset Management Cost,Cost,265491.09,242227.67
+240,Commercial,2025-03-14,360,GSR All-Assets Sweep,Recovery,350237.11,333248.61
+240,Commercial,2024-10-15,210,Director Guarantee,Recovery,157079.32,152588.79
+240,Commercial,2025-07-12,480,Receiver/Administrator Fee,Cost,226070.79,211569.32
+240,Commercial,2024-10-15,210,Legal Cost,Cost,181620.86,176428.75
+240,Commercial,2024-04-15,27,Valuation Fee,Cost,5825.75,5804.07
+240,Commercial,2024-11-14,240,Asset Management Cost,Cost,103023.74,99664.71
+241,Commercial,2021-02-27,90,PPSR Plant & Equipment,Recovery,476922.97,469748.64
+241,Commercial,2022-01-23,420,PPSR Plant & Equipment,Recovery,607873.94,566362.18
+241,Commercial,2021-03-29,120,PPSR Plant & Equipment,Recovery,126529.96,123998.5
+241,Commercial,2022-01-23,420,PPSR Plant & Equipment,Recovery,1722837.35,1605184.66
+241,Commercial,2021-08-26,270,PPSR Plant & Equipment,Recovery,966133.84,923185.95
+241,Commercial,2021-06-27,210,PPSR Plant & Equipment,Recovery,44668.93,43116.74
+241,Commercial,2022-01-23,420,Receiver/Administrator Fee,Cost,595763.69,555078.94
+241,Commercial,2021-05-28,180,Legal Cost,Cost,584307.23,566860.06
+241,Commercial,2020-12-20,21,Valuation Fee,Cost,4461.86,4446.11
+242,Commercial,2025-04-09,450,Property Sale,Recovery,14665990.68,13783045.57
+242,Commercial,2024-11-10,300,Director Guarantee,Recovery,1744304.72,1673573.85
+242,Commercial,2025-04-09,450,Receiver/Administrator Fee,Cost,804826.02,756372.62
+242,Commercial,2024-05-14,120,Legal Cost,Cost,294292.34,289459.61
+242,Commercial,2024-03-10,55,Valuation Fee,Cost,13903.64,13798.52
+243,Commercial,2021-11-21,510,GSR All-Assets Sweep,Recovery,903419.4,823083.57
+243,Commercial,2021-05-25,330,Director Guarantee,Recovery,1122200.52,1056573.85
+243,Commercial,2021-11-21,510,Receiver/Administrator Fee,Cost,616918.83,562059.83
+243,Commercial,2021-02-24,240,Legal Cost,Cost,182567.52,174739.2
+243,Commercial,2020-08-25,57,Valuation Fee,Cost,10719.03,10608.04
+244,Commercial,2025-04-21,330,PPSR Receivables Collection,Recovery,5266.4,5008.68
+244,Commercial,2025-01-21,240,PPSR Receivables Collection,Recovery,76760.26,74009.67
+244,Commercial,2024-12-22,210,PPSR Receivables Collection,Recovery,62454.09,60491.44
+244,Commercial,2024-08-24,90,PPSR Receivables Collection,Recovery,66425.83,65523.03
+244,Commercial,2024-10-23,150,PPSR Receivables Collection,Recovery,63625.87,62191.17
+244,Commercial,2025-11-17,540,PPSR Receivables Collection,Recovery,68659.48,63247.37
+244,Commercial,2025-11-17,540,PPSR Receivables Collection,Recovery,49575.46,45667.66
+244,Commercial,2025-11-17,540,Director Guarantee,Recovery,472893.22,435617.22
+244,Commercial,2025-11-17,540,Receiver/Administrator Fee,Cost,95094.73,87598.85
+244,Commercial,2025-02-20,270,Legal Cost,Cost,71830.3,68941.17
+244,Commercial,2024-06-11,16,Valuation Fee,Cost,12608.96,12578.33
+245,Commercial,2020-07-31,450,Property Sale,Recovery,5215709.99,4897174.98
+245,Commercial,2020-06-01,390,Director Guarantee,Recovery,523702.19,495867.47
+245,Commercial,2020-07-31,450,Receiver/Administrator Fee,Cost,291694.85,273880.39
+245,Commercial,2019-12-04,210,Legal Cost,Cost,292782.3,284297.59
+245,Commercial,2019-06-19,42,Valuation Fee,Cost,6980.47,6939.53
+245,Commercial,2019-12-04,210,Asset Management Cost,Cost,220588.17,214195.62
+246,Commercial,2024-10-07,390,Property Sale,Recovery,2835856.93,2691162.71
+246,Commercial,2024-11-06,420,Receiver/Administrator Fee,Cost,173582.55,164063.56
+246,Commercial,2023-12-12,90,Legal Cost,Cost,176623.13,174501.39
+246,Commercial,2023-10-30,47,Valuation Fee,Cost,6122.44,6083.92
+247,Commercial,2023-07-04,390,GSR All-Assets Sweep,Recovery,853521.49,795270.01
+247,Commercial,2023-11-01,510,Director Guarantee,Recovery,2180929.42,1988362.86
+247,Commercial,2023-11-01,510,Receiver/Administrator Fee,Cost,623641.81,568576.96
+247,Commercial,2022-10-07,120,Legal Cost,Cost,460002.54,450105.29
+247,Commercial,2022-07-14,35,Valuation Fee,Cost,5685.39,5649.43
+247,Commercial,2023-02-04,240,Asset Management Cost,Cost,126973.83,121568.76
+248,Commercial,2023-11-17,120,PPSR Plant & Equipment,Recovery,98406.63,96457.18
+248,Commercial,2024-07-14,360,PPSR Plant & Equipment,Recovery,92335.98,86956.4
+248,Commercial,2023-12-17,150,PPSR Plant & Equipment,Recovery,43828.42,42745.81
+248,Commercial,2023-12-17,150,PPSR Plant & Equipment,Recovery,21588.56,21055.3
+248,Commercial,2024-03-16,240,PPSR Plant & Equipment,Recovery,73867.42,70969.75
+248,Commercial,2023-11-17,120,PPSR Plant & Equipment,Recovery,62.11,60.88
+248,Commercial,2024-01-16,180,Director Guarantee,Recovery,127817.05,124037.81
+248,Commercial,2024-07-14,360,Receiver/Administrator Fee,Cost,89012.05,83826.13
+248,Commercial,2023-10-18,90,Legal Cost,Cost,59937.55,59044.8
+248,Commercial,2023-08-10,21,Valuation Fee,Cost,13436.99,13390.03
+248,Commercial,2024-01-16,180,Asset Management Cost,Cost,31739.04,30800.59
+249,Commercial,2019-10-05,600,Property Sale,Recovery,1416460.62,1293914.31
+249,Commercial,2020-07-01,870,Receiver/Administrator Fee,Cost,61366.29,53820.33
+249,Commercial,2019-03-09,390,Legal Cost,Cost,59342.16,55952.43
+249,Commercial,2018-03-06,22,Valuation Fee,Cost,13696.8,13651.43
+249,Commercial,2019-04-08,420,Asset Management Cost,Cost,24543.06,23036.66
+250,Commercial,2024-04-04,840,PPSR Plant & Equipment,Recovery,40701.97,36069.51
+250,Commercial,2024-04-04,840,PPSR Receivables Collection,Recovery,396189.56,351097.59
+250,Commercial,2023-10-07,660,PPSR Inventory,Recovery,27335.25,24859.51
+250,Commercial,2022-11-11,330,PPSR Plant & Equipment,Recovery,275749.29,262965.73
+250,Commercial,2023-05-10,510,PPSR Plant & Equipment,Recovery,180751.98,167966.68
+250,Commercial,2023-04-10,480,PPSR Plant & Equipment,Recovery,1561668.39,1457481.34
+250,Commercial,2023-07-09,570,Director Guarantee,Recovery,170796.5,157351.47
+250,Commercial,2024-04-04,840,Receiver/Administrator Fee,Cost,552587.21,489694.98
+250,Commercial,2022-02-14,60,Legal Cost,Cost,293107.89,290589.08
+250,Commercial,2022-01-16,31,Valuation Fee,Cost,5248.06,5224.71
+250,Commercial,2023-02-09,420,Asset Management Cost,Cost,161695.62,152216.13
+251,Commercial,2020-12-12,750,PPSR Plant & Equipment,Recovery,200015.14,177084.53
+251,Commercial,2020-05-16,540,PPSR Plant & Equipment,Recovery,411343.9,376816.44
+251,Commercial,2020-09-13,660,PPSR Plant & Equipment,Recovery,41990.53,37723.76
+251,Commercial,2020-10-13,690,PPSR Plant & Equipment,Recovery,1550916.51,1386553.86
+251,Commercial,2019-11-18,360,PPSR Plant & Equipment,Recovery,682009.34,643290.06
+251,Commercial,2021-08-09,990,PPSR Plant & Equipment,Recovery,1685085.54,1434885.92
+251,Commercial,2021-06-10,930,PPSR Plant & Equipment,Recovery,1338432.86,1150860.26
+251,Commercial,2019-09-19,300,Director Guarantee,Recovery,1750621.57,1667398.37
+251,Commercial,2021-08-09,990,Receiver/Administrator Fee,Cost,941172.96,801428.65
+251,Commercial,2020-09-13,660,Legal Cost,Cost,567104.5,509479.49
+251,Commercial,2018-12-23,30,Valuation Fee,Cost,9140.98,9096.57
+252,Commercial,2019-05-01,390,Property Sale,Recovery,8419674.5,7889388.06
+252,Commercial,2019-08-29,510,Receiver/Administrator Fee,Cost,319722.05,293648.43
+252,Commercial,2018-11-02,210,Legal Cost,Cost,178001.91,171874.74
+252,Commercial,2018-05-22,46,Valuation Fee,Cost,14611.33,14499.65
+252,Commercial,2018-12-02,240,Asset Management Cost,Cost,108718.32,104452.04
+253,Commercial,2020-02-20,360,GSR All-Assets Sweep,Recovery,735362.28,700067.45
+253,Commercial,2019-12-22,300,Director Guarantee,Recovery,458683.64,440262.84
+253,Commercial,2020-02-20,360,Receiver/Administrator Fee,Cost,637961.69,607341.74
+253,Commercial,2019-10-23,240,Legal Cost,Cost,420115.47,406562.85
+253,Commercial,2019-03-17,20,Valuation Fee,Cost,3436.56,3427.18
+253,Commercial,2019-08-24,180,Asset Management Cost,Cost,130407.25,127239.22
+254,Commercial,2021-03-07,240,PPSR Inventory,Recovery,179574.25,172046.93
+254,Commercial,2021-06-05,330,PPSR Receivables Collection,Recovery,431950.28,407251.52
+254,Commercial,2022-08-29,780,PPSR Receivables Collection,Recovery,969706.41,843722.44
+254,Commercial,2020-12-07,150,PPSR Inventory,Recovery,142647.95,138880.84
+254,Commercial,2021-09-03,420,Director Guarantee,Recovery,229274.11,212720.84
+254,Commercial,2022-12-27,900,Receiver/Administrator Fee,Cost,209536.13,178451.29
+254,Commercial,2022-05-31,690,Legal Cost,Cost,80521.48,71194.26
+254,Commercial,2020-07-28,18,Valuation Fee,Cost,2378.68,2371.05
+254,Commercial,2021-10-03,450,Asset Management Cost,Cost,51733.69,47742.36
+255,Commercial,2026-07-02,810,PPSR Plant & Equipment,Recovery,79712.88,70289.71
+255,Commercial,2026-03-04,690,PPSR Inventory,Recovery,897621.24,806400.28
+255,Commercial,2026-11-29,960,PPSR Inventory,Recovery,439179.36,378344.31
+255,Commercial,2026-12-29,990,PPSR Inventory,Recovery,2272602.55,1948700.92
+255,Commercial,2025-03-09,330,PPSR Plant & Equipment,Recovery,381581.87,362516.93
+255,Commercial,2026-12-29,990,Receiver/Administrator Fee,Cost,678395.86,581707.8
+255,Commercial,2024-09-10,150,Legal Cost,Cost,651742.65,636734.26
+255,Commercial,2024-05-24,41,Valuation Fee,Cost,14371.48,14280.26
+255,Commercial,2025-08-06,480,Asset Management Cost,Cost,165592.23,153696.01
+256,Commercial,2022-03-16,270,PPSR Receivables Collection,Recovery,9566.68,9154.01
+256,Commercial,2022-03-16,270,PPSR Plant & Equipment,Recovery,40355.95,38615.13
+256,Commercial,2022-07-14,390,PPSR Plant & Equipment,Recovery,173881.42,163151.78
+256,Commercial,2022-03-16,270,PPSR Inventory,Recovery,4533.33,4337.78
+256,Commercial,2022-09-12,450,PPSR Inventory,Recovery,31939.18,29676.1
+256,Commercial,2022-08-13,420,Director Guarantee,Recovery,65905.7,61536.65
+256,Commercial,2022-11-11,510,Receiver/Administrator Fee,Cost,30037.31,27636.85
+256,Commercial,2022-04-15,300,Legal Cost,Cost,16247.7,15470.84
+256,Commercial,2021-07-25,36,Valuation Fee,Cost,11234.39,11168.54
+257,Commercial,2021-06-06,420,GSR All-Assets Sweep,Recovery,979751.73,911568.85
+257,Commercial,2021-08-05,480,Receiver/Administrator Fee,Cost,541890.49,499010.56
+257,Commercial,2021-03-08,330,Legal Cost,Cost,288724.56,272816.1
+257,Commercial,2020-05-13,31,Valuation Fee,Cost,7906.01,7864.03
+258,Commercial,2020-09-19,390,Property Sale,Recovery,7745321.86,7293033.65
+258,Commercial,2020-12-18,480,Director Guarantee,Recovery,913265.86,848077.78
+258,Commercial,2022-01-12,870,Receiver/Administrator Fee,Cost,581568.16,508519.75
+258,Commercial,2021-10-14,780,Legal Cost,Cost,253499.2,224757.45
+258,Commercial,2019-10-03,38,Valuation Fee,Cost,8357.2,8308.35
+259,Commercial,2021-12-05,600,Property Sale,Recovery,7258192.04,6532258.98
+259,Commercial,2021-03-10,330,Director Guarantee,Recovery,562342.15,530676.5
+259,Commercial,2022-02-03,660,Receiver/Administrator Fee,Cost,253902.53,226112.97
+259,Commercial,2021-01-09,270,Legal Cost,Cost,186851.07,178197.38
+259,Commercial,2020-06-10,57,Valuation Fee,Cost,9478.7,9384.29
+259,Commercial,2021-03-10,330,Asset Management Cost,Cost,177792.0,167780.48
+260,Commercial,2021-02-22,810,PPSR Plant & Equipment,Recovery,415254.16,359743.87
+260,Commercial,2019-08-02,240,PPSR Plant & Equipment,Recovery,6296.26,6034.17
+260,Commercial,2021-04-23,870,PPSR Plant & Equipment,Recovery,13372.57,11462.46
+260,Commercial,2021-08-21,990,PPSR Plant & Equipment,Recovery,499349.1,419019.91
+260,Commercial,2020-11-24,720,PPSR Plant & Equipment,Recovery,302091.03,265914.33
+260,Commercial,2021-06-22,930,Director Guarantee,Recovery,341195.69,289367.84
+260,Commercial,2021-08-21,990,Receiver/Administrator Fee,Cost,161070.6,135159.53
+260,Commercial,2020-12-24,750,Legal Cost,Cost,92777.39,81234.01
+260,Commercial,2019-01-26,52,Valuation Fee,Cost,9688.89,9600.04
+260,Commercial,2020-03-29,480,Asset Management Cost,Cost,36891.17,33883.77
+261,Commercial,2024-04-14,180,PPSR Inventory,Recovery,472901.43,458010.67
+261,Commercial,2024-01-15,90,PPSR Plant & Equipment,Recovery,415294.6,408703.88
+261,Commercial,2024-06-13,240,PPSR Plant & Equipment,Recovery,82441.47,78998.53
+261,Commercial,2024-07-13,270,PPSR Inventory,Recovery,191763.01,182777.31
+261,Commercial,2024-06-13,240,PPSR Plant & Equipment,Recovery,683095.48,654567.9
+261,Commercial,2024-01-15,90,PPSR Inventory,Recovery,382460.89,376391.24
+261,Commercial,2024-12-10,420,Director Guarantee,Recovery,640672.69,594585.72
+261,Commercial,2025-01-09,450,Receiver/Administrator Fee,Cost,478922.66,442107.43
+261,Commercial,2024-08-12,300,Legal Cost,Cost,178069.08,168822.43
+261,Commercial,2023-10-31,14,Valuation Fee,Cost,12206.07,12175.74
+261,Commercial,2024-05-14,210,Asset Management Cost,Cost,185606.08,178805.69
+262,Commercial,2022-08-21,750,Property Sale,Recovery,391014.62,348741.85
+262,Commercial,2023-07-17,1080,Receiver/Administrator Fee,Cost,36986.86,31368.62
+262,Commercial,2022-06-22,690,Legal Cost,Cost,25610.43,23051.7
+262,Commercial,2020-09-08,38,Valuation Fee,Cost,4755.79,4728.3
+263,Commercial,2021-03-23,780,PPSR Plant & Equipment,Recovery,24464.08,21883.24
+263,Commercial,2020-12-23,690,PPSR Plant & Equipment,Recovery,53518.16,48492.05
+263,Commercial,2021-02-21,750,PPSR Plant & Equipment,Recovery,2989.48,2685.59
+263,Commercial,2019-05-03,90,PPSR Plant & Equipment,Recovery,67000.19,66143.84
+263,Commercial,2020-08-25,570,PPSR Plant & Equipment,Recovery,26201.64,24151.65
+263,Commercial,2019-06-02,120,PPSR Plant & Equipment,Recovery,45891.4,45111.01
+263,Commercial,2021-04-22,810,Receiver/Administrator Fee,Cost,101833.72,90701.02
+263,Commercial,2019-04-03,60,Legal Cost,Cost,53741.14,53282.24
+263,Commercial,2019-03-01,27,Valuation Fee,Cost,14527.62,14471.67
+263,Commercial,2020-02-27,390,Asset Management Cost,Cost,30761.51,29093.7
+264,Commercial,2020-01-21,90,PPSR Inventory,Recovery,61158.59,60245.9
+264,Commercial,2020-06-19,240,PPSR Receivables Collection,Recovery,631131.02,606326.22
+264,Commercial,2020-08-18,300,PPSR Inventory,Recovery,2614276.2,2486480.14
+264,Commercial,2020-09-17,330,PPSR Plant & Equipment,Recovery,1106187.83,1046853.13
+264,Commercial,2021-01-15,450,PPSR Receivables Collection,Recovery,187266.47,173704.2
+264,Commercial,2021-01-15,450,Receiver/Administrator Fee,Cost,697819.49,647281.78
+264,Commercial,2020-03-21,150,Legal Cost,Cost,357089.38,348252.06
+264,Commercial,2019-11-23,31,Valuation Fee,Cost,3194.63,3178.13
+264,Commercial,2020-05-20,210,Asset Management Cost,Cost,262698.73,253642.16
+265,Commercial,2022-06-16,420,GSR All-Assets Sweep,Recovery,1698740.89,1573299.08
+265,Commercial,2022-10-14,540,Director Guarantee,Recovery,610036.24,552740.1
+265,Commercial,2023-02-11,660,Receiver/Administrator Fee,Cost,343584.37,304564.94
+265,Commercial,2022-08-15,480,Legal Cost,Cost,320864.38,293931.58
+265,Commercial,2021-05-18,26,Valuation Fee,Cost,11530.64,11476.01
+266,Commercial,2020-07-13,210,PPSR Inventory,Recovery,305844.3,294856.15
+266,Commercial,2020-10-11,300,PPSR Receivables Collection,Recovery,2173310.75,2062631.07
+266,Commercial,2020-09-11,270,PPSR Plant & Equipment,Recovery,67028.61,63948.44
+266,Commercial,2021-02-08,420,PPSR Receivables Collection,Recovery,97207.93,90348.57
+266,Commercial,2020-07-13,210,PPSR Receivables Collection,Recovery,544813.13,525239.49
+266,Commercial,2020-09-11,270,PPSR Inventory,Recovery,294677.23,281135.92
+266,Commercial,2020-04-14,120,PPSR Plant & Equipment,Recovery,626128.83,613173.8
+266,Commercial,2021-03-10,450,Receiver/Administrator Fee,Cost,491023.89,453996.19
+266,Commercial,2020-04-14,120,Legal Cost,Cost,162086.35,158732.68
+266,Commercial,2020-01-03,18,Valuation Fee,Cost,5115.99,5099.97
+267,Commercial,2023-07-11,270,PPSR Plant & Equipment,Recovery,269627.08,257610.09
+267,Commercial,2023-09-09,330,PPSR Plant & Equipment,Recovery,687222.06,649974.52
+267,Commercial,2023-04-12,180,PPSR Plant & Equipment,Recovery,521874.81,506251.03
+267,Commercial,2023-11-08,390,Receiver/Administrator Fee,Cost,222132.6,207975.12
+267,Commercial,2023-08-10,300,Legal Cost,Cost,177560.09,168789.2
+267,Commercial,2022-12-03,50,Valuation Fee,Cost,9285.83,9207.75
+267,Commercial,2023-04-12,180,Asset Management Cost,Cost,79926.7,77533.87
+268,Commercial,2024-08-15,570,PPSR Inventory,Recovery,98472.57,90026.45
+268,Commercial,2023-07-22,180,PPSR Inventory,Recovery,426108.54,414211.14
+268,Commercial,2023-08-21,210,PPSR Inventory,Recovery,105516.87,102087.76
+268,Commercial,2024-01-18,360,PPSR Inventory,Recovery,120773.18,114123.1
+268,Commercial,2024-07-16,540,PPSR Plant & Equipment,Recovery,58505.03,53740.02
+268,Commercial,2023-12-19,330,Director Guarantee,Recovery,311023.52,295288.17
+268,Commercial,2025-01-12,720,Receiver/Administrator Fee,Cost,128220.0,114488.52
+268,Commercial,2023-05-23,120,Legal Cost,Cost,59848.74,58729.46
+268,Commercial,2023-03-13,49,Valuation Fee,Cost,6557.08,6506.72
+269,Commercial,2020-02-21,480,GSR All-Assets Sweep,Recovery,739744.99,686418.38
+269,Commercial,2020-07-20,630,Director Guarantee,Recovery,1187954.02,1076843.03
+269,Commercial,2021-03-17,870,Receiver/Administrator Fee,Cost,484223.59,422816.72
+269,Commercial,2020-09-18,690,Legal Cost,Cost,260495.77,233933.17
+269,Commercial,2018-12-13,45,Valuation Fee,Cost,14904.72,14800.54
+270,Commercial,2019-05-14,480,PPSR Receivables Collection,Recovery,1286544.9,1180114.8
+270,Commercial,2018-06-18,150,PPSR Receivables Collection,Recovery,493768.46,480622.81
+270,Commercial,2018-07-18,180,PPSR Receivables Collection,Recovery,1335442.87,1292892.92
+270,Commercial,2019-10-11,630,Director Guarantee,Recovery,350041.87,312536.21
+270,Commercial,2020-09-05,960,Receiver/Administrator Fee,Cost,311128.24,261780.96
+270,Commercial,2019-06-13,510,Legal Cost,Cost,307708.12,280733.65
+270,Commercial,2018-02-26,38,Valuation Fee,Cost,8244.53,8188.36
+271,Commercial,2022-06-01,330,PPSR Receivables Collection,Recovery,1307941.51,1231193.89
+271,Commercial,2022-09-29,450,PPSR Receivables Collection,Recovery,257167.14,236812.07
+271,Commercial,2022-11-28,510,PPSR Receivables Collection,Recovery,2286594.05,2082584.06
+271,Commercial,2021-11-03,120,PPSR Receivables Collection,Recovery,174309.49,170518.4
+271,Commercial,2022-07-31,390,PPSR Receivables Collection,Recovery,950856.7,885275.23
+271,Commercial,2023-04-27,660,Receiver/Administrator Fee,Cost,557652.11,494128.16
+271,Commercial,2021-09-04,60,Legal Cost,Cost,517749.62,512088.36
+271,Commercial,2021-07-20,14,Valuation Fee,Cost,5079.39,5066.37
+271,Commercial,2022-06-01,330,Asset Management Cost,Cost,155050.22,145952.16
+272,Commercial,2024-10-30,330,Property Sale,Recovery,5330659.37,5096183.96
+272,Commercial,2025-01-28,420,Receiver/Administrator Fee,Cost,433131.64,409030.9
+272,Commercial,2024-10-30,330,Legal Cost,Cost,432485.31,413461.93
+272,Commercial,2024-01-16,42,Valuation Fee,Cost,7658.96,7615.24
+273,Commercial,2021-03-16,480,GSR All-Assets Sweep,Recovery,2550164.22,2344687.26
+273,Commercial,2020-11-16,360,Director Guarantee,Recovery,966287.64,907285.57
+273,Commercial,2022-05-10,900,Receiver/Administrator Fee,Cost,809621.25,691633.23
+273,Commercial,2020-02-20,90,Legal Cost,Cost,267149.0,262974.08
+273,Commercial,2020-01-14,53,Valuation Fee,Cost,4241.37,4202.21
+274,Commercial,2026-02-07,630,PPSR Plant & Equipment,Recovery,1011540.26,902789.0
+274,Commercial,2024-10-15,150,PPSR Inventory,Recovery,731212.85,711676.53
+274,Commercial,2026-02-07,630,PPSR Receivables Collection,Recovery,132831.5,118550.71
+274,Commercial,2024-11-14,180,Director Guarantee,Recovery,1109106.06,1073642.45
+274,Commercial,2026-05-08,720,Receiver/Administrator Fee,Cost,472172.0,414616.53
+274,Commercial,2024-09-15,120,Legal Cost,Cost,337723.83,330485.78
+274,Commercial,2024-06-17,30,Valuation Fee,Cost,8226.13,8181.69
+274,Commercial,2025-05-13,360,Asset Management Cost,Cost,184748.34,173122.59
+275,Commercial,2023-07-20,540,Property Sale,Recovery,8614892.92,7859320.6
+275,Commercial,2023-06-20,510,Director Guarantee,Recovery,3047591.73,2794516.15
+275,Commercial,2023-09-18,600,Receiver/Administrator Fee,Cost,970116.06,876050.99
+275,Commercial,2023-04-21,450,Legal Cost,Cost,683487.48,633154.7
+275,Commercial,2022-03-08,41,Valuation Fee,Cost,11620.51,11539.8
+275,Commercial,2022-11-22,300,Asset Management Cost,Cost,320299.03,304374.64
+276,Commercial,2026-09-03,840,PPSR Receivables Collection,Recovery,1869930.56,1604837.54
+276,Commercial,2026-05-06,720,PPSR Receivables Collection,Recovery,294685.13,258492.97
+276,Commercial,2025-11-07,540,PPSR Receivables Collection,Recovery,392913.68,356135.31
+276,Commercial,2026-05-06,720,PPSR Receivables Collection,Recovery,278020.17,243874.73
+276,Commercial,2025-06-10,390,Director Guarantee,Recovery,757499.96,705596.86
+276,Commercial,2027-03-02,1020,Receiver/Administrator Fee,Cost,328672.27,272986.57
+276,Commercial,2025-09-08,480,Legal Cost,Cost,176761.96,161975.44
+276,Commercial,2024-07-01,46,Valuation Fee,Cost,13438.53,13326.5
+277,Commercial,2024-08-15,450,PPSR Receivables Collection,Recovery,2213474.59,2075157.57
+277,Commercial,2025-04-12,690,PPSR Receivables Collection,Recovery,306010.21,277183.01
+277,Commercial,2024-12-13,570,PPSR Receivables Collection,Recovery,291504.94,268626.92
+277,Commercial,2025-01-12,600,Director Guarantee,Recovery,538249.08,493876.86
+277,Commercial,2025-05-12,720,Receiver/Administrator Fee,Cost,557355.44,502683.58
+277,Commercial,2023-07-22,60,Legal Cost,Cost,403802.35,400343.13
+277,Commercial,2023-06-19,27,Valuation Fee,Cost,13941.69,13887.82
+277,Commercial,2024-05-17,360,Asset Management Cost,Cost,248846.58,236326.77
+278,Commercial,2019-11-02,540,GSR All-Assets Sweep,Recovery,2637554.97,2432575.17
+278,Commercial,2021-02-24,1020,Receiver/Administrator Fee,Cost,299229.4,256825.22
+278,Commercial,2020-10-27,900,Legal Cost,Cost,468781.94,409649.21
+278,Commercial,2018-07-04,54,Valuation Fee,Cost,13521.35,13412.4
+278,Commercial,2019-10-03,510,Asset Management Cost,Cost,216074.31,200179.62
+279,Commercial,2023-03-19,780,GSR All-Assets Sweep,Recovery,121162.56,108462.55
+279,Commercial,2021-10-25,270,Director Guarantee,Recovery,230553.41,221883.74
+279,Commercial,2023-04-18,810,Receiver/Administrator Fee,Cost,59420.07,52965.73
+279,Commercial,2021-07-27,180,Legal Cost,Cost,42085.44,41023.67
+279,Commercial,2021-03-02,33,Valuation Fee,Cost,9219.6,9176.51
+279,Commercial,2022-02-22,390,Asset Management Cost,Cost,20836.93,19714.66
+280,Commercial,2021-07-20,480,GSR All-Assets Sweep,Recovery,507940.23,464913.03
+280,Commercial,2021-01-21,300,Director Guarantee,Recovery,309618.43,292955.22
+280,Commercial,2021-12-17,630,Receiver/Administrator Fee,Cost,231085.04,205739.73
+280,Commercial,2021-01-21,300,Legal Cost,Cost,169562.19,160436.61
+280,Commercial,2020-05-17,51,Valuation Fee,Cost,8130.25,8054.15
+280,Commercial,2021-01-21,300,Asset Management Cost,Cost,48637.9,46020.28
+281,Commercial,2019-04-17,450,GSR All-Assets Sweep,Recovery,670147.87,624737.17
+281,Commercial,2018-11-18,300,Director Guarantee,Recovery,626939.43,598287.67
+281,Commercial,2019-08-15,570,Receiver/Administrator Fee,Cost,253714.42,232137.69
+281,Commercial,2018-05-22,120,Legal Cost,Cost,326510.1,320457.47
+281,Commercial,2018-02-12,21,Valuation Fee,Cost,3760.06,3747.76
+281,Commercial,2018-10-19,270,Asset Management Cost,Cost,100778.99,96624.23
+282,Commercial,2023-04-06,360,PPSR Plant & Equipment,Recovery,1224732.59,1153159.48
+282,Commercial,2023-04-06,360,PPSR Plant & Equipment,Recovery,783920.91,738108.75
+282,Commercial,2022-08-09,120,PPSR Inventory,Recovery,900863.69,882961.53
+282,Commercial,2023-06-05,420,PPSR Receivables Collection,Recovery,645823.72,602009.64
+282,Commercial,2023-02-05,300,Director Guarantee,Recovery,466750.39,443906.43
+282,Commercial,2023-10-03,540,Receiver/Administrator Fee,Cost,626833.94,572696.66
+282,Commercial,2022-10-08,180,Legal Cost,Cost,364156.02,353355.25
+282,Commercial,2022-05-31,50,Valuation Fee,Cost,9888.2,9805.85
+282,Commercial,2023-01-06,270,Asset Management Cost,Cost,275475.15,263310.69
+283,Commercial,2022-11-01,450,GSR All-Assets Sweep,Recovery,1024138.29,964228.29
+283,Commercial,2023-03-01,570,Director Guarantee,Recovery,1477940.16,1369295.3
+283,Commercial,2023-11-26,840,Receiver/Administrator Fee,Cost,765523.18,684055.55
+283,Commercial,2023-08-28,750,Legal Cost,Cost,501176.32,453272.45
+283,Commercial,2021-09-15,38,Valuation Fee,Cost,7444.02,7406.23
+283,Commercial,2022-10-02,420,Asset Management Cost,Cost,294022.5,277937.46
+284,Commercial,2022-11-09,510,GSR All-Assets Sweep,Recovery,159202.11,146195.68
+284,Commercial,2022-11-09,510,Receiver/Administrator Fee,Cost,124543.26,114368.37
+284,Commercial,2021-10-15,120,Legal Cost,Cost,49137.67,48162.09
+284,Commercial,2021-08-13,57,Valuation Fee,Cost,14391.61,14255.18
+285,Commercial,2020-11-24,300,PPSR Plant & Equipment,Recovery,87449.96,83167.24
+285,Commercial,2021-03-24,420,PPSR Plant & Equipment,Recovery,265577.87,247549.26
+285,Commercial,2021-01-23,360,PPSR Plant & Equipment,Recovery,159450.48,150126.39
+285,Commercial,2020-04-28,90,PPSR Plant & Equipment,Recovery,312163.3,307496.12
+285,Commercial,2021-03-24,420,PPSR Plant & Equipment,Recovery,284288.07,264989.34
+285,Commercial,2020-10-25,270,PPSR Plant & Equipment,Recovery,589042.12,563014.74
+285,Commercial,2020-08-26,210,Director Guarantee,Recovery,434790.78,419773.68
+285,Commercial,2021-04-23,450,Receiver/Administrator Fee,Cost,223580.7,207359.21
+285,Commercial,2021-01-23,360,Legal Cost,Cost,158353.17,149093.25
+285,Commercial,2020-03-21,52,Valuation Fee,Cost,4382.69,4344.71
+286,Commercial,2022-09-04,390,PPSR Receivables Collection,Recovery,238238.06,222248.53
+286,Commercial,2022-06-06,300,PPSR Plant & Equipment,Recovery,2693.27,2553.11
+286,Commercial,2022-09-04,390,PPSR Inventory,Recovery,320060.6,298579.48
+286,Commercial,2022-09-04,390,PPSR Plant & Equipment,Recovery,888755.12,829105.64
+286,Commercial,2022-09-04,390,Director Guarantee,Recovery,407981.89,380599.87
+286,Commercial,2022-09-04,390,Receiver/Administrator Fee,Cost,501788.24,468110.33
+286,Commercial,2021-10-09,60,Legal Cost,Cost,282175.81,279175.88
+286,Commercial,2021-10-04,55,Valuation Fee,Cost,8927.67,8840.63
+287,Commercial,2024-10-08,390,Property Sale,Recovery,2199340.69,2086372.94
+287,Commercial,2024-10-08,390,Receiver/Administrator Fee,Cost,149758.97,142066.7
+287,Commercial,2023-12-13,90,Legal Cost,Cost,98619.5,97426.71
+287,Commercial,2023-11-04,51,Valuation Fee,Cost,11403.89,11325.52
+288,Commercial,2021-03-20,120,PPSR Inventory,Recovery,650455.6,638470.9
+288,Commercial,2022-03-15,480,PPSR Plant & Equipment,Recovery,1172357.99,1088313.57
+288,Commercial,2021-05-19,180,PPSR Plant & Equipment,Recovery,1828156.92,1777864.45
+288,Commercial,2021-06-18,210,PPSR Plant & Equipment,Recovery,576703.14,558236.66
+288,Commercial,2021-08-17,270,PPSR Inventory,Recovery,175648.37,168450.33
+288,Commercial,2022-02-13,450,PPSR Inventory,Recovery,25806.35,24067.97
+288,Commercial,2022-06-13,570,Receiver/Administrator Fee,Cost,717826.96,657137.35
+288,Commercial,2021-01-19,60,Legal Cost,Cost,624553.79,618773.31
+288,Commercial,2020-12-31,41,Valuation Fee,Cost,14940.49,14845.86
+289,Commercial,2019-08-10,480,PPSR Receivables Collection,Recovery,570475.19,531996.06
+289,Commercial,2020-03-07,690,PPSR Plant & Equipment,Recovery,1680035.38,1519572.52
+289,Commercial,2020-01-07,630,PPSR Receivables Collection,Recovery,1469573.01,1340865.49
+289,Commercial,2018-09-14,150,PPSR Receivables Collection,Recovery,66869.03,65425.55
+289,Commercial,2019-07-11,450,Director Guarantee,Recovery,1109240.45,1038945.75
+289,Commercial,2020-04-06,720,Receiver/Administrator Fee,Cost,527668.24,475191.25
+289,Commercial,2018-10-14,180,Legal Cost,Cost,508286.76,495148.73
+289,Commercial,2018-05-28,41,Valuation Fee,Cost,7770.22,7724.01
+290,Commercial,2024-05-01,360,Property Sale,Recovery,7298753.18,6939483.22
+290,Commercial,2024-06-30,420,Receiver/Administrator Fee,Cost,834543.97,786817.63
+290,Commercial,2023-10-04,150,Legal Cost,Cost,481128.28,471114.97
+290,Commercial,2023-06-21,45,Valuation Fee,Cost,12909.44,12828.24
+290,Commercial,2023-12-03,210,Asset Management Cost,Cost,110761.38,107547.62
+291,Commercial,2022-03-04,300,PPSR Receivables Collection,Recovery,317444.18,304885.74
+291,Commercial,2023-02-27,660,PPSR Receivables Collection,Recovery,1033579.94,945752.49
+291,Commercial,2022-02-02,270,PPSR Receivables Collection,Recovery,360971.1,348092.92
+291,Commercial,2021-11-04,180,Director Guarantee,Recovery,743893.27,726093.37
+291,Commercial,2023-06-27,780,Receiver/Administrator Fee,Cost,152797.25,137574.15
+291,Commercial,2021-11-04,180,Legal Cost,Cost,130997.81,127863.29
+291,Commercial,2021-06-30,53,Valuation Fee,Cost,14723.51,14618.89
+291,Commercial,2022-06-02,390,Asset Management Cost,Cost,72430.69,68727.93
+292,Commercial,2022-04-24,210,PPSR Plant & Equipment,Recovery,583341.19,566598.62
+292,Commercial,2023-03-20,540,PPSR Receivables Collection,Recovery,348972.39,323794.8
+292,Commercial,2022-02-23,150,PPSR Receivables Collection,Recovery,222707.37,218122.73
+292,Commercial,2022-01-24,120,PPSR Inventory,Recovery,80618.0,79287.57
+292,Commercial,2021-12-25,90,PPSR Plant & Equipment,Recovery,128255.37,126664.63
+292,Commercial,2022-11-20,420,PPSR Receivables Collection,Recovery,325968.19,307525.37
+292,Commercial,2023-01-19,480,PPSR Receivables Collection,Recovery,2854811.13,2670973.91
+292,Commercial,2022-06-23,270,Director Guarantee,Recovery,518560.67,499504.0
+292,Commercial,2023-03-20,540,Receiver/Administrator Fee,Cost,401913.67,372916.48
+292,Commercial,2022-08-22,330,Legal Cost,Cost,318282.56,304045.64
+292,Commercial,2021-11-17,52,Valuation Fee,Cost,8943.44,8879.18
+293,Commercial,2020-10-23,180,PPSR Receivables Collection,Recovery,170561.83,165347.85
+293,Commercial,2021-05-21,390,PPSR Receivables Collection,Recovery,1130607.16,1057055.76
+293,Commercial,2021-07-20,450,PPSR Receivables Collection,Recovery,787562.69,728747.14
+293,Commercial,2020-12-22,240,Director Guarantee,Recovery,332221.51,318749.87
+293,Commercial,2021-10-18,540,Receiver/Administrator Fee,Cost,184725.66,168297.36
+293,Commercial,2020-12-22,240,Legal Cost,Cost,223858.29,214780.8
+293,Commercial,2020-05-27,31,Valuation Fee,Cost,10700.26,10643.2
+293,Commercial,2021-01-21,270,Asset Management Cost,Cost,154410.52,147384.54
+294,Commercial,2021-12-22,330,Property Sale,Recovery,7800235.23,7453292.15
+294,Commercial,2021-12-22,330,Director Guarantee,Recovery,505112.76,482646.08
+294,Commercial,2022-01-21,360,Receiver/Administrator Fee,Cost,570797.92,543158.4
+294,Commercial,2021-08-24,210,Legal Cost,Cost,263506.82,255986.82
+294,Commercial,2021-03-08,41,Valuation Fee,Cost,2353.49,2340.22
+295,Commercial,2024-01-02,330,PPSR Plant & Equipment,Recovery,400950.25,383538.78
+295,Commercial,2023-07-06,150,PPSR Plant & Equipment,Recovery,1422322.08,1393906.9
+295,Commercial,2024-02-01,360,PPSR Plant & Equipment,Recovery,95908.03,91373.65
+295,Commercial,2023-11-03,270,PPSR Plant & Equipment,Recovery,1527204.12,1472724.66
+295,Commercial,2023-12-03,300,PPSR Plant & Equipment,Recovery,562354.93,540109.9
+295,Commercial,2023-07-06,150,PPSR Plant & Equipment,Recovery,404170.16,396095.64
+295,Commercial,2023-10-04,240,PPSR Plant & Equipment,Recovery,14340.19,13884.56
+295,Commercial,2023-09-04,210,Director Guarantee,Recovery,1158176.58,1125913.23
+295,Commercial,2024-04-01,420,Receiver/Administrator Fee,Cost,667214.63,630559.18
+295,Commercial,2023-09-04,210,Legal Cost,Cost,309293.15,300677.17
+295,Commercial,2023-03-21,43,Valuation Fee,Cost,6139.8,6104.38
+295,Commercial,2023-09-04,210,Asset Management Cost,Cost,348261.03,338559.51
+296,Commercial,2020-08-28,390,PPSR Inventory,Recovery,66460.83,61951.77
+296,Commercial,2021-01-25,540,PPSR Inventory,Recovery,5211.07,4728.02
+296,Commercial,2020-09-27,420,PPSR Inventory,Recovery,262226.34,243118.02
+296,Commercial,2020-01-01,150,PPSR Receivables Collection,Recovery,5748.58,5595.33
+296,Commercial,2020-05-30,300,PPSR Plant & Equipment,Recovery,347764.41,329468.8
+296,Commercial,2021-02-24,570,PPSR Plant & Equipment,Recovery,87343.55,78819.97
+296,Commercial,2020-07-29,360,Director Guarantee,Recovery,104053.58,97519.63
+296,Commercial,2021-02-24,570,Receiver/Administrator Fee,Cost,58485.15,52777.77
+296,Commercial,2020-01-31,180,Legal Cost,Cost,90191.34,87313.69
+296,Commercial,2019-10-02,59,Valuation Fee,Cost,7787.85,7705.52
+296,Commercial,2020-04-30,270,Asset Management Cost,Cost,28007.2,26677.55
+297,Commercial,2021-08-22,420,GSR All-Assets Sweep,Recovery,799536.31,746035.68
+297,Commercial,2021-04-24,300,Director Guarantee,Recovery,436909.56,415821.4
+297,Commercial,2022-06-18,720,Receiver/Administrator Fee,Cost,252888.95,224577.67
+297,Commercial,2021-08-22,420,Legal Cost,Cost,167751.54,156526.52
+297,Commercial,2020-07-23,25,Valuation Fee,Cost,14742.27,14681.62
+298,Commercial,2023-05-13,420,Property Sale,Recovery,12040529.9,11337608.93
+298,Commercial,2023-09-10,540,Director Guarantee,Recovery,1091035.53,1009835.72
+298,Commercial,2024-02-07,690,Receiver/Administrator Fee,Cost,460219.27,416914.1
+298,Commercial,2023-10-10,570,Legal Cost,Cost,347475.88,320236.24
+298,Commercial,2022-04-16,28,Valuation Fee,Cost,3217.81,3204.93
+299,Commercial,2022-08-18,780,Property Sale,Recovery,13965363.01,12491225.46
+299,Commercial,2023-01-15,930,Director Guarantee,Recovery,458546.04,401438.48
+299,Commercial,2023-02-14,960,Receiver/Administrator Fee,Cost,905463.36,789302.69
+299,Commercial,2022-09-17,810,Legal Cost,Cost,500055.89,445356.72
+299,Commercial,2020-07-29,30,Valuation Fee,Cost,2033.18,2024.48
+299,Commercial,2021-10-22,480,Asset Management Cost,Cost,164565.53,153647.4
+300,Commercial,2022-12-22,330,Property Sale,Recovery,5755549.16,5472678.48
+300,Commercial,2023-02-20,390,Director Guarantee,Recovery,503991.53,474850.59
+300,Commercial,2023-08-19,570,Receiver/Administrator Fee,Cost,533773.23,489274.13
+300,Commercial,2022-03-27,60,Legal Cost,Cost,196660.9,194867.14
+300,Commercial,2022-03-16,49,Valuation Fee,Cost,2755.64,2735.09

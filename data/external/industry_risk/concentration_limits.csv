@@ -1,0 +1,10 @@
+industry,risk_level,industry_base_risk_score,concentration_limit_pct,current_exposure_pct,headroom_pct,breach,utilisation_pct
+Accommodation And Food Services,Medium,2.68,20.0,6.7,13.3,False,33.5
+"Agriculture, Forestry And Fishing",Elevated,3.5,15.0,3.6,11.4,False,24.0
+Construction,Medium,2.68,20.0,15.0,5.0,False,75.0
+Health Care and Social Assistance,Medium,2.22,20.0,16.0,4.0,False,80.0
+Manufacturing,Elevated,3.5,15.0,14.0,1.0,False,93.3
+"Professional, Scientific And Technical Services",Medium,2.18,20.0,12.0,8.0,False,60.0
+Retail Trade,Elevated,3.23,15.0,17.0,-2.0,True,113.3
+"Transport, Postal And Warehousing",Medium,2.14,20.0,8.0,12.0,False,40.0
+Wholesale Trade,Elevated,3.23,15.0,12.6,2.4,False,84.0
