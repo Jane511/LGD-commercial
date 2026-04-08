@@ -1,0 +1,414 @@
+"""
+Final LGD layer builder for EL-ready facility-level outputs.
+
+This module adds a simplified final LGD layer on top of the detailed APRA LGD
+framework. It standardises the three product datasets into one portfolio view,
+applies a compact set of base LGD assumptions and risk-driver adjustments, and
+produces a clean `lgd_final` field for downstream Expected Loss use.
+"""
+from __future__ import annotations
+
+from pathlib import Path
+
+import pandas as pd
+
+try:
+    from .data_generation import generate_all_datasets
+except ImportError:  # pragma: no cover - enables direct script execution
+    from data_generation import generate_all_datasets
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_RAW_DIR = PROJECT_ROOT / "data" / "raw"
+DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "outputs" / "tables"
+DEFAULT_DOWNTURN_SCALAR = 1.10
+
+# Simple lookup requested in the final-layer instructions, extended to cover
+# development finance so all repo products can feed one EL-ready dataset.
+BASE_LGD_LOOKUP = {
+    ("property", "residential"): 0.20,
+    ("property", "commercial"): 0.35,
+    ("sme_cashflow", "secured"): 0.45,
+    ("sme_cashflow", "partially_secured"): 0.55,
+    ("sme_cashflow", "unsecured"): 0.65,
+    ("overdraft", "unsecured"): 0.75,
+    ("development", "secured"): 0.40,
+}
+
+HIGH_RISK_INDUSTRY_TOKENS = (
+    "construction",
+    "accommodation",
+    "food",
+    "hospitality",
+    "manufacturing",
+)
+
+REQUIRED_COLUMNS = [
+    "loan_id",
+    "product_type",
+    "security_type",
+    "property_type",
+    "property_value",
+    "current_lvr",
+    "loan_stage",
+    "industry",
+    "ead",
+]
+
+OUTPUT_COLUMNS = [
+    "loan_id",
+    "source_product",
+    "source_loan_id",
+    "product_type",
+    "security_type",
+    "property_type",
+    "property_value",
+    "current_lvr",
+    "loan_stage",
+    "industry",
+    "ead",
+    "lgd_base",
+    "lgd_adj_lvr",
+    "lgd_adj_stage",
+    "lgd_adj_industry",
+    "lgd_adjusted",
+    "downturn_scalar",
+    "lgd_downturn",
+    "lgd_final",
+]
+
+
+def _normalise_label(value) -> str:
+    """Normalise text labels for lookup logic."""
+    if pd.isna(value):
+        return ""
+    return str(value).strip().lower().replace("-", "_").replace("/", "_").replace("&", "and")
+
+
+def _classify_commercial_security(row) -> str:
+    """
+    Collapse repo-specific commercial collateral detail into simple secured /
+    partially secured / unsecured buckets for the final layer.
+    """
+    if _normalise_label(row.get("facility_type")) == "overdraft":
+        return "unsecured"
+
+    seniority = _normalise_label(row.get("seniority"))
+    coverage = row.get("security_coverage_ratio")
+
+    if seniority == "senior_unsecured":
+        return "unsecured"
+    if pd.isna(coverage):
+        return "partially_secured"
+    if coverage >= 1.0:
+        return "secured"
+    if coverage >= 0.5:
+        return "partially_secured"
+    return "unsecured"
+
+
+def _normalise_development_stage(stage) -> str:
+    """Map detailed development stages to the simple early / mid / late buckets."""
+    label = _normalise_label(stage)
+    if label in {"pre_construction", "early_construction", "early"}:
+        return "early"
+    if label in {"mid_construction", "mid"}:
+        return "mid"
+    if label:
+        return "late"
+    return ""
+
+
+def _prepare_mortgage_inputs(df: pd.DataFrame) -> pd.DataFrame:
+    out = pd.DataFrame(
+        {
+            "loan_id": df["loan_id"].map(lambda x: f"MTG-{int(x)}"),
+            "source_product": "Mortgage",
+            "source_loan_id": df["loan_id"],
+            "product_type": "property",
+            "security_type": "residential",
+            "property_type": df["property_type"],
+            "property_value": df["property_value_at_default"],
+            "current_lvr": df["ltv_at_default"],
+            "loan_stage": pd.NA,
+            "industry": pd.NA,
+            "ead": df["ead"],
+        }
+    )
+    return out
+
+
+def _prepare_commercial_inputs(df: pd.DataFrame) -> pd.DataFrame:
+    security_bucket = df.apply(_classify_commercial_security, axis=1)
+    product_type = df["facility_type"].map(
+        lambda value: "overdraft" if _normalise_label(value) == "overdraft" else "sme_cashflow"
+    )
+    current_lvr = (df["ead"] / df["collateral_value"]).where(df["collateral_value"] > 0)
+
+    out = pd.DataFrame(
+        {
+            "loan_id": df["loan_id"].map(lambda x: f"COM-{int(x)}"),
+            "source_product": "Commercial",
+            "source_loan_id": df["loan_id"],
+            "product_type": product_type,
+            "security_type": security_bucket,
+            "property_type": pd.NA,
+            "property_value": df["collateral_value"],
+            "current_lvr": current_lvr,
+            "loan_stage": pd.NA,
+            "industry": df["industry"],
+            "ead": df["ead"],
+        }
+    )
+    return out
+
+
+def _prepare_development_inputs(df: pd.DataFrame) -> pd.DataFrame:
+    out = pd.DataFrame(
+        {
+            "loan_id": df["loan_id"].map(lambda x: f"DEV-{int(x)}"),
+            "source_product": "Development",
+            "source_loan_id": df["loan_id"],
+            "product_type": "development",
+            "security_type": "secured",
+            "property_type": df["development_type"],
+            "property_value": df["as_if_complete_value"],
+            "current_lvr": df["lvr_as_if_complete"],
+            "loan_stage": df["completion_stage"].map(_normalise_development_stage),
+            "industry": df["industry"],
+            "ead": df["ead"],
+        }
+    )
+    return out
+
+
+def load_repo_portfolio_inputs(raw_dir: str | Path | None = None) -> pd.DataFrame:
+    """
+    Load raw repo loan files and standardise them into one final-layer input set.
+
+    If the raw CSVs are not present, synthetic datasets are generated in-memory.
+    """
+    raw_path = Path(raw_dir) if raw_dir is not None else DEFAULT_RAW_DIR
+    file_map = {
+        "mortgage": raw_path / "mortgage_loans.csv",
+        "commercial": raw_path / "commercial_loans.csv",
+        "development": raw_path / "development_loans.csv",
+    }
+
+    if all(path.exists() for path in file_map.values()):
+        mortgage = pd.read_csv(file_map["mortgage"])
+        commercial = pd.read_csv(file_map["commercial"])
+        development = pd.read_csv(file_map["development"])
+    else:
+        datasets = generate_all_datasets()
+        mortgage = datasets["mortgage"]["loans"]
+        commercial = datasets["commercial"]["loans"]
+        development = datasets["development"]["loans"]
+
+    portfolio_inputs = pd.concat(
+        [
+            _prepare_mortgage_inputs(mortgage),
+            _prepare_commercial_inputs(commercial),
+            _prepare_development_inputs(development),
+        ],
+        ignore_index=True,
+    )
+    return portfolio_inputs
+
+
+def assign_base_lgd(row: pd.Series) -> float:
+    """Assign a simple base LGD by product and security type."""
+    product = _normalise_label(row["product_type"])
+    security = _normalise_label(row["security_type"])
+
+    if product in {"mortgage", "home_loan", "residential_mortgage"}:
+        product, security = "property", "residential"
+    elif product in {"commercial", "commercial_cashflow", "cashflow", "sme"}:
+        product = "sme_cashflow"
+    elif product in {"development_finance"}:
+        product = "development"
+
+    if product == "overdraft":
+        security = "unsecured"
+    elif product == "property" and security not in {"residential", "commercial"}:
+        security = "commercial"
+    elif product == "development" and security != "secured":
+        security = "secured"
+
+    key = (product, security)
+    if key in BASE_LGD_LOOKUP:
+        return BASE_LGD_LOOKUP[key]
+
+    if product == "sme_cashflow":
+        return BASE_LGD_LOOKUP[(product, "partially_secured")]
+
+    raise ValueError(
+        f"Unsupported product/security combination for loan {row.get('loan_id')}: "
+        f"{row['product_type']} / {row['security_type']}"
+    )
+
+
+def lvr_adjustment(lvr) -> float:
+    """Additive LGD adjustment for higher leverage."""
+    if pd.isna(lvr):
+        return 0.0
+    if float(lvr) > 0.80:
+        return 0.05
+    if float(lvr) > 0.60:
+        return 0.02
+    return 0.0
+
+
+def stage_adjustment(stage) -> float:
+    """Additive LGD adjustment for development-stage risk."""
+    normalised_stage = _normalise_development_stage(stage)
+    if normalised_stage == "early":
+        return 0.08
+    if normalised_stage == "mid":
+        return 0.04
+    return 0.0
+
+
+def industry_adjustment(industry) -> float:
+    """Simple high-risk industry overlay."""
+    label = _normalise_label(industry)
+    if any(token in label for token in HIGH_RISK_INDUSTRY_TOKENS):
+        return 0.03
+    return 0.0
+
+
+def build_final_lgd_layer(
+    df: pd.DataFrame,
+    downturn_scalar: float = DEFAULT_DOWNTURN_SCALAR,
+) -> pd.DataFrame:
+    """
+    Build the simplified final LGD layer from an EL-ready input dataset.
+    """
+    missing = [column for column in REQUIRED_COLUMNS if column not in df.columns]
+    if missing:
+        raise ValueError(f"Missing required columns for LGD final layer: {missing}")
+
+    out = df.copy()
+
+    out["lgd_base"] = out.apply(assign_base_lgd, axis=1)
+    out["lgd_adj_lvr"] = out["current_lvr"].apply(lvr_adjustment)
+    out["lgd_adj_stage"] = out["loan_stage"].apply(stage_adjustment)
+    out["lgd_adj_industry"] = out["industry"].apply(industry_adjustment)
+    out["lgd_adjusted"] = (
+        out["lgd_base"]
+        + out["lgd_adj_lvr"]
+        + out["lgd_adj_stage"]
+        + out["lgd_adj_industry"]
+    )
+    out["downturn_scalar"] = downturn_scalar
+    out["lgd_downturn"] = out["lgd_adjusted"] * out["downturn_scalar"]
+    out["lgd_final"] = out["lgd_downturn"].clip(0, 1)
+
+    extra_columns = [
+        column for column in out.columns if column not in OUTPUT_COLUMNS
+    ]
+    return out[OUTPUT_COLUMNS + extra_columns]
+
+
+def summarise_final_lgd_by_product(df: pd.DataFrame) -> pd.DataFrame:
+    """Create a compact product-level summary for validation and handoff."""
+    summary = (
+        df.groupby(["source_product", "product_type"], observed=True)
+        .apply(
+            lambda group: pd.Series(
+                {
+                    "loan_count": len(group),
+                    "total_ead": group["ead"].sum(),
+                    "average_lgd_base": group["lgd_base"].mean(),
+                    "average_lgd_final": group["lgd_final"].mean(),
+                    "ead_weighted_lgd_final": (
+                        (group["lgd_final"] * group["ead"]).sum() / group["ead"].sum()
+                        if group["ead"].sum() else 0.0
+                    ),
+                }
+            ),
+            include_groups=False,
+        )
+        .reset_index()
+    )
+    return summary.sort_values(["source_product", "product_type"]).reset_index(drop=True)
+
+
+def validate_final_lgd_layer(df: pd.DataFrame) -> pd.DataFrame:
+    """Run the sanity checks requested in the final-layer instructions."""
+    commercial_like = df[df["product_type"].isin(["sme_cashflow", "overdraft"])].copy()
+    secured_mean = commercial_like.loc[
+        commercial_like["security_type"] == "secured", "lgd_final"
+    ].mean()
+    unsecured_mean = commercial_like.loc[
+        commercial_like["security_type"] == "unsecured", "lgd_final"
+    ].mean()
+
+    checks = [
+        {
+            "check_name": "no_negative_lgd",
+            "passed": bool((df["lgd_final"] >= 0).all()),
+            "detail": f"min_lgd_final={df['lgd_final'].min():.4f}",
+        },
+        {
+            "check_name": "no_lgd_above_100pct",
+            "passed": bool((df["lgd_final"] <= 1).all()),
+            "detail": f"max_lgd_final={df['lgd_final'].max():.4f}",
+        },
+        {
+            "check_name": "downturn_not_below_adjusted",
+            "passed": bool((df["lgd_downturn"] >= df["lgd_adjusted"]).all()),
+            "detail": f"downturn_scalar={df['downturn_scalar'].iloc[0]:.2f}",
+        },
+        {
+            "check_name": "secured_below_unsecured",
+            "passed": bool(pd.notna(secured_mean) and pd.notna(unsecured_mean) and secured_mean < unsecured_mean),
+            "detail": (
+                f"secured_mean={secured_mean:.4f}; unsecured_mean={unsecured_mean:.4f}"
+                if pd.notna(secured_mean) and pd.notna(unsecured_mean)
+                else "insufficient commercial observations"
+            ),
+        },
+    ]
+    return pd.DataFrame(checks)
+
+
+def build_and_save_repo_final_lgd(
+    raw_dir: str | Path | None = None,
+    output_dir: str | Path | None = None,
+    downturn_scalar: float = DEFAULT_DOWNTURN_SCALAR,
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """
+    Build the repo's final LGD layer and save the CSV outputs.
+    """
+    portfolio_inputs = load_repo_portfolio_inputs(raw_dir=raw_dir)
+    final_lgd = build_final_lgd_layer(portfolio_inputs, downturn_scalar=downturn_scalar)
+    summary = summarise_final_lgd_by_product(final_lgd)
+    checks = validate_final_lgd_layer(final_lgd)
+
+    target_dir = Path(output_dir) if output_dir is not None else DEFAULT_OUTPUT_DIR
+    target_dir.mkdir(parents=True, exist_ok=True)
+
+    final_lgd.to_csv(target_dir / "lgd_final.csv", index=False)
+    summary.to_csv(target_dir / "lgd_final_summary_by_product.csv", index=False)
+    checks.to_csv(target_dir / "lgd_final_validation_checks.csv", index=False)
+
+    return final_lgd, summary, checks
+
+
+def main() -> None:
+    """CLI entry point for building the final LGD layer outputs."""
+    final_lgd, summary, checks = build_and_save_repo_final_lgd()
+
+    print(
+        f"Saved {len(final_lgd)} rows to "
+        f"{DEFAULT_OUTPUT_DIR / 'lgd_final.csv'}"
+    )
+    print("\nAverage final LGD by product:")
+    print(summary.to_string(index=False))
+    print("\nValidation checks:")
+    print(checks.to_string(index=False))
+
+
+if __name__ == "__main__":
+    main()
