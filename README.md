@@ -28,6 +28,7 @@ lgd_project_repo/
 │   ├── __init__.py
 │   ├── data_generation.py        # Product-specific synthetic data generators
 │   ├── lgd_calculation.py        # LGD engines with APRA overlays
+│   ├── lgd_final.py              # EL-ready final LGD layer builder
 │   ├── validation.py             # Backtesting & validation framework
 │   └── industry_risk_integration.py  # Industry risk loader & LGD adjustments
 │
@@ -36,7 +37,8 @@ lgd_project_repo/
 │   ├── 02_commercial_cashflow_lgd.ipynb
 │   ├── 03_development_finance_lgd.ipynb
 │   ├── 04_cross_product_comparison.ipynb
-│   └── 05_industry_risk_integration.ipynb
+│   ├── 05_industry_risk_integration.ipynb
+│   └── 06_lgd_final_layer.ipynb
 │
 ├── data/
 │   ├── raw/                      # Generated CSV datasets
@@ -119,6 +121,22 @@ Industry risk scores (1-5 scale) from the [Industry Risk Analysis](https://githu
 
 9 ANZSIC industries covered, sourced from ABS and RBA public data. See `notebooks/05_industry_risk_integration.ipynb` for the full analysis.
 
+### LGD Final Layer
+
+The repository now includes a simplified final LGD layer for downstream Expected Loss usage. It converts the detailed product datasets into one facility-level output with:
+
+- **Base LGD** by product/security bucket
+- **LVR adjustment** for higher leverage exposures
+- **Development stage adjustment** for earlier-stage projects
+- **Industry risk adjustment** for higher-risk sectors
+- **Downturn scalar** to convert adjusted LGD into stressed LGD
+
+The final output is a single `lgd_final` number per loan, saved to `outputs/tables/lgd_final.csv`, ready for use in an EL engine:
+
+```python
+EL = PD * LGD_final * EAD
+```
+
 ---
 
 ## Quick Start
@@ -132,8 +150,13 @@ pip install -r requirements.txt
 ### Generate synthetic data
 
 ```bash
-cd src
-python data_generation.py
+python -m src.data_generation
+```
+
+### Build the final LGD layer
+
+```bash
+python -m src.lgd_final
 ```
 
 ### Run notebooks
@@ -142,7 +165,7 @@ python data_generation.py
 jupyter notebook notebooks/
 ```
 
-Run notebooks 01-04 in order. Each notebook is self-contained and generates its own data.
+Run notebooks 01-06 in order. `06_lgd_final_layer.ipynb` demonstrates the EL-ready final layer and reproduces the output CSV and validation checks.
 
 ---
 
