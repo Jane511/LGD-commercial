@@ -338,6 +338,17 @@ def generate_validation_report(df, actual_col="realised_lgd",
             df, actual_col, predicted_col, "industry"
         )
 
+    # PD score band calibration (for cash flow lending)
+    if "pd_score_band" in df.columns:
+        report["calibration_by_pd_band"] = calibration_by_score_band(
+            df, actual_col, predicted_col, band_col="pd_score_band"
+        )
+    if "pd_estimate" in df.columns and "pd_score_band" in df.columns:
+        report["pd_lgd_consistency"] = pd_lgd_consistency_check(
+            df, pd_col="pd_estimate", lgd_col=predicted_col,
+            band_col="pd_score_band"
+        )
+
     return report
 
 
@@ -397,6 +408,132 @@ def industry_attribution_analysis(df, actual_col="realised_lgd",
         predicted_col if predicted_col in df_clean.columns else actual_col,
         industry_col
     )
+
+    return result
+
+
+# ==========================================================================
+# 9. PD-LGD CONSISTENCY VALIDATION
+# ==========================================================================
+
+def calibration_by_score_band(df, actual_col="realised_lgd",
+                              predicted_col="lgd_final",
+                              pd_col="pd_estimate",
+                              band_col="pd_score_band"):
+    """
+    Validate LGD calibration across PD score bands.
+
+    Checks that:
+    - LGD increases monotonically with PD band (A < B < ... < E)
+    - Each band is conservatively calibrated
+    - PD-LGD correlation is positive (internal consistency)
+
+    Returns dict with calibration table, monotonicity check, and
+    PD-LGD rank correlation.
+    """
+    result = {}
+
+    # Calibration table by PD band
+    cal = calibration_by_segment(df, actual_col, predicted_col, band_col)
+    band_order = ["A", "B", "C", "D", "E"]
+    cal[band_col] = pd.Categorical(cal[band_col], categories=band_order, ordered=True)
+    cal = cal.sort_values(band_col)
+    result["calibration_table"] = cal
+
+    # Monotonicity: predicted LGD should increase across bands A -> E
+    predicted_means = cal["mean_predicted"].values
+    is_monotonic = all(
+        predicted_means[i] <= predicted_means[i + 1]
+        for i in range(len(predicted_means) - 1)
+        if np.isfinite(predicted_means[i]) and np.isfinite(predicted_means[i + 1])
+    )
+    result["is_monotonic"] = is_monotonic
+
+    # PD-LGD rank correlation
+    if pd_col in df.columns:
+        mask = np.isfinite(df[pd_col]) & np.isfinite(df[predicted_col])
+        if mask.sum() > 5:
+            corr, pval = stats.spearmanr(
+                df.loc[mask, pd_col], df.loc[mask, predicted_col]
+            )
+            result["pd_lgd_correlation"] = round(corr, 6)
+            result["pd_lgd_pvalue"] = round(pval, 6)
+
+    # Mean PD and LGD by band for EL computation
+    if pd_col in df.columns:
+        el_table = df.groupby(band_col).agg(
+            mean_pd=(pd_col, "mean"),
+            mean_lgd=(predicted_col, "mean"),
+            count=(actual_col, "size"),
+        ).reset_index()
+        el_table["implied_el"] = el_table["mean_pd"] * el_table["mean_lgd"]
+        el_table[band_col] = pd.Categorical(
+            el_table[band_col], categories=band_order, ordered=True
+        )
+        result["el_table"] = el_table.sort_values(band_col)
+
+    return result
+
+
+def pd_lgd_consistency_check(df, pd_col="pd_estimate",
+                             lgd_col="lgd_final",
+                             band_col="pd_score_band"):
+    """
+    Check PD-LGD internal consistency for APRA compliance.
+
+    APRA APS 113 requires that PD and LGD estimates are internally
+    consistent -- i.e., they should not be independently optimistic.
+
+    Returns dict with:
+    - Correlation test (should be positive)
+    - Implied EL by band
+    - Joint conservatism test
+    - Downturn dependency check
+    """
+    result = {}
+
+    # 1. PD-LGD correlation (should be positive for consistency)
+    mask = np.isfinite(df[pd_col]) & np.isfinite(df[lgd_col])
+    df_clean = df[mask]
+    if len(df_clean) > 5:
+        corr, pval = stats.spearmanr(df_clean[pd_col], df_clean[lgd_col])
+        result["correlation"] = {
+            "spearman_rho": round(corr, 6),
+            "p_value": round(pval, 6),
+            "is_positive": bool(corr > 0),
+            "interpretation": (
+                "Consistent: higher PD associated with higher LGD"
+                if corr > 0
+                else "WARNING: negative PD-LGD correlation suggests inconsistency"
+            ),
+        }
+
+    # 2. Implied EL by score band
+    band_order = ["A", "B", "C", "D", "E"]
+    band_stats = df_clean.groupby(band_col).agg(
+        n=(pd_col, "size"),
+        mean_pd=(pd_col, "mean"),
+        mean_lgd=(lgd_col, "mean"),
+        total_ead=("ead", "sum") if "ead" in df_clean.columns else (pd_col, "size"),
+    ).reset_index()
+    band_stats["implied_el"] = band_stats["mean_pd"] * band_stats["mean_lgd"]
+    band_stats[band_col] = pd.Categorical(
+        band_stats[band_col], categories=band_order, ordered=True
+    )
+    result["el_by_band"] = band_stats.sort_values(band_col)
+
+    # 3. Portfolio-level implied EL
+    portfolio_el = (df_clean[pd_col] * df_clean[lgd_col]).mean()
+    result["portfolio_implied_el"] = round(portfolio_el, 6)
+
+    # 4. Joint conservatism: is EL increasing across bands?
+    el_vals = result["el_by_band"]["implied_el"].values
+    el_monotonic = all(
+        el_vals[i] <= el_vals[i + 1]
+        for i in range(len(el_vals) - 1)
+        if np.isfinite(el_vals[i]) and np.isfinite(el_vals[i + 1])
+    )
+    result["el_monotonic"] = el_monotonic
 
     return result
 

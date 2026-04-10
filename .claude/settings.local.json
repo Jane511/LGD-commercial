@@ -23,7 +23,12 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:api.github.com)",
       "Bash(python3 -c \"import json; nb=json.load\\(open\\('D:/Jane/Job Search/Github/credit-risk-portfolio_bank/2. APRA LGD Model/notebooks/02_commercial_cashflow_lgd.ipynb'\\)\\); [print\\(c['source'][:200] if c['cell_type']=='code' else c['source'][:150]\\) for c in nb['cells'][:15]]\")",
-      "Bash(python -c \"import json; nb=json.load\\(open\\('D:/Jane/Job Search/Github/credit-risk-portfolio_bank/2. APRA LGD Model/notebooks/02_commercial_cashflow_lgd.ipynb'\\)\\); [print\\(c['source'][:200] if c['cell_type']=='code' else c['source'][:150]\\) for c in nb['cells'][:15]]\")"
+      "Bash(python -c \"import json; nb=json.load\\(open\\('D:/Jane/Job Search/Github/credit-risk-portfolio_bank/2. APRA LGD Model/notebooks/02_commercial_cashflow_lgd.ipynb'\\)\\); [print\\(c['source'][:200] if c['cell_type']=='code' else c['source'][:150]\\) for c in nb['cells'][:15]]\")",
+      "Bash(rm -rf _readme_refresh_staging/)",
+      "Bash(rm -f \"data/synthetic_lgd_dataset.xlsx\")",
+      "Bash(rm -f \"docs/project_notes.md\")",
+      "Bash(rm -f \"final lgd layers.pdf\")",
+      "Bash(python -m pytest tests/ -v)"
     ]
   }
 }

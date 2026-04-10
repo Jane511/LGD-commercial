@@ -23,12 +23,20 @@ venv/
 .venv/
 env/
 
-# Data outputs (generated, not tracked)
+# Raw/source data (do not commit)
+data/raw/
+data/source/
+data/financials/
+data/interim/
+
+# Figures and model binaries (keep repo size down)
 outputs/figures/*.png
-outputs/tables/*.csv
 outputs/models/*.pkl
 
 # Keep output dirs via .gitkeep
 !outputs/figures/.gitkeep
 !outputs/tables/.gitkeep
 !outputs/models/.gitkeep
+
+# Claude Code
+.claude/

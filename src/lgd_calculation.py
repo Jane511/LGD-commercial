@@ -649,12 +649,241 @@ class DevelopmentLGDEngine:
 
 
 # ==========================================================================
+# 4. CASH FLOW LENDING LGD ENGINE (PD-aligned)
+# ==========================================================================
+
+class CashFlowLendingLGDEngine:
+    """
+    Australian cash flow lending LGD engine aligned with PD Scorecard.
+
+    Implements:
+    - PD score band segmentation (A-E from WoE logistic regression)
+    - Product-type segmentation (8 cash flow lending products)
+    - PD-band-adjusted downturn add-ons
+    - DSCR stress overlay
+    - Conduct overlay (Green / Amber / Red)
+    - Industry risk adjustments (shared with CommercialLGDEngine)
+    - Supervisory LGD floors by product and seniority
+
+    Key principle: PD and LGD must be internally consistent -- higher PD
+    borrowers face systematically worse recovery outcomes due to weaker
+    cash flow capacity during workout.
+    """
+
+    # Supervisory LGD floors (APS 112 fallback)
+    SUPERVISORY_LGD = {
+        "Senior Secured": 0.35,
+        "Senior Unsecured": 0.45,
+        "Subordinated": 0.75,
+    }
+
+    # Product-specific supervisory floors (unsecured cash flow products
+    # warrant higher floors than collateralised commercial)
+    PRODUCT_LGD_FLOOR = {
+        "Business Term Loan": 0.45,
+        "Working Capital Facility": 0.50,
+        "Trade Finance": 0.40,
+        "Equipment Finance": 0.35,
+        "Invoice Finance": 0.35,
+        "Merchant Cash Advance": 0.55,
+        "Business Line of Credit": 0.50,
+        "Professional Practice Loan": 0.40,
+    }
+
+    # Base downturn scalars by product type
+    BASE_DOWNTURN_SCALARS = {
+        "Business Term Loan": 1.15,
+        "Working Capital Facility": 1.20,
+        "Trade Finance": 1.10,
+        "Equipment Finance": 1.10,
+        "Invoice Finance": 1.10,
+        "Merchant Cash Advance": 1.25,
+        "Business Line of Credit": 1.20,
+        "Professional Practice Loan": 1.10,
+    }
+
+    # PD-band downturn add-ons: worse PD -> more severe downturn impact
+    PD_BAND_DOWNTURN_ADDON = {
+        "A": -0.03,
+        "B": -0.01,
+        "C":  0.00,
+        "D":  0.03,
+        "E":  0.05,
+    }
+
+    # MoC multiplier by PD band (higher PD -> more model uncertainty)
+    MOC_PD_MULTIPLIER = {
+        "A": 0.85,
+        "B": 0.95,
+        "C": 1.00,
+        "D": 1.10,
+        "E": 1.25,
+    }
+
+    # Conduct overlay (additive, in decimal)
+    CONDUCT_OVERLAY = {
+        "Green": 0.000,
+        "Amber": 0.005,
+        "Red":   0.015,
+    }
+
+    DEFAULT_MOC = 0.04  # 4pp base (higher than secured commercial)
+
+    def __init__(self, moc=None):
+        self.moc = moc or self.DEFAULT_MOC
+
+    @staticmethod
+    def segment_loans(df):
+        """
+        Create segmentation columns for cash flow lending portfolio.
+
+        Segments:
+          Level 1: pd_score_band (A-E)
+          Level 2: cashflow_product
+          Level 3: industry_risk_band
+          Level 4: conduct_classification
+        """
+        out = df.copy()
+
+        # DSCR bands
+        dscr_bins = [0, 1.0, 1.3, 1.8, 2.5, float("inf")]
+        dscr_labels = ["<1.0x", "1.0-1.3x", "1.3-1.8x", "1.8-2.5x", "2.5x+"]
+        if "dscr" in out.columns:
+            out["dscr_band"] = pd.cut(
+                out["dscr"], bins=dscr_bins, labels=dscr_labels, right=True
+            )
+
+        # Bureau score bands
+        if "bureau_score" in out.columns:
+            bscore_bins = [0, 500, 580, 650, 720, 900]
+            bscore_labels = ["<500", "500-580", "580-650", "650-720", "720+"]
+            out["bureau_band"] = pd.cut(
+                out["bureau_score"], bins=bscore_bins,
+                labels=bscore_labels, right=True
+            )
+
+        # Industry risk band
+        if "industry_risk_score" in out.columns:
+            risk_bins = [0, 2.5, 3.0, 5.0]
+            risk_labels = ["Low", "Medium", "Elevated"]
+            out["industry_risk_band"] = pd.cut(
+                out["industry_risk_score"], bins=risk_bins,
+                labels=risk_labels, right=True
+            )
+
+        return out
+
+    def compute_long_run_lgd(self, df, segments=None):
+        """Compute exposure-weighted long-run LGD by segment."""
+        if segments is None:
+            segments = ["pd_score_band", "cashflow_product"]
+        segmented = self.segment_loans(df)
+        return exposure_weighted_average(
+            segmented, lgd_col="realised_lgd", ead_col="ead", group_col=segments
+        )
+
+    def apply_overlays(self, df):
+        """
+        Apply PD-aligned downturn, MoC, and regulatory overlays.
+
+        Enhanced pipeline:
+          1. Industry recovery haircut (if available)
+          2. PD-band-adjusted downturn scalar
+          3. PD-band-adjusted MoC + industry adjustment
+          4. DSCR stress overlay
+          5. Conduct overlay
+          6. Working capital adjustment (if available)
+          7. Product-specific supervisory LGD floor
+          8. Cap at 100%
+        """
+        out = df.copy()
+        has_industry = "industry_risk_score" in out.columns
+
+        # Step 1: Industry recovery haircut
+        if has_industry:
+            out["industry_recovery_haircut"] = compute_industry_recovery_haircut(
+                out["industry_risk_score"]
+            )
+            out["lgd_industry_adjusted"] = (
+                out["realised_lgd"] + out["industry_recovery_haircut"]
+            )
+        else:
+            out["lgd_industry_adjusted"] = out["realised_lgd"]
+
+        # Step 2: PD-band-adjusted downturn scalar
+        base_scalar = out["cashflow_product"].map(
+            self.BASE_DOWNTURN_SCALARS
+        ).fillna(1.15)
+        pd_addon = out["pd_score_band"].map(
+            self.PD_BAND_DOWNTURN_ADDON
+        ).fillna(0.0)
+        effective_scalar = base_scalar + pd_addon
+
+        if has_industry:
+            out["downturn_scalar"] = compute_industry_downturn_scalar(
+                out["industry_risk_score"], effective_scalar
+            )
+        else:
+            out["downturn_scalar"] = effective_scalar
+        out["lgd_downturn"] = out["lgd_industry_adjusted"] * out["downturn_scalar"]
+
+        # Step 3: PD-band-adjusted MoC + industry
+        pd_moc_mult = out["pd_score_band"].map(
+            self.MOC_PD_MULTIPLIER
+        ).fillna(1.0)
+        base_moc = self.moc * pd_moc_mult
+        if has_industry:
+            out["industry_moc"] = compute_industry_moc_adjustment(
+                out["industry_risk_score"], base_moc
+            )
+        else:
+            out["industry_moc"] = base_moc
+        out["lgd_with_moc"] = out["lgd_downturn"] + out["industry_moc"]
+
+        # Step 4: DSCR stress overlay
+        if "dscr" in out.columns:
+            out["dscr_stress_overlay"] = np.maximum(
+                (1.3 - out["dscr"]) * 0.02, 0
+            )
+            out["lgd_with_moc"] = out["lgd_with_moc"] + out["dscr_stress_overlay"]
+
+        # Step 5: Conduct overlay
+        if "conduct_classification" in out.columns:
+            out["conduct_overlay"] = out["conduct_classification"].map(
+                self.CONDUCT_OVERLAY
+            ).fillna(0.0)
+            out["lgd_with_moc"] = out["lgd_with_moc"] + out["conduct_overlay"]
+
+        # Step 6: Working capital adjustment
+        if "wc_lgd_overlay_score" in out.columns:
+            out["wc_lgd_adjustment"] = compute_working_capital_lgd_adjustment(
+                out["wc_lgd_overlay_score"]
+            )
+            out["lgd_with_moc"] = out["lgd_with_moc"] + out["wc_lgd_adjustment"]
+
+        # Step 7: Product-specific supervisory floor
+        product_floor = out["cashflow_product"].map(
+            self.PRODUCT_LGD_FLOOR
+        ).fillna(0.45)
+        seniority_floor = out["seniority"].map(
+            self.SUPERVISORY_LGD
+        ).fillna(0.45)
+        out["supervisory_lgd"] = np.maximum(product_floor, seniority_floor)
+        out["lgd_with_moc"] = np.maximum(out["lgd_with_moc"], out["supervisory_lgd"])
+
+        # Step 8: Cap at 100%
+        out["lgd_final"] = out["lgd_with_moc"].clip(0, 1)
+
+        return out
+
+
+# ==========================================================================
 # FULL PIPELINE: Run all products
 # ==========================================================================
 
 def run_full_pipeline(datasets):
     """
-    Run the complete LGD pipeline for all three products.
+    Run the complete LGD pipeline for all products.
 
     Parameters
     ----------
@@ -662,7 +891,7 @@ def run_full_pipeline(datasets):
 
     Returns
     -------
-    dict with keys 'mortgage', 'commercial', 'development',
+    dict with keys 'mortgage', 'commercial', 'development', 'cashflow_lending',
     each containing 'loans_with_overlays' and 'segment_summary' DataFrames.
     """
     results = {}
@@ -698,5 +927,16 @@ def run_full_pipeline(datasets):
         "loans_with_overlays": dev_with_overlays,
         "segment_summary": dev_segments,
     }
+
+    # --- Cash Flow Lending ---
+    if "cashflow_lending" in datasets:
+        cfl = CashFlowLendingLGDEngine()
+        cfl_loans = datasets["cashflow_lending"]["loans"]
+        cfl_with_overlays = cfl.apply_overlays(cfl_loans)
+        cfl_segments = cfl.compute_long_run_lgd(cfl_loans)
+        results["cashflow_lending"] = {
+            "loans_with_overlays": cfl_with_overlays,
+            "segment_summary": cfl_segments,
+        }
 
     return results

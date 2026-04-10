@@ -1352,22 +1352,23 @@ Same framework as commercial (Section 2.13) with additional considerations:
 
 # Part C: Cross-Product Comparison Matrix
 
-| Dimension | Residential Mortgage | Commercial Cash Flow | Development Finance |
-|-----------|---------------------|---------------------|---------------------|
-| **Primary security** | Residential property | Mixed (property, PPSR, GSR) | Development site + WIP |
-| **Typical LGD range** | 10-25% (with cures) | 30-55% | 15-50% (stage dependent) |
-| **Key LGD driver** | LTV at default | Security coverage ratio | Completion stage at default |
-| **Typical workout period** | 6-18 months | 12-36 months | 12-36 months |
-| **Cure rate** | 30-50% | 10-20% | 5-10% |
-| **Data availability** | Good (large portfolios) | Moderate (fewer defaults) | Poor (very few defaults) |
-| **Downturn sensitivity** | Medium | Medium-High | Very High |
-| **Model complexity** | Two-stage (cure + loss) | Segmented + regression | Scenario-based / expert |
-| **APRA floors** | 10% (standard), 15% (non-standard) | Supervisory LGD if no model | Slotting may be required |
-| **LMI applicable** | Yes | No | No |
-| **Fund-to-complete risk** | No | No | Yes (unique feature) |
-| **Discount rate** | 3-5% | 5-7% | 7-9% |
-| **Recommended MoC** | +1-3pp | +3-5pp | +5-8pp |
-| **APRA scalar** | 1.1x on RWA | 1.1x on RWA | 1.1x on RWA (+ higher correlation if HVCRE) |
+| Dimension | Residential Mortgage | Commercial Cash Flow | Development Finance | Cash Flow Lending |
+|-----------|---------------------|---------------------|---------------------|-------------------|
+| **Primary security** | Residential property | Mixed (property, PPSR, GSR) | Development site + WIP | Unsecured / receivables |
+| **Typical LGD range** | 10-25% (with cures) | 30-55% | 15-50% (stage dependent) | 40-80% (PD dependent) |
+| **Key LGD driver** | LTV at default | Security coverage ratio | Completion stage | PD score band + DSCR |
+| **Typical workout period** | 6-18 months | 12-36 months | 12-36 months | 6-30 months |
+| **Cure rate** | 30-50% | 10-20% | 5-10% | 5-15% |
+| **Data availability** | Good (large portfolios) | Moderate (fewer defaults) | Poor (very few defaults) | Moderate |
+| **Downturn sensitivity** | Medium | Medium-High | Very High | High |
+| **Model complexity** | Two-stage (cure + loss) | Segmented + regression | Scenario-based / expert | PD-aligned overlays |
+| **APRA floors** | 10%/15% (std/non-std) | Supervisory LGD | Slotting may be required | Product-specific (35-55%) |
+| **LMI applicable** | Yes | No | No | No |
+| **PD alignment** | No | No | No | Yes (bands A-E) |
+| **Fund-to-complete risk** | No | No | Yes (unique feature) | No |
+| **Discount rate** | 3-5% | 5-7% | 7-9% | 6-9% |
+| **Recommended MoC** | +1-3pp | +3-5pp | +5-8pp | +3-5pp (PD-adjusted) |
+| **APRA scalar** | 1.1x on RWA | 1.1x on RWA | 1.1x on RWA (+ HVCRE) | 1.1x on RWA |
 
 ---
 
@@ -1455,94 +1456,62 @@ Note: LGD can exceed 100% when post-default funding (cost-to-complete) exceeds i
 
 ---
 
-# Part E: Consolidated Gap Analysis & Recommendations
+# Part E: Gap Analysis -- Original vs Current
 
-## E.1 Gap Summary by Category
+## E.1 Gaps Addressed in Current Implementation
 
-### Data Gaps
-| Gap | Affects | Priority |
-|-----|---------|----------|
-| No real default/workout data | All products | Critical |
-| No borrower financials for commercial | Commercial | Critical |
-| No PPSR/GSR security register data | Commercial | Critical |
-| No completion stage / QS data | Development | Critical |
-| No pre-sale data | Development | Critical |
-| No cost-to-complete data | Development | High |
-| No indexed property values at default | Mortgage | Medium |
-| No LMI claim history | Mortgage | Medium |
+The original LGD implementations had significant gaps. The following have been resolved:
 
-### Methodology Gaps
-| Gap | Affects | Priority |
-|-----|---------|----------|
-| No two-stage cure model | Mortgage | High |
-| No exposure-weighted averaging | All products | High |
-| No macro-linked downturn | All products | High |
-| No scenario modelling | Development | High |
-| No fund-to-complete decision logic | Development | High |
-| OLS on raw LGD (unbounded) | Mortgage | Medium |
-| No vintage/cohort analysis | All products | Medium |
-| Unjustified discount rates | All products | Medium |
+### Data Gaps -- Resolved
+| Original Gap | Resolution |
+|-------------|-----------|
+| No borrower financials for commercial | `generate_commercial_data()` includes revenue, EBITDA, leverage, ICR |
+| No PPSR/GSR security register data | Security types (Property/PPSR/GSR) with coverage ratios |
+| No completion stage / QS data | `generate_development_data()` with completion stages and cost-to-complete |
+| No pre-sale data | Pre-sale coverage and rescission modelling |
+| No cost-to-complete data | Fund-to-complete scenario with cost overrun |
+| No PD/scorecard integration | `generate_cashflow_lending_data()` with WoE score bands A-E |
 
-### Product-Specific Gaps
-| Gap | Affects | Priority |
-|-----|---------|----------|
-| All 3 products share identical generation logic | Multi-product framework | Critical |
-| No security type differentiation | Commercial | Critical |
-| No completion stage segmentation | Development | Critical |
-| No industry segmentation | Commercial | High |
-| No facility structure (drawn/undrawn/CCF) | Commercial | High |
-| No PPSR recovery hierarchy | Commercial | High |
-| No pre-sale rescission modelling | Development | High |
-| No state-specific property analysis | Mortgage | Medium |
+### Methodology Gaps -- Resolved
+| Original Gap | Resolution |
+|-------------|-----------|
+| No two-stage cure model | `MortgageLGDEngine` with P(Cure) logistic + LGD|Loss |
+| No exposure-weighted averaging | `exposure_weighted_average()` used across all engines |
+| No scenario modelling | `DevelopmentLGDEngine.scenario_analysis()` |
+| No fund-to-complete decision logic | Fund-to-complete vs sell-as-is in data generation |
+| All products share identical logic | 4 distinct engines with product-specific parameters |
+| No industry segmentation | 16-industry risk integration across 3 products |
+| No PD-LGD alignment | `CashFlowLendingLGDEngine` with PD-band overlays |
 
-### Regulatory Gaps
-| Gap | Affects | Priority |
-|-----|---------|----------|
-| Implementation 2 has zero APRA overlays | All products | Critical |
-| No specialised lending / slotting | Development | High |
-| No APS 112 collateral recognition | Commercial | High |
-| No HVCRE treatment | Development | Medium |
-| No SME firm-size adjustment | Commercial | Medium |
-| No supervisory LGD fallback | Commercial | Medium |
+### Regulatory Gaps -- Resolved
+| Original Gap | Resolution |
+|-------------|-----------|
+| Zero APRA overlays | Full overlay pipelines in all 4 engines |
+| No specialised lending / slotting | `DevelopmentLGDEngine.assign_slotting()` |
+| No APS 112 collateral recognition | Supervisory LGD floors by seniority and product |
+| No HVCRE treatment | HVCRE correlation multiplier (1.25x) |
+| No SME firm-size adjustment | `CommercialLGDEngine.sme_firm_size_adjustment()` |
+| No supervisory LGD fallback | Implemented for Commercial and Cash Flow Lending |
 
-### Validation Gaps
-| Gap | Affects | Priority |
-|-----|---------|----------|
-| No out-of-time validation | All products | High |
-| No stability monitoring (PSI) | All products | High |
-| No external benchmarking | All products | Medium |
-| No conservatism testing | All products | Medium |
-| No sensitivity analysis | All products | Medium |
+### Validation Gaps -- Resolved
+| Original Gap | Resolution |
+|-------------|-----------|
+| No out-of-time validation | `out_of_time_backtest()` |
+| No stability monitoring | `compute_psi()` |
+| No conservatism testing | `conservatism_test()` with one-sided t-test |
+| No sensitivity analysis | `sensitivity_analysis()` |
+| No PD-LGD consistency | `pd_lgd_consistency_check()` |
+| No industry attribution | `industry_attribution_analysis()` |
 
-## E.2 Recommended Enhancement Roadmap
+## E.2 Remaining Gaps
 
-### Phase 1: Data Foundation
-- Source or simulate realistic default/workout data for each product
-- Build product-specific data schemas with all required fields
-- Implement data quality checks and completeness monitoring
-
-### Phase 2: Product-Specific LGD Engines
-- **Mortgage**: Implement two-stage model (cure probability + LGD|loss), add exposure-weighted averaging
-- **Commercial**: Build security-type segmentation, add PPSR/GSR recovery framework, implement industry-based analysis
-- **Development**: Build completion-stage segmentation, implement fund-to-complete scenario model, add pre-sale risk
-
-### Phase 3: Regulatory Overlay Layer
-- Implement APRA overlays for all products (floors, LMI, standard/non-standard)
-- Add specialised lending / slotting framework for development
-- Implement APS 112 collateral recognition for commercial
-- Add macro-linked downturn methodology with scenario calibration
-
-### Phase 4: Validation Framework
-- Build out-of-time testing capability
-- Implement PSI monitoring for model stability
-- Add conservatism testing (predicted vs actual at segment level)
-- Create sensitivity analysis toolkit
-
-### Phase 5: Capital Integration
-- Link LGD to PD and EAD models
-- Implement IRB risk-weight function
-- Apply APRA scalar and produce RWA outputs
-- Connect to pricing / hurdle rate framework
+| Gap | Severity | Notes |
+|-----|----------|-------|
+| No real default/workout data | Critical | Synthetic data; production would require bank internal data |
+| No macro-linked downturn | Medium | Flat scalars (industry-adjusted) rather than macro-regression |
+| No indexed property values at default | Medium | Synthetic HPI change, not linked to actual HPI indices |
+| No LMI claim history | Low | LMI modelled probabilistically |
+| No external benchmarking | Low | Would require APRA loss benchmarks or peer data |
 
 ---
 
@@ -1550,11 +1519,11 @@ Note: LGD can exceed 100% when post-default funding (cost-to-complete) exceeds i
 
 ## F.1 Overview
 
-Industry risk analysis outputs have been integrated into the LGD framework to replace flat downturn scalars with industry-sensitive adjustments. The integration draws on a nine-layer industry analysis pipeline that produces risk scores, working capital metrics, stress scenarios, and benchmarks for 9 ANZSIC industry divisions, sourced from ABS and RBA public data.
+Industry risk analysis outputs have been integrated into the LGD framework to replace flat downturn scalars with industry-sensitive adjustments. The integration draws on a multi-layer industry analysis pipeline that produces risk scores, working capital metrics, stress scenarios, and benchmarks for **16 ANZSIC-aligned industry divisions**, sourced from ABS and RBA public data.
 
-**Source project:** Industry Risk Analysis (ANZSIC-aligned, ABS/RBA data-driven)
+**Source project:** [Industry Risk Analysis](https://github.com/Jane511/industry_analysis) (ANZSIC-aligned, ABS/RBA data-driven)
 
-**Products affected:** Commercial Cash Flow, Development Finance
+**Products affected:** Commercial Cash Flow, Development Finance, Cash Flow Lending
 
 **Module:** `src/industry_risk_integration.py`
 
@@ -1566,11 +1535,12 @@ $$\text{Industry Base Risk Score} = 0.55 \times \text{Classification Risk} + 0.4
 
 | Risk Level | Score Range | Industries |
 |:-----------|:-----------|:-----------|
-| Elevated | > 3.0 | Agriculture (3.50), Manufacturing (3.50), Wholesale Trade (3.23), Retail Trade (3.23) |
-| Medium | 2.5 – 3.0 | Accommodation & Food (2.68), Construction (2.68) |
-| Medium | ≤ 2.5 | Health Care (2.22), Professional Services (2.18), Transport (2.14) |
+| Elevated | > 3.0 | Agriculture (3.50), Manufacturing (3.50), Mining (3.50), Wholesale Trade (3.23), Retail Trade (3.23), Arts & Recreation (3.10) |
+| Medium | 2.5 - 3.0 | Real Estate (2.90), Accommodation & Food (2.68), Construction (2.68), Information Technology (2.55), Financial Services (2.45) |
+| Medium-Low | 2.0 - 2.5 | Education & Training (2.30), Health Care (2.22), Professional Services (2.18), Transport (2.14) |
+| Low | < 2.0 | Utilities (1.90) |
 
-**Mining** has no match in the industry analysis and is assigned a conservative default (score = 3.50, Elevated).
+**Mining** has no match in the industry analysis and is assigned a conservative default (score = 3.50, Elevated). The 6 new industries (Education & Training, Financial Services, Information Technology, Real Estate, Arts & Recreation, Utilities) were added for alignment with the PD Scorecard project.
 
 ## F.3 Integration Formulas
 
@@ -1691,12 +1661,147 @@ All industry risk scores derive from publicly available Australian data:
 
 | File | Purpose |
 |:-----|:--------|
-| `src/industry_risk_integration.py` | Core integration module — loader, formulas, enrichment |
-| `src/data_generation.py` | Enhanced with `INDUSTRY_RISK_PROFILES` and industry-sensitive recovery rates |
-| `src/lgd_calculation.py` | `CommercialLGDEngine` and `DevelopmentLGDEngine` enhanced with industry overlays |
-| `src/validation.py` | `industry_attribution_analysis()` and `compare_models()` added |
+| `src/industry_risk_integration.py` | Core integration module -- loader, formulas, enrichment, 16-industry name mapping |
+| `src/data_generation.py` | 16 industries in `INDUSTRY_RISK_PROFILES`, industry-sensitive recovery rates |
+| `src/lgd_calculation.py` | `CommercialLGDEngine`, `DevelopmentLGDEngine`, `CashFlowLendingLGDEngine` with industry overlays |
+| `src/validation.py` | `industry_attribution_analysis()`, `compare_models()`, `pd_lgd_consistency_check()` |
 | `data/external/industry_risk/` | Industry analysis CSV outputs (7 files) |
-| `notebooks/05_industry_risk_integration.ipynb` | Full integration demonstration and validation |
+| `notebooks/05_industry_risk_integration.ipynb` | Industry risk integration demonstration |
+
+---
+
+# Part G: Cash Flow Lending -- PD-LGD Alignment
+
+## G.1 Overview
+
+Cash flow lending covers 8 unsecured and receivables-secured products for Australian SMEs. Unlike the collateral-driven Commercial engine, LGD here is driven by **borrower cash flow capacity** and is aligned with the [PD Scorecard](https://github.com/Jane511/PD-and-Scorecard-Cashflow-Lending) project's WoE logistic regression score bands (A-E).
+
+**APRA principle:** PD and LGD must be internally consistent -- higher PD borrowers should face systematically higher LGD due to weaker cash flow capacity during workout.
+
+## G.2 Products
+
+| Product | Security Type | Supervisory Floor |
+|---------|--------------|-------------------|
+| Business Term Loan | Unsecured | 45% |
+| Working Capital Facility | Unsecured | 50% |
+| Trade Finance | Receivables | 40% |
+| Equipment Finance | Equipment | 35% |
+| Invoice Finance | Receivables | 35% |
+| Merchant Cash Advance | Unsecured | 55% |
+| Business Line of Credit | Unsecured | 50% |
+| Professional Practice Loan | Unsecured | 40% |
+
+## G.3 PD Score Bands
+
+From the WoE logistic regression scorecard:
+
+| Band | PD Range | Label | Downturn Add-on | MoC Multiplier |
+|------|----------|-------|-----------------|----------------|
+| A | 0-2.5% | Very Low | -3% | 0.85x |
+| B | 2.5-5.0% | Low | -1% | 0.95x |
+| C | 5.0-7.5% | Medium | 0% | 1.00x |
+| D | 7.5-10.0% | High | +3% | 1.10x |
+| E | 10.0-25.0% | Very High | +5% | 1.25x |
+
+## G.4 LGD Overlay Pipeline
+
+The `CashFlowLendingLGDEngine` applies overlays in 8 steps:
+
+1. **Industry recovery haircut**: `0.02 x max(risk_score - 2.0, 0)` -- 0-6pp additive
+2. **PD-band-adjusted downturn scalar**: base scalar by product + PD band add-on, then industry-adjusted via `compute_industry_downturn_scalar()`
+3. **PD-band-adjusted MoC**: base 4pp x PD multiplier, then industry-adjusted via `compute_industry_moc_adjustment()`
+4. **DSCR stress overlay**: `max(0, (1.3 - DSCR) x 0.02)` -- penalises sub-1.3x debt service coverage
+5. **Conduct overlay**: Green +0pp, Amber +0.5pp, Red +1.5pp
+6. **Working capital adjustment**: `0.01 x max(wc_score - 2.0, 0)` (if available)
+7. **Product-specific supervisory floor**: 35-55% depending on product (floored against seniority floor)
+8. **Cap at 100%**
+
+## G.5 Borrower Features
+
+Key drivers from the PD Scorecard that also feed LGD:
+
+| Feature | Weight in PD Score | LGD Impact |
+|---------|-------------------|------------|
+| Bureau score | 30% | Higher score -> better recovery capacity |
+| DSCR | 25% | Direct DSCR stress overlay in LGD |
+| FCF margin | 15% | Higher margin -> more cash available for workout |
+| Revenue CAGR | 10% | Growth trajectory affects going-concern recovery |
+| Years in business | 10% | Maturity proxy for operational resilience |
+| Conduct classification | 10% | Direct conduct overlay in LGD |
+
+## G.6 PD-LGD Consistency Validation
+
+APRA APS 113 requires that PD and LGD estimates be internally consistent. Validation checks:
+
+| Check | Metric | Result |
+|-------|--------|--------|
+| PD-LGD correlation | Spearman rho | Positive (verified) |
+| LGD monotonicity | Mean LGD by band | Increasing A -> E (verified) |
+| EL monotonicity | PD x LGD by band | Increasing A -> E (verified) |
+| Calibration by band | Predicted vs actual | Conservative in each band (verified) |
+
+## G.7 Key Files
+
+| File | Purpose |
+|:-----|:--------|
+| `src/data_generation.py` | `generate_cashflow_lending_data()` -- 400 loans, 8 products, PD scorecard features |
+| `src/lgd_calculation.py` | `CashFlowLendingLGDEngine` class with PD-aligned overlays |
+| `src/validation.py` | `calibration_by_score_band()`, `pd_lgd_consistency_check()` |
+| `notebooks/07_cashflow_lending_pd_alignment.ipynb` | Full PD-LGD alignment demonstration |
+
+---
+
+# Part H: Final LGD Layer
+
+## H.1 Overview
+
+The `lgd_final.py` module standardises all four products (Mortgage, Commercial, Development, Cash Flow Lending) into one facility-level output for downstream Expected Loss use. It implements the simplified final layer requested for EL engine integration.
+
+## H.2 Formula
+
+```
+lgd_adjusted = base_lgd + adj_lvr + adj_stage + adj_industry + adj_pd_band + adj_dscr + adj_conduct
+lgd_downturn = lgd_adjusted x downturn_scalar
+lgd_final    = clip(lgd_downturn, 0, 1)
+```
+
+## H.3 Adjustment Components
+
+| Component | Range | Applies To |
+|-----------|-------|------------|
+| Base LGD | 20-75% | All products |
+| LVR adjustment | 0-5pp | All (>80% LVR: +5pp, >60%: +2pp) |
+| Stage adjustment | 0-8pp | Development (early: +8pp, mid: +4pp) |
+| Industry adjustment | 0-3pp | Commercial, Development, Cash Flow (high-risk industries: +3pp) |
+| PD band adjustment | -5pp to +6pp | Cash Flow Lending (A:-5pp through E:+6pp) |
+| DSCR stress | 0-1pp | Cash Flow Lending (max(0, (1.3-DSCR) x 2%)) |
+| Conduct overlay | 0-1.5pp | Cash Flow Lending (Green:0, Amber:+0.5pp, Red:+1.5pp) |
+| Downturn scalar | 1.10x | All |
+
+## H.4 Validation Checks
+
+| Check | Description |
+|-------|-------------|
+| No negative LGD | All lgd_final >= 0 |
+| No LGD above 100% | All lgd_final <= 1 |
+| Downturn not below adjusted | lgd_downturn >= lgd_adjusted |
+| Secured below unsecured | Mean secured LGD < mean unsecured LGD |
+
+## H.5 Output
+
+Single CSV: `outputs/tables/lgd_final.csv` with 1,400 rows (500 mortgage + 300 commercial + 200 development + 400 cash flow lending), ready for:
+
+```
+EL = PD x LGD_final x EAD
+```
+
+## H.6 Key Files
+
+| File | Purpose |
+|:-----|:--------|
+| `src/lgd_final.py` | Final layer builder -- standardise, adjust, save |
+| `notebooks/06_lgd_final_layer.ipynb` | Final layer demonstration with 4-product visualisations |
+| `outputs/tables/lgd_final.csv` | EL-ready facility-level LGD output |
 
 ---
 
@@ -1717,6 +1822,7 @@ All industry risk scores derive from publicly available Australian data:
 | **DSCR** | Debt Service Coverage Ratio |
 | **DTI** | Debt-to-Income ratio |
 | **EAD** | Exposure at Default |
+| **EL** | Expected Loss (= PD x LGD x EAD) |
 | **GRV** | Gross Realisation Value -- total expected sales revenue of a development |
 | **GSR** | General Security Agreement -- security over all present and after-acquired property |
 | **HVCRE** | High-Volatility Commercial Real Estate |
@@ -1735,3 +1841,4 @@ All industry risk scores derive from publicly available Australian data:
 | **QS** | Quantity Surveyor -- independent construction cost assessor |
 | **RWA** | Risk-Weighted Assets |
 | **TDC** | Total Development Cost |
+| **WoE** | Weight of Evidence -- feature binning technique used in scorecard development |

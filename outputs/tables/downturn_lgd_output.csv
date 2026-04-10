@@ -1,0 +1,7 @@
+facility_id,borrower_id,segment,lgd_final,downturn_lgd
+F001,B001,SME Cash Flow,0.1,0.198
+F002,B002,SME Cash Flow,0.4333,0.5383
+F003,B003,Property Backed,0.1,0.202
+F004,B004,Working Capital,0.2018,0.3018
+F005,B005,Trade Finance,0.2371,0.3451
+F006,B006,Contingent,0.1,0.196
