@@ -323,8 +323,13 @@ INDUSTRIES = [
     "Agriculture", "Manufacturing", "Retail Trade", "Construction",
     "Transport", "Professional Services", "Accommodation & Food",
     "Health Care", "Mining", "Wholesale Trade",
+    "Education & Training", "Financial Services", "Information Technology",
+    "Real Estate", "Arts & Recreation", "Utilities",
 ]
-INDUSTRY_WEIGHTS = [0.12, 0.14, 0.13, 0.10, 0.08, 0.12, 0.09, 0.08, 0.06, 0.08]
+INDUSTRY_WEIGHTS = [
+    0.09, 0.10, 0.10, 0.08, 0.06, 0.09, 0.07, 0.06, 0.05, 0.06,
+    0.04, 0.05, 0.04, 0.04, 0.03, 0.04,
+]
 
 # Industry risk profiles from industry analysis scorecard (1-5 scale)
 # Mining has no match in industry analysis -- conservative Elevated default
@@ -339,7 +344,43 @@ INDUSTRY_RISK_PROFILES = {
     "Professional Services": {"risk_score": 2.18, "risk_level": "Medium",   "debt_to_ebitda": 2.3, "icr": 4.3},
     "Transport":             {"risk_score": 2.14, "risk_level": "Medium",   "debt_to_ebitda": 2.6, "icr": 3.8},
     "Mining":                {"risk_score": 3.50, "risk_level": "Elevated", "debt_to_ebitda": 3.5, "icr": 2.9},
+    # New industries aligned with PD Scorecard project
+    "Education & Training":  {"risk_score": 2.30, "risk_level": "Medium",   "debt_to_ebitda": 1.8, "icr": 5.0},
+    "Financial Services":    {"risk_score": 2.45, "risk_level": "Medium",   "debt_to_ebitda": 2.5, "icr": 4.0},
+    "Information Technology": {"risk_score": 2.55, "risk_level": "Medium",   "debt_to_ebitda": 2.0, "icr": 4.8},
+    "Real Estate":           {"risk_score": 2.90, "risk_level": "Medium",   "debt_to_ebitda": 3.8, "icr": 2.7},
+    "Arts & Recreation":     {"risk_score": 3.10, "risk_level": "Elevated", "debt_to_ebitda": 2.4, "icr": 3.3},
+    "Utilities":             {"risk_score": 1.90, "risk_level": "Low",      "debt_to_ebitda": 3.0, "icr": 3.5},
 }
+
+# ---------------------------------------------------------------------------
+# CASH FLOW LENDING PRODUCTS (aligned with PD Scorecard project)
+# ---------------------------------------------------------------------------
+
+CASHFLOW_PRODUCTS = [
+    "Business Term Loan",
+    "Working Capital Facility",
+    "Trade Finance",
+    "Equipment Finance",
+    "Invoice Finance",
+    "Merchant Cash Advance",
+    "Business Line of Credit",
+    "Professional Practice Loan",
+]
+CASHFLOW_PRODUCT_WEIGHTS = [0.20, 0.18, 0.10, 0.15, 0.10, 0.05, 0.12, 0.10]
+
+# PD score bands from WoE logistic regression scorecard
+PD_SCORE_BANDS = {
+    "A": {"pd_range": (0.000, 0.025), "label": "Very Low"},
+    "B": {"pd_range": (0.025, 0.050), "label": "Low"},
+    "C": {"pd_range": (0.050, 0.075), "label": "Medium"},
+    "D": {"pd_range": (0.075, 0.100), "label": "High"},
+    "E": {"pd_range": (0.100, 0.250), "label": "Very High"},
+}
+
+# Conduct classification for overlay
+CONDUCT_CLASSES = ["Green", "Amber", "Red"]
+CONDUCT_WEIGHTS = [0.70, 0.20, 0.10]
 
 # Development type -> industry mapping for risk score lookup
 _DEV_TYPE_INDUSTRY = {
@@ -1006,24 +1047,314 @@ def generate_development_data(n_loans=200, seed=44):
 
 
 # ---------------------------------------------------------------------------
+# 4. CASH FLOW LENDING (PD-aligned unsecured / receivables-secured)
+# ---------------------------------------------------------------------------
+
+def generate_cashflow_lending_data(n_loans=400, seed=45):
+    """
+    Generate synthetic cash flow lending default & workout data.
+
+    Aligned with PD Scorecard project:
+    - 8 product types (unsecured and receivables-secured)
+    - PD score bands A-E from WoE logistic regression scorecard
+    - Borrower features: DSCR, bureau score, FCF margin, revenue CAGR
+    - Conduct classification (Green / Amber / Red)
+    - Recovery driven by cash flow capacity, not hard collateral
+    """
+    rng = np.random.RandomState(seed)
+
+    loan_ids = np.arange(1, n_loans + 1)
+    states = rng.choice(STATES, n_loans, p=STATE_WEIGHTS)
+    industries = rng.choice(INDUSTRIES, n_loans, p=INDUSTRY_WEIGHTS)
+    products = rng.choice(
+        CASHFLOW_PRODUCTS, n_loans, p=CASHFLOW_PRODUCT_WEIGHTS
+    )
+
+    # --- Borrower characteristics ---
+    annual_revenue = rng.lognormal(np.log(3_000_000), 0.9, n_loans).clip(
+        300_000, 100_000_000
+    )
+    ebitda_margin = rng.uniform(0.04, 0.22, n_loans)
+    ebitda = annual_revenue * ebitda_margin
+    years_in_business = rng.randint(1, 35, n_loans)
+
+    # Cash flow metrics (key PD drivers)
+    dscr = rng.uniform(0.80, 3.50, n_loans)
+    bureau_score = rng.normal(650, 70, n_loans).clip(400, 850).astype(int)
+    fcf_margin = rng.uniform(-0.05, 0.20, n_loans)
+    revenue_cagr = rng.uniform(-0.15, 0.30, n_loans)
+
+    # Conduct classification
+    conduct = rng.choice(CONDUCT_CLASSES, n_loans, p=CONDUCT_WEIGHTS)
+
+    # --- PD score band assignment ---
+    # Simulate WoE scorecard: composite score from borrower features
+    raw_score = (
+        0.30 * np.clip((bureau_score - 400) / 450, 0, 1)
+        + 0.25 * np.clip((dscr - 0.80) / 2.70, 0, 1)
+        + 0.15 * np.clip((fcf_margin + 0.05) / 0.25, 0, 1)
+        + 0.10 * np.clip(revenue_cagr / 0.30, 0, 1)
+        + 0.10 * np.clip(years_in_business / 30, 0, 1)
+        + 0.10 * np.where(conduct == "Green", 0.8,
+                 np.where(conduct == "Amber", 0.4, 0.1))
+        + rng.normal(0, 0.05, n_loans)
+    ).clip(0, 1)
+
+    # Map to PD and score band
+    pd_estimate = 0.25 * np.exp(-4.0 * raw_score)  # higher score = lower PD
+    pd_estimate = pd_estimate.clip(0.002, 0.25)
+
+    score_band = np.where(
+        pd_estimate <= 0.025, "A",
+        np.where(pd_estimate <= 0.05, "B",
+        np.where(pd_estimate <= 0.075, "C",
+        np.where(pd_estimate <= 0.10, "D", "E")))
+    )
+
+    # --- Facility details ---
+    facility_limit = rng.uniform(100_000, 8_000_000, n_loans)
+
+    # Product-specific drawn behaviour
+    is_revolving = np.isin(products, [
+        "Working Capital Facility", "Business Line of Credit",
+        "Invoice Finance", "Merchant Cash Advance",
+    ])
+    drawn_pct = np.where(
+        is_revolving,
+        rng.uniform(0.45, 0.95, n_loans),
+        rng.uniform(0.80, 1.00, n_loans),
+    )
+    drawn_balance = facility_limit * drawn_pct
+    undrawn = facility_limit - drawn_balance
+    ccf = np.where(is_revolving, rng.uniform(0.50, 0.80, n_loans), 1.0)
+    ead = drawn_balance + ccf * undrawn
+
+    # Leverage
+    total_debt = ead * rng.uniform(1.0, 2.0, n_loans)
+    leverage = total_debt / np.maximum(ebitda, 1)
+
+    # Seniority -- mostly senior unsecured for cashflow lending
+    has_receivables_security = np.isin(products, [
+        "Invoice Finance", "Trade Finance",
+    ]).astype(int)
+    seniority = np.where(
+        has_receivables_security, "Senior Secured", "Senior Unsecured"
+    )
+
+    # Security coverage (low for cashflow lending)
+    security_coverage = np.where(
+        has_receivables_security,
+        rng.uniform(0.40, 0.80, n_loans),
+        rng.uniform(0.0, 0.20, n_loans),
+    )
+
+    # Default
+    default_dates = _random_dates(
+        datetime(2018, 1, 1), datetime(2024, 6, 30), n_loans, rng
+    )
+    default_triggers = rng.choice(
+        ["90 DPD", "Covenant Breach", "Voluntary Administration",
+         "Cash Flow Shortfall", "Bureau Downgrade"],
+        n_loans, p=[0.25, 0.20, 0.15, 0.25, 0.15]
+    )
+    discount_rate = rng.uniform(0.06, 0.09, n_loans)
+
+    resolution_strategies = rng.choice(
+        ["Voluntary Administration", "Workout", "Write-off", "DOCA"],
+        n_loans, p=[0.25, 0.35, 0.20, 0.20]
+    )
+
+    # Industry risk scores
+    industry_risk_scores = np.array([
+        INDUSTRY_RISK_PROFILES[ind]["risk_score"] for ind in industries
+    ])
+
+    # --- Build cashflows and compute LGD ---
+    all_cashflows = []
+    realised_lgd = np.zeros(n_loans)
+    workout_months_arr = np.zeros(n_loans, dtype=int)
+
+    for i in range(n_loans):
+        loan_cfs = []
+        d_date = default_dates[i]
+        workout_months = rng.randint(6, 30)
+        workout_months_arr[i] = workout_months
+        total_pv_recovery = 0.0
+        total_pv_cost = 0.0
+
+        # Industry risk penalty
+        ind_penalty = 0.02 * max(industry_risk_scores[i] - 2.0, 0)
+
+        # Base recovery rate driven by cash flow capacity and PD band
+        pd_band_recovery_mod = {
+            "A": 0.12, "B": 0.06, "C": 0.0, "D": -0.08, "E": -0.15
+        }
+        base_recovery = 0.35 + pd_band_recovery_mod[score_band[i]]
+        # DSCR effect on recovery
+        dscr_effect = 0.05 * max(dscr[i] - 1.0, 0)
+        # Conduct effect
+        conduct_effect = (
+            0.03 if conduct[i] == "Green"
+            else -0.02 if conduct[i] == "Red"
+            else 0.0
+        )
+        effective_recovery = max(
+            base_recovery + dscr_effect + conduct_effect - ind_penalty, 0.05
+        )
+        effective_recovery = min(effective_recovery, 0.70)
+
+        # Receivables-secured products get additional asset recovery
+        if has_receivables_security[i]:
+            recv_recovery = security_coverage[i] * ead[i] * rng.uniform(0.50, 0.80)
+            recv_month = rng.randint(3, min(workout_months, 12) + 1)
+            recv_date = d_date + timedelta(days=30 * recv_month)
+            recv_days = (recv_date - d_date).days
+            recv_pv = _discount(recv_recovery, recv_days, discount_rate[i])
+            total_pv_recovery += recv_pv
+            loan_cfs.append({
+                "loan_id": i + 1, "product": "Cashflow Lending",
+                "cashflow_date": recv_date, "days_from_default": recv_days,
+                "cashflow_type": "Receivables Collection",
+                "cashflow_category": "Recovery",
+                "amount": round(recv_recovery, 2),
+                "amount_pv": round(recv_pv, 2),
+            })
+
+        # Cash flow recovery (administration dividend / workout payments)
+        cf_recovery = ead[i] * effective_recovery
+        if has_receivables_security[i]:
+            cf_recovery *= 0.60  # avoid double-counting
+        n_tranches = rng.randint(2, 6)
+        tranche_amts = rng.dirichlet(np.ones(n_tranches)) * cf_recovery
+        for t_idx, t_amt in enumerate(tranche_amts):
+            t_month = rng.randint(3, workout_months + 1)
+            t_date = d_date + timedelta(days=30 * t_month)
+            t_days = (t_date - d_date).days
+            t_pv = _discount(t_amt, t_days, discount_rate[i])
+            total_pv_recovery += t_pv
+            loan_cfs.append({
+                "loan_id": i + 1, "product": "Cashflow Lending",
+                "cashflow_date": t_date, "days_from_default": t_days,
+                "cashflow_type": "Administration Dividend",
+                "cashflow_category": "Recovery",
+                "amount": round(t_amt, 2),
+                "amount_pv": round(t_pv, 2),
+            })
+
+        # --- Costs ---
+        # Administrator / receiver fees
+        admin_fee = ead[i] * rng.uniform(0.04, 0.10)
+        admin_date = d_date + timedelta(days=30 * workout_months)
+        admin_days = (admin_date - d_date).days
+        admin_pv = _discount(admin_fee, admin_days, discount_rate[i])
+        total_pv_cost += admin_pv
+        loan_cfs.append({
+            "loan_id": i + 1, "product": "Cashflow Lending",
+            "cashflow_date": admin_date, "days_from_default": admin_days,
+            "cashflow_type": "Administrator Fee",
+            "cashflow_category": "Cost",
+            "amount": round(admin_fee, 2),
+            "amount_pv": round(admin_pv, 2),
+        })
+
+        # Legal
+        legal = ead[i] * rng.uniform(0.02, 0.06)
+        legal_month = rng.randint(1, max(workout_months // 2, 2))
+        legal_date = d_date + timedelta(days=30 * legal_month)
+        legal_days = (legal_date - d_date).days
+        legal_pv = _discount(legal, legal_days, discount_rate[i])
+        total_pv_cost += legal_pv
+        loan_cfs.append({
+            "loan_id": i + 1, "product": "Cashflow Lending",
+            "cashflow_date": legal_date, "days_from_default": legal_days,
+            "cashflow_type": "Legal Cost",
+            "cashflow_category": "Cost",
+            "amount": round(legal, 2),
+            "amount_pv": round(legal_pv, 2),
+        })
+
+        econ_loss = ead[i] + total_pv_cost - total_pv_recovery
+        realised_lgd[i] = max(econ_loss / ead[i], 0.0)
+
+        all_cashflows.extend(loan_cfs)
+
+    # Industry columns
+    industry_risk_levels = np.array([
+        INDUSTRY_RISK_PROFILES[ind]["risk_level"] for ind in industries
+    ])
+    industry_debt_to_ebitda = np.array([
+        INDUSTRY_RISK_PROFILES[ind]["debt_to_ebitda"] for ind in industries
+    ])
+    industry_icr_bench = np.array([
+        INDUSTRY_RISK_PROFILES[ind]["icr"] for ind in industries
+    ])
+
+    loans = pd.DataFrame({
+        "loan_id": loan_ids,
+        "product": "Cashflow Lending",
+        "cashflow_product": products,
+        "state": states,
+        "industry": industries,
+        "annual_revenue": annual_revenue.round(2),
+        "ebitda": ebitda.round(2),
+        "ebitda_margin": ebitda_margin.round(4),
+        "leverage_ratio": leverage.round(2),
+        "dscr": dscr.round(4),
+        "bureau_score": bureau_score,
+        "fcf_margin": fcf_margin.round(4),
+        "revenue_cagr": revenue_cagr.round(4),
+        "conduct_classification": conduct,
+        "years_in_business": years_in_business,
+        "pd_estimate": pd_estimate.round(6),
+        "pd_score_band": score_band,
+        "facility_type": np.where(is_revolving, "Revolving", "Term"),
+        "facility_limit": facility_limit.round(2),
+        "drawn_balance": drawn_balance.round(2),
+        "undrawn_amount": undrawn.round(2),
+        "ccf": ccf.round(4),
+        "ead": ead.round(2),
+        "seniority": seniority,
+        "has_receivables_security": has_receivables_security,
+        "security_coverage_ratio": security_coverage.round(4),
+        "default_date": default_dates,
+        "default_trigger": default_triggers,
+        "discount_rate": discount_rate.round(4),
+        "resolution_strategy": resolution_strategies,
+        "workout_months": workout_months_arr,
+        "realised_lgd": realised_lgd.round(6),
+        "industry_risk_score": industry_risk_scores.round(2),
+        "industry_risk_level": industry_risk_levels,
+        "industry_debt_to_ebitda_benchmark": industry_debt_to_ebitda,
+        "industry_icr_benchmark": industry_icr_bench,
+    })
+
+    cashflows = pd.DataFrame(all_cashflows)
+    return loans, cashflows
+
+
+# ---------------------------------------------------------------------------
 # CONVENIENCE: Generate all products
 # ---------------------------------------------------------------------------
 
 def generate_all_datasets():
-    """Generate all three product datasets and return as a dict."""
+    """Generate all four product datasets and return as a dict."""
     mortgage_loans, mortgage_cfs = generate_mortgage_data()
     commercial_loans, commercial_cfs = generate_commercial_data()
     development_loans, development_cfs = generate_development_data()
+    cashflow_loans, cashflow_cfs = generate_cashflow_lending_data()
 
     return {
         "mortgage": {"loans": mortgage_loans, "cashflows": mortgage_cfs},
         "commercial": {"loans": commercial_loans, "cashflows": commercial_cfs},
         "development": {"loans": development_loans, "cashflows": development_cfs},
+        "cashflow_lending": {"loans": cashflow_loans, "cashflows": cashflow_cfs},
     }
 
 
 if __name__ == "__main__":
+    import os
     datasets = generate_all_datasets()
+    os.makedirs("data/raw", exist_ok=True)
     for product, data in datasets.items():
         loans_file = f"data/raw/{product}_loans.csv"
         cfs_file = f"data/raw/{product}_cashflows.csv"

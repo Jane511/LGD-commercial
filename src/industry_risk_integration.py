@@ -30,6 +30,13 @@ INDUSTRY_NAME_MAP = {
     "Wholesale Trade": "Wholesale Trade",
     # Mining has no match in industry analysis -- conservative default applied
     "Mining": None,
+    # New industries aligned with PD Scorecard project
+    "Education & Training": "Education And Training",
+    "Financial Services": "Financial And Insurance Services",
+    "Information Technology": "Information Media And Telecommunications",
+    "Real Estate": "Rental, Hiring And Real Estate Services",
+    "Arts & Recreation": "Arts And Recreation Services",
+    "Utilities": "Electricity, Gas, Water And Waste Services",
 }
 
 # Reverse map: ANZSIC name -> LGD model short name

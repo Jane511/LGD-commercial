@@ -1,0 +1,7 @@
+segment,product_type,facilities,exposure,avg_lgd,avg_downturn_lgd
+Contingent,guarantee,1,285000,0.1,0.196
+Property Backed,commercial_mortgage,1,2220000,0.1,0.202
+SME Cash Flow,overdraft,1,742000,0.4333,0.5383
+SME Cash Flow,term_loan,1,1040000,0.1,0.198
+Trade Finance,trade_finance,1,420000,0.2371,0.3451
+Working Capital,revolving_working_capital,1,1100000,0.2018,0.3018

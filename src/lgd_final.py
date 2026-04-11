@@ -33,6 +33,19 @@ BASE_LGD_LOOKUP = {
     ("sme_cashflow", "unsecured"): 0.65,
     ("overdraft", "unsecured"): 0.75,
     ("development", "secured"): 0.40,
+    # Cash flow lending products (unsecured / receivables-secured)
+    ("cashflow_lending", "secured"): 0.40,
+    ("cashflow_lending", "partially_secured"): 0.50,
+    ("cashflow_lending", "unsecured"): 0.60,
+}
+
+# PD score band adjustment for cash flow lending (additive)
+PD_BAND_LGD_ADDON = {
+    "A": -0.05,
+    "B": -0.02,
+    "C":  0.00,
+    "D":  0.03,
+    "E":  0.06,
 }
 
 HIGH_RISK_INDUSTRY_TOKENS = (
@@ -67,10 +80,16 @@ OUTPUT_COLUMNS = [
     "loan_stage",
     "industry",
     "ead",
+    "pd_score_band",
+    "dscr",
+    "conduct_classification",
     "lgd_base",
     "lgd_adj_lvr",
     "lgd_adj_stage",
     "lgd_adj_industry",
+    "lgd_adj_pd_band",
+    "lgd_adj_dscr",
+    "lgd_adj_conduct",
     "lgd_adjusted",
     "downturn_scalar",
     "lgd_downturn",
@@ -182,6 +201,36 @@ def _prepare_development_inputs(df: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
+def _prepare_cashflow_lending_inputs(df: pd.DataFrame) -> pd.DataFrame:
+    security_bucket = df["has_receivables_security"].map(
+        {1: "secured", 0: "unsecured"}
+    )
+    # Partially secured: unsecured with some coverage
+    security_bucket = security_bucket.where(
+        ~((security_bucket == "unsecured") & (df["security_coverage_ratio"] > 0.20)),
+        "partially_secured",
+    )
+    out = pd.DataFrame(
+        {
+            "loan_id": df["loan_id"].map(lambda x: f"CFL-{int(x)}"),
+            "source_product": "Cashflow Lending",
+            "source_loan_id": df["loan_id"],
+            "product_type": "cashflow_lending",
+            "security_type": security_bucket,
+            "property_type": df["cashflow_product"],
+            "property_value": df["ead"] * df["security_coverage_ratio"],
+            "current_lvr": (1.0 / df["security_coverage_ratio"].replace(0, float("inf"))).clip(0, 5),
+            "loan_stage": pd.NA,
+            "industry": df["industry"],
+            "ead": df["ead"],
+            "pd_score_band": df["pd_score_band"],
+            "dscr": df["dscr"],
+            "conduct_classification": df["conduct_classification"],
+        }
+    )
+    return out
+
+
 def load_repo_portfolio_inputs(raw_dir: str | Path | None = None) -> pd.DataFrame:
     """
     Load raw repo loan files and standardise them into one final-layer input set.
@@ -193,23 +242,27 @@ def load_repo_portfolio_inputs(raw_dir: str | Path | None = None) -> pd.DataFram
         "mortgage": raw_path / "mortgage_loans.csv",
         "commercial": raw_path / "commercial_loans.csv",
         "development": raw_path / "development_loans.csv",
+        "cashflow_lending": raw_path / "cashflow_lending_loans.csv",
     }
 
     if all(path.exists() for path in file_map.values()):
         mortgage = pd.read_csv(file_map["mortgage"])
         commercial = pd.read_csv(file_map["commercial"])
         development = pd.read_csv(file_map["development"])
+        cashflow = pd.read_csv(file_map["cashflow_lending"])
     else:
         datasets = generate_all_datasets()
         mortgage = datasets["mortgage"]["loans"]
         commercial = datasets["commercial"]["loans"]
         development = datasets["development"]["loans"]
+        cashflow = datasets["cashflow_lending"]["loans"]
 
     portfolio_inputs = pd.concat(
         [
             _prepare_mortgage_inputs(mortgage),
             _prepare_commercial_inputs(commercial),
             _prepare_development_inputs(development),
+            _prepare_cashflow_lending_inputs(cashflow),
         ],
         ignore_index=True,
     )
@@ -223,10 +276,12 @@ def assign_base_lgd(row: pd.Series) -> float:
 
     if product in {"mortgage", "home_loan", "residential_mortgage"}:
         product, security = "property", "residential"
-    elif product in {"commercial", "commercial_cashflow", "cashflow", "sme"}:
+    elif product in {"commercial", "commercial_cashflow", "sme"}:
         product = "sme_cashflow"
     elif product in {"development_finance"}:
         product = "development"
+    elif product in {"cashflow", "cashflow_lending", "cash_flow_lending"}:
+        product = "cashflow_lending"
 
     if product == "overdraft":
         security = "unsecured"
@@ -234,6 +289,8 @@ def assign_base_lgd(row: pd.Series) -> float:
         security = "commercial"
     elif product == "development" and security != "secured":
         security = "secured"
+    elif product == "cashflow_lending" and security not in {"secured", "partially_secured", "unsecured"}:
+        security = "unsecured"
 
     key = (product, security)
     if key in BASE_LGD_LOOKUP:
@@ -241,6 +298,8 @@ def assign_base_lgd(row: pd.Series) -> float:
 
     if product == "sme_cashflow":
         return BASE_LGD_LOOKUP[(product, "partially_secured")]
+    if product == "cashflow_lending":
+        return BASE_LGD_LOOKUP[(product, "unsecured")]
 
     raise ValueError(
         f"Unsupported product/security combination for loan {row.get('loan_id')}: "
@@ -294,11 +353,32 @@ def build_final_lgd_layer(
     out["lgd_adj_lvr"] = out["current_lvr"].apply(lvr_adjustment)
     out["lgd_adj_stage"] = out["loan_stage"].apply(stage_adjustment)
     out["lgd_adj_industry"] = out["industry"].apply(industry_adjustment)
+
+    # PD score band adjustment (cash flow lending only)
+    if "pd_score_band" not in out.columns:
+        out["pd_score_band"] = pd.NA
+    out["lgd_adj_pd_band"] = out["pd_score_band"].map(PD_BAND_LGD_ADDON).fillna(0.0)
+
+    # DSCR stress adjustment (cash flow lending only)
+    if "dscr" not in out.columns:
+        out["dscr"] = pd.NA
+    dscr_vals = pd.to_numeric(out["dscr"], errors="coerce")
+    out["lgd_adj_dscr"] = (((1.3 - dscr_vals) * 0.02).clip(lower=0)).fillna(0.0)
+
+    # Conduct overlay (cash flow lending only)
+    if "conduct_classification" not in out.columns:
+        out["conduct_classification"] = pd.NA
+    conduct_map = {"Green": 0.000, "Amber": 0.005, "Red": 0.015}
+    out["lgd_adj_conduct"] = out["conduct_classification"].map(conduct_map).fillna(0.0)
+
     out["lgd_adjusted"] = (
         out["lgd_base"]
         + out["lgd_adj_lvr"]
         + out["lgd_adj_stage"]
         + out["lgd_adj_industry"]
+        + out["lgd_adj_pd_band"]
+        + out["lgd_adj_dscr"]
+        + out["lgd_adj_conduct"]
     )
     out["downturn_scalar"] = downturn_scalar
     out["lgd_downturn"] = out["lgd_adjusted"] * out["downturn_scalar"]

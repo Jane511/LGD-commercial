@@ -1,0 +1,5 @@
+check_name,passed,detail
+no_negative_lgd,True,min_lgd_final=0.2200
+no_lgd_above_100pct,True,max_lgd_final=0.9130
+downturn_not_below_adjusted,True,downturn_scalar=1.10
+secured_below_unsecured,True,secured_mean=0.5539; unsecured_mean=0.8377
