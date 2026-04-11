@@ -1,4 +1,4 @@
-# Data Dictionary - LGD-Cashflow-and-Property-Lending
+# Data Dictionary - LGD-commercial
 
 | Field | Description |
 | --- | --- |

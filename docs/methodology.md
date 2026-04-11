@@ -1,4 +1,4 @@
-# Methodology - LGD-Cashflow-and-Property-Lending
+# Methodology - LGD-commercial
 
 1. Load or generate synthetic demo data.
 2. Standardise borrower, facility, exposure, collateral, and financial fields.

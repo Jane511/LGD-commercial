@@ -1,10 +1,10 @@
-# Project Overview - LGD-Cashflow-and-Property-Lending
+# Project Overview - LGD-commercial
 
 This folder has been rebuilt around a clean README, docs, notebooks, modular Python pipeline, sample outputs, and validation checks.
 
 ## Portfolio role
 
-LGD-Cashflow-and-Property-Lending is the bank-style severity and recovery engine.
+`LGD-commercial` is the bank-style severity and recovery engine.
 
 ## Rebuilt deliverables
 

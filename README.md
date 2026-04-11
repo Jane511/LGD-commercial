@@ -1,4 +1,4 @@
-# LGD-Cashflow-and-Property-Lending
+# LGD-commercial
 
 ## What this repo is
 
@@ -7,15 +7,15 @@ This repo is the bank-style severity and recovery engine for a bank-style Austra
 ## Where it sits in the full credit-risk stack
 
 Upstream inputs:
-- PD-and-Scorecard-Cashflow-Lending
-- industry_analysis
+- `PD-and-scorecard-commercial`
+- `industry-analysis`
 - collateral and recovery assumptions
 
 Downstream consumers:
-- Expected-Loss-Engine-Australia
-- Stress-Testing-Credit-Portfolio
-- Risk-Based-Pricing-Credit
-- RWA-Capital-Credit-Risk
+- `expected-loss-engine-commercial`
+- `stress-testing-commercial`
+- `RAROC-pricing-and-return-hurdle`
+- `RWA-capital-commercial`
 
 ## Inputs
 

@@ -1,4 +1,4 @@
-# Assumptions - LGD-Cashflow-and-Property-Lending
+# Assumptions - LGD-commercial
 
 - Uses synthetic sample records only.
 - Does not rely on hidden internal data, sibling paths, or local Windows paths.

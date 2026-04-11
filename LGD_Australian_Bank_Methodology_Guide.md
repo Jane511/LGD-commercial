@@ -1521,7 +1521,7 @@ The original LGD implementations had significant gaps. The following have been r
 
 Industry risk analysis outputs have been integrated into the LGD framework to replace flat downturn scalars with industry-sensitive adjustments. The integration draws on a multi-layer industry analysis pipeline that produces risk scores, working capital metrics, stress scenarios, and benchmarks for **16 ANZSIC-aligned industry divisions**, sourced from ABS and RBA public data.
 
-**Source project:** [Industry Risk Analysis](https://github.com/Jane511/industry_analysis) (ANZSIC-aligned, ABS/RBA data-driven)
+**Source project:** [industry-analysis](https://github.com/Jane511/industry-analysis) (ANZSIC-aligned, ABS/RBA data-driven)
 
 **Products affected:** Commercial Cash Flow, Development Finance, Cash Flow Lending
 
@@ -1674,7 +1674,7 @@ All industry risk scores derive from publicly available Australian data:
 
 ## G.1 Overview
 
-Cash flow lending covers 8 unsecured and receivables-secured products for Australian SMEs. Unlike the collateral-driven Commercial engine, LGD here is driven by **borrower cash flow capacity** and is aligned with the [PD Scorecard](https://github.com/Jane511/PD-and-Scorecard-Cashflow-Lending) project's WoE logistic regression score bands (A-E).
+Cash flow lending covers 8 unsecured and receivables-secured products for Australian SMEs. Unlike the collateral-driven Commercial engine, LGD here is driven by **borrower cash flow capacity** and is aligned with the [PD-and-scorecard-commercial](https://github.com/Jane511/PD-and-scorecard-commercial) repo's WoE logistic regression score bands (A-E).
 
 **APRA principle:** PD and LGD must be internally consistent -- higher PD borrowers should face systematically higher LGD due to weaker cash flow capacity during workout.
 
