@@ -1,6 +1,6 @@
-# Commercial LGD & Recovery Project
+# Commercial Loss Given Default & Recovery Project
 
-This repository is the Loss Given Default and recovery analytics layer in the commercial credit-risk stack. It uses synthetic facility data, collateral and recovery assumptions, and supporting borrower or industry context to estimate downturn LGD outcomes and recovery views for a commercial lending portfolio. The main outputs feed downstream expected loss, stress testing, pricing, and capital workflows.
+This repository is the LGD and recovery layer in the public commercial credit-risk stack. It uses borrower risk context, synthetic facility data, and collateral and recovery assumptions to produce downturn LGD tables, recovery waterfalls, and validation outputs for downstream loss, stress, pricing, and capital workflows.
 
 ## What this repo is
 
@@ -8,16 +8,13 @@ This project demonstrates how a bank-style commercial LGD workflow can be presen
 
 ## Where it sits in the stack
 
-Upstream inputs:
-- `PD-and-scorecard-commercial`
-- `industry-analysis`
-- collateral and recovery assumptions
+This repo sits after borrower risk assessment and industry overlay work, and before expected loss, stress testing, pricing, and capital reporting in the public commercial stack.
 
-Downstream consumers:
-- `expected-loss-engine-commercial`
-- `stress-testing-commercial`
-- `RAROC-pricing-and-return-hurdle`
-- `RWA-capital-commercial`
+## Key inputs
+
+- borrower risk outputs from `PD-and-scorecard-commercial`
+- industry and macro overlay context from `industry-analysis`
+- synthetic facility, collateral, workout, and recovery assumption tables staged under `data/`
 
 ## Key outputs
 
@@ -32,7 +29,7 @@ Downstream consumers:
 - `data/`: raw, interim, processed, and external demo inputs
 - `src/`: reusable LGD, recovery, and pipeline logic
 - `scripts/`: wrapper scripts for pipeline execution
-- `docs/`: methodology, assumptions, data dictionary, and validation notes
+- `docs/`: methodology, assumptions, data dictionary, validation notes, and the long-form LGD methodology guide
 - `notebooks/`: reviewer-facing walkthrough notebooks
 - `outputs/`: exported tables, reports, and sample artifacts
 - `tests/`: validation and regression checks
