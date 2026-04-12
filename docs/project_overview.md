@@ -1,4 +1,4 @@
-# Project Overview - LGD-commercial
+# Project Overview
 
 `LGD-commercial` is the commercial loss-given-default and recovery engine in the public credit-risk stack.
 

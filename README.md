@@ -8,7 +8,15 @@ This project demonstrates how a bank-style commercial LGD workflow can be presen
 
 ## Where it sits in the stack
 
-This repo sits after borrower risk assessment and industry overlay work, and before expected loss, stress testing, pricing, and capital reporting in the public commercial stack.
+Upstream inputs:
+- `PD-and-scorecard-commercial`
+- `industry-analysis`
+
+Downstream consumers:
+- `expected-loss-engine-commercial`
+- `stress-testing-commercial`
+- `RAROC-pricing-and-return-hurdle`
+- `RWA-capital-commercial`
 
 ## Key inputs
 
