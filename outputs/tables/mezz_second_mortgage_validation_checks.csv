@@ -1,0 +1,8 @@
+check_name,passed
+lgd_base_between_0_and_1,True
+lgd_downturn_between_0_and_1,True
+lgd_final_between_0_and_1,True
+downturn_not_below_base,True
+final_not_below_downturn,True
+ranking_gap_positive_weighted_base,True
+residual_mezz_coverage_lower_in_downturn,True

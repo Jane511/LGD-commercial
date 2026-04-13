@@ -35,6 +35,15 @@ def _discount(amount, days_from_default, annual_rate):
     return amount / (1 + annual_rate) ** (days_from_default / 365.0)
 
 
+def _build_discount_rate(contract_rate_proxy, cost_of_funds_proxy):
+    """
+    Bank-style discount-rate rule used across products.
+
+    discount_rate = max(contract_rate_proxy, cost_of_funds_proxy)
+    """
+    return np.maximum(contract_rate_proxy, cost_of_funds_proxy)
+
+
 # ---------------------------------------------------------------------------
 # 1. RESIDENTIAL MORTGAGE
 # ---------------------------------------------------------------------------
@@ -113,8 +122,21 @@ def generate_mortgage_data(n_loans=500, seed=42):
     ).astype(int)
     mortgage_class = np.where(is_non_standard, "Non-Standard", "Standard")
 
-    # Discount rate: contract rate proxy
-    discount_rate = rng.uniform(0.035, 0.055, n_loans)
+    # Discount-rate proxies (bank-style floor logic)
+    contract_rate_proxy = rng.uniform(0.035, 0.060, n_loans)
+    cost_of_funds_proxy = rng.uniform(0.028, 0.052, n_loans)
+    discount_rate = _build_discount_rate(contract_rate_proxy, cost_of_funds_proxy)
+    house_price_decline = (
+        (property_value_orig - property_value_at_default)
+        / np.maximum(property_value_orig, 1)
+    ).clip(0, 0.40)
+    default_years = np.array([d.year for d in default_dates])
+    unemployment_shock = np.where(
+        np.isin(default_years, [2020, 2021]),
+        0.030,
+        np.where(np.isin(default_years, [2022, 2023]), 0.015, 0.010),
+    )
+    rate_shock = np.maximum(discount_rate - contract_rate_proxy, 0.0)
 
     # --- Resolution outcomes ---
     # Cure probability: higher for lower LTV, better credit score
@@ -305,7 +327,12 @@ def generate_mortgage_data(n_loans=500, seed=42):
         "ltv_at_default": ltv_at_default.round(4),
         "lmi_flag": lmi_flag,
         "lmi_eligible": lmi_eligible.astype(int),
+        "contract_rate_proxy": contract_rate_proxy.round(4),
+        "cost_of_funds_proxy": cost_of_funds_proxy.round(4),
         "discount_rate": discount_rate.round(4),
+        "house_price_decline": house_price_decline.round(4),
+        "unemployment_shock": unemployment_shock.round(4),
+        "rate_shock": rate_shock.round(4),
         "resolution_type": resolution_type,
         "workout_months": workout_months_arr.astype(int),
         "realised_lgd": realised_lgd.round(6),
@@ -468,7 +495,9 @@ def generate_commercial_data(n_loans=300, seed=43):
         ["90 DPD", "Covenant Breach", "Voluntary Administration", "Receivership"],
         n_loans, p=[0.35, 0.25, 0.25, 0.15]
     )
-    discount_rate = rng.uniform(0.05, 0.07, n_loans)
+    contract_rate_proxy = rng.uniform(0.055, 0.085, n_loans)
+    cost_of_funds_proxy = rng.uniform(0.045, 0.070, n_loans)
+    discount_rate = _build_discount_rate(contract_rate_proxy, cost_of_funds_proxy)
 
     # Resolution
     resolution_strategies = rng.choice(
@@ -685,6 +714,8 @@ def generate_commercial_data(n_loans=300, seed=43):
         "security_coverage_ratio": base_coverage.round(4),
         "default_date": default_dates,
         "default_trigger": default_triggers,
+        "contract_rate_proxy": contract_rate_proxy.round(4),
+        "cost_of_funds_proxy": cost_of_funds_proxy.round(4),
         "discount_rate": discount_rate.round(4),
         "resolution_strategy": resolution_strategies,
         "workout_months": workout_months_arr,
@@ -809,7 +840,10 @@ def generate_development_data(n_loans=200, seed=44):
          "Interest Reserve Exhausted", "90 DPD"],
         n_loans, p=[0.25, 0.20, 0.20, 0.15, 0.20]
     )
-    discount_rate = rng.uniform(0.07, 0.09, n_loans)
+    contract_rate_proxy = rng.uniform(0.075, 0.105, n_loans)
+    cost_of_funds_proxy = rng.uniform(0.055, 0.085, n_loans)
+    discount_rate = _build_discount_rate(contract_rate_proxy, cost_of_funds_proxy)
+    grv_decline = ((grv - as_is_value) / np.maximum(grv, 1)).clip(0, 0.60)
 
     # Fund-to-complete decision
     # More likely when near-complete (cheaper to finish)
@@ -1034,7 +1068,10 @@ def generate_development_data(n_loans=200, seed=44):
         "cost_to_complete": cost_to_complete.round(2),
         "default_date": default_dates,
         "default_trigger": default_triggers,
+        "contract_rate_proxy": contract_rate_proxy.round(4),
+        "cost_of_funds_proxy": cost_of_funds_proxy.round(4),
         "discount_rate": discount_rate.round(4),
+        "grv_decline": grv_decline.round(4),
         "fund_to_complete": fund_to_complete.astype(int),
         "workout_months": workout_months_arr,
         "realised_lgd": realised_lgd.round(6),
@@ -1157,7 +1194,9 @@ def generate_cashflow_lending_data(n_loans=400, seed=45):
          "Cash Flow Shortfall", "Bureau Downgrade"],
         n_loans, p=[0.25, 0.20, 0.15, 0.25, 0.15]
     )
-    discount_rate = rng.uniform(0.06, 0.09, n_loans)
+    contract_rate_proxy = rng.uniform(0.065, 0.105, n_loans)
+    cost_of_funds_proxy = rng.uniform(0.050, 0.080, n_loans)
+    discount_rate = _build_discount_rate(contract_rate_proxy, cost_of_funds_proxy)
 
     resolution_strategies = rng.choice(
         ["Voluntary Administration", "Workout", "Write-off", "DOCA"],
@@ -1318,6 +1357,8 @@ def generate_cashflow_lending_data(n_loans=400, seed=45):
         "security_coverage_ratio": security_coverage.round(4),
         "default_date": default_dates,
         "default_trigger": default_triggers,
+        "contract_rate_proxy": contract_rate_proxy.round(4),
+        "cost_of_funds_proxy": cost_of_funds_proxy.round(4),
         "discount_rate": discount_rate.round(4),
         "resolution_strategy": resolution_strategies,
         "workout_months": workout_months_arr,

@@ -1,3 +1,3 @@
-# Pipeline Summary - LGD-commercial
+# Pipeline Summary - LGD-Cashflow-and-Property-Lending
 
-Wrote 5 output tables. Validation checks passed: 14/14.
+Wrote 6 output tables. Validation checks passed: 20/20.

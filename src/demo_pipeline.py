@@ -1,7 +1,15 @@
 from __future__ import annotations
 from pathlib import Path
+import numpy as np
 import pandas as pd
-from .demo_config import PROJECT_ROOT, REPO_NAME, PIPELINE_KIND, EXPECTED_OUTPUTS
+from .demo_config import (
+    PROJECT_ROOT,
+    REPO_NAME,
+    PIPELINE_KIND,
+    EXPECTED_OUTPUTS,
+    POLICY_PARAMETER_REGISTER,
+    FALLBACK_HIERARCHY,
+)
 
 DEMO = [
 {'borrower_id':'B001','facility_id':'F001','segment':'SME Cash Flow','industry':'Wholesale Trade','product_type':'term_loan','limit':1200000,'drawn':980000,'current_assets':1650000,'current_liabilities':920000,'inventory':410000,'receivables':560000,'payables':390000,'revenue':5200000,'ebitda':620000,'net_debt':1450000,'debt_service':360000,'collateral':1500000,'haircut':.18,'pd':.018,'lgd':.42,'ead':1040000,'maturity':3},
@@ -14,6 +22,52 @@ DEMO = [
 
 def _div(a,b):
     return (a / b.replace(0, pd.NA)).fillna(0)
+
+
+def _weighted_lgd(lgd: pd.Series, ead: pd.Series) -> float:
+    ead_num = pd.to_numeric(ead, errors="coerce").fillna(0.0)
+    total = ead_num.sum()
+    if total <= 0:
+        return 0.0
+    lgd_num = pd.to_numeric(lgd, errors="coerce").fillna(0.0)
+    return float((lgd_num * ead_num).sum() / total)
+
+
+def build_policy_parameter_register() -> pd.DataFrame:
+    """
+    Build a compact governance register for reporting hooks.
+
+    Includes declared policy parameters and fallback hierarchy steps.
+    """
+    rows = []
+    for r in POLICY_PARAMETER_REGISTER:
+        rows.append({
+            'record_type': 'policy_parameter',
+            'group': r.get('group', ''),
+            'parameter': r.get('parameter', ''),
+            'value': str(r.get('value', '')),
+            'description': r.get('description', ''),
+            'fallback_hierarchy': r.get('fallback_hierarchy', 'not_applicable'),
+            'category': r.get('category', 'policy_parameter'),
+            'status': r.get('status', 'active'),
+            'calibration_status': r.get('calibration_status', 'proxy_not_calibrated'),
+            'fallback_priority': pd.NA,
+        })
+    for f in FALLBACK_HIERARCHY:
+        rows.append({
+            'record_type': 'fallback_hierarchy',
+            'group': 'fallback_hierarchy',
+            'parameter': f.get('topic', ''),
+            'value': f.get('rule', ''),
+            'description': 'Documented fallback step',
+            'fallback_hierarchy': f.get('topic', ''),
+            'category': 'fallback_rule',
+            'status': 'active',
+            'calibration_status': 'n/a_rule_based',
+            'fallback_priority': f.get('priority', pd.NA),
+        })
+    out = pd.DataFrame(rows)
+    return out.sort_values(['record_type', 'fallback_hierarchy', 'fallback_priority', 'group', 'parameter'], na_position='last').reset_index(drop=True)
 
 def load_demo(path: Path | None = None) -> pd.DataFrame:
     path = path or PROJECT_ROOT / 'data' / 'raw' / 'demo_portfolio.csv'
@@ -50,9 +104,12 @@ def build_outputs(f: pd.DataFrame) -> dict[str,pd.DataFrame]:
         out=w[['borrower_id','facility_id','segment','industry','product_type','score','risk_grade','pd_estimate','dscr','utilisation']].copy(); out['policy_decision']=w.apply(_decision,axis=1)
         return {'pd_model_output.csv':out.drop(columns=['policy_decision']),'borrower_grade_summary.csv':w.groupby('risk_grade',as_index=False).agg(borrowers=('borrower_id','nunique'),facilities=('facility_id','count'),exposure=('ead','sum'),avg_pd=('pd_estimate','mean')),'policy_decisions.csv':out,'score_band_output.csv':w.groupby('risk_grade',as_index=False).agg(min_score=('score','min'),max_score=('score','max'),min_pd=('pd_estimate','min'),max_pd=('pd_estimate','max'),facilities=('facility_id','count'))}
     if PIPELINE_KIND=='lgd':
-        w=f.copy(); w['net_collateral']=w.collateral*(1-w.haircut); w['workout_cost']=w.ead*.06; w['net_recovery']=(w.net_collateral-w.workout_cost).clip(lower=0); w['lgd_final']=(1-w.net_recovery/w.ead.replace(0,pd.NA)).fillna(1).clip(.10,.90); w['downturn_lgd']=(w.lgd_final+.08+w.haircut*.10).clip(upper=.95)
+        w=f.copy(); w['net_collateral']=w.collateral*(1-w.haircut); w['workout_cost']=w.ead*.06; w['net_recovery']=(w.net_collateral-w.workout_cost).clip(lower=0); w['lgd_final']=(1-w.net_recovery/w.ead.replace(0,pd.NA)).fillna(1).clip(.10,.90)
+        w['value_decline_proxy']=w.haircut.clip(0,.45); w['cashflow_weakness_proxy']=((1.25-w.dscr)/1.25).clip(lower=0,upper=1); w['recovery_delay_proxy']=((w.maturity-2.5)/3).clip(lower=0,upper=1)
+        w['downturn_scalar']=(1+0.30*w.value_decline_proxy+0.10*w.cashflow_weakness_proxy+0.08*w.recovery_delay_proxy).clip(1.00,1.45); w['downturn_lgd']=(w.lgd_final*w.downturn_scalar).clip(upper=.95)
         val=pd.DataFrame([{'check_name':'lgd_between_zero_and_one','status':w.lgd_final.between(0,1).all()},{'check_name':'downturn_not_below_base','status':(w.downturn_lgd>=w.lgd_final).all()}])
-        return {'lgd_segment_summary.csv':w.groupby(['segment','product_type'],as_index=False).agg(facilities=('facility_id','count'),exposure=('ead','sum'),avg_lgd=('lgd_final','mean'),avg_downturn_lgd=('downturn_lgd','mean')),'recovery_waterfall.csv':w[['facility_id','borrower_id','product_type','ead','collateral','haircut','net_collateral','workout_cost','net_recovery','lgd_final']],'downturn_lgd_output.csv':w[['facility_id','borrower_id','segment','lgd_final','downturn_lgd']],'lgd_validation_report.csv':val}
+        seg=(w.groupby(['segment','product_type'],as_index=False).apply(lambda g: pd.Series({'facilities':len(g),'exposure':g.ead.sum(),'ead_weighted_lgd':_weighted_lgd(g.lgd_final,g.ead),'ead_weighted_downturn_lgd':_weighted_lgd(g.downturn_lgd,g.ead)}),include_groups=False).reset_index(drop=True))
+        return {'lgd_segment_summary.csv':seg,'recovery_waterfall.csv':w[['facility_id','borrower_id','product_type','ead','collateral','haircut','net_collateral','workout_cost','net_recovery','lgd_final']],'downturn_lgd_output.csv':w[['facility_id','borrower_id','segment','lgd_final','downturn_lgd','downturn_scalar']],'lgd_validation_report.csv':val}
     if PIPELINE_KIND=='ead':
         w=f.copy(); mp={'term_loan':0,'overdraft':.65,'commercial_mortgage':.20,'revolving_working_capital':.55,'trade_finance':.45,'guarantee':.30}; w['base_ccf']=w.product_type.map(mp).fillna(.4); w['utilisation_uplift']=w.utilisation.apply(lambda v:.10 if v>.85 else .05 if v>.65 else .02); w['downturn_ccf']=(w.base_ccf+w.utilisation_uplift).clip(upper=1); w['ead_central']=w.drawn+w.undrawn*w.base_ccf; w['ead_downturn']=w.drawn+w.undrawn*w.downturn_ccf
         val=pd.DataFrame([{'check_name':'ccf_between_zero_and_one','status':w.downturn_ccf.between(0,1).all()},{'check_name':'ead_not_below_drawn','status':(w.ead_central>=w.drawn).all()},{'check_name':'ead_within_limit','status':(w.ead_central<=w.limit).all()}])
@@ -65,12 +122,30 @@ def build_outputs(f: pd.DataFrame) -> dict[str,pd.DataFrame]:
     return {'rwa_by_facility.csv':w[['facility_id','borrower_id','segment','product_type','pd','lgd','ead','maturity','risk_weight','rwa','capital_requirement']],'rwa_by_segment.csv':w.groupby('segment',as_index=False).agg(facilities=('facility_id','count'),total_ead=('ead','sum'),total_rwa=('rwa','sum'),capital_requirement=('capital_requirement','sum'),expected_loss=('expected_loss','sum')),'capital_summary.csv':pd.DataFrame([{'portfolio':'demo_portfolio','total_ead':w.ead.sum(),'total_rwa':w.rwa.sum(),'capital_requirement':w.capital_requirement.sum(),'capital_ratio_assumption':.105}]),'expected_loss_adjustment_summary.csv':w[['facility_id','expected_loss','capital_requirement','capital_after_el_adjustment']]}
 
 def validate_outputs(o: dict[str,pd.DataFrame]) -> pd.DataFrame:
-    rows=[{'check_name':f'required_output::{n}','status':n in o and not o[n].empty,'detail':'present and non-empty' if n in o and not o[n].empty else 'missing or empty'} for n in EXPECTED_OUTPUTS]
+    rows=[{'check_group':'contract','check_name':f'required_output::{n}','status':n in o and not o[n].empty,'detail':'present and non-empty' if n in o and not o[n].empty else 'missing or empty'} for n in EXPECTED_OUTPUTS]
+    if 'policy_parameter_register.csv' in o and not o['policy_parameter_register.csv'].empty:
+        p=o['policy_parameter_register.csv']
+        req_cols={'record_type','group','parameter','value','fallback_hierarchy','category','status','calibration_status'}
+        rows.append({'check_group':'governance','check_name':'policy_register_required_columns','status':req_cols.issubset(set(p.columns)),'detail':'required governance columns present'})
+        rows.append({'check_group':'governance','check_name':'policy_register_has_fallback_records','status':bool((p['record_type']=='fallback_hierarchy').any()),'detail':'fallback hierarchy rows exist'})
+        if req_cols.issubset(set(p.columns)):
+            core = p[['category','status','calibration_status']].astype(str).apply(lambda col: col.str.strip())
+            filled = ~(core.eq('') | core.eq('nan') | core.eq('None')).any(axis=1)
+            rows.append({'check_group':'governance','check_name':'policy_register_core_fields_populated','status':bool(filled.all()),'detail':'category/status/calibration_status populated'})
+    if 'downturn_lgd_output.csv' in o and not o['downturn_lgd_output.csv'].empty:
+        d=o['downturn_lgd_output.csv']
+        if 'downturn_scalar' in d.columns:
+            rows.append({'check_group':'downturn','check_name':'downturn_scalar_not_below_one','status':bool((pd.to_numeric(d['downturn_scalar'],errors='coerce')>=1).all()),'detail':'downturn scalar >= 1.00'})
+    if 'lgd_segment_summary.csv' in o and not o['lgd_segment_summary.csv'].empty:
+        s=o['lgd_segment_summary.csv']
+        req_cols={'ead_weighted_lgd','ead_weighted_downturn_lgd'}
+        rows.append({'check_group':'aggregation','check_name':'segment_summary_weighted_columns_present','status':req_cols.issubset(set(s.columns)),'detail':'weighted lgd columns present'})
     for name,df in o.items():
         nums=df.select_dtypes('number')
         for col in nums.columns:
             c=col.lower()
-            if any(t in c for t in ['pd','lgd','ccf','utilisation','risk_weight','margin','ratio','ead','exposure','capital','loss','rwa','recovery','collateral']): rows.append({'check_name':f'non_negative::{name}::{col}','status':bool((nums[col]>=0).all()),'detail':'all values non-negative'})
+            if any(t in c for t in ['pd','lgd','ccf','utilisation','risk_weight','margin','ratio','ead','exposure','capital','loss','rwa','recovery','collateral']):
+                rows.append({'check_group':'numeric','check_name':f'non_negative::{name}::{col}','status':bool((nums[col]>=0).all()),'detail':'all values non-negative'})
     return pd.DataFrame(rows)
 
 def write_outputs(o: dict[str,pd.DataFrame], root: Path) -> dict[str,Path]:
@@ -80,7 +155,7 @@ def write_outputs(o: dict[str,pd.DataFrame], root: Path) -> dict[str,Path]:
     return paths
 
 def run_pipeline(project_root: Path | str | None=None, persist: bool=True) -> dict[str,object]:
-    root=Path(project_root) if project_root else PROJECT_ROOT; raw=load_demo(root/'data'/'raw'/'demo_portfolio.csv'); feat=build_features(raw); outs=build_outputs(feat); val=validate_outputs(outs); outs['pipeline_validation_report.csv']=val
+    root=Path(project_root) if project_root else PROJECT_ROOT; raw=load_demo(root/'data'/'raw'/'demo_portfolio.csv'); feat=build_features(raw); outs=build_outputs(feat); outs['policy_parameter_register.csv']=build_policy_parameter_register(); val=validate_outputs(outs); outs['pipeline_validation_report.csv']=val
     paths={}
     if persist:
         (root/'data'/'processed').mkdir(parents=True,exist_ok=True); (root/'outputs'/'samples').mkdir(parents=True,exist_ok=True); (root/'outputs'/'reports').mkdir(parents=True,exist_ok=True)

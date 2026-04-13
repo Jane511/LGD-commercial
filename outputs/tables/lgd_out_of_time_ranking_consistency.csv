@@ -1,0 +1,4 @@
+product,segment_col,common_segments,spearman_rank_corr,top_segment_train,top_segment_test,top_segment_match
+mortgage,mortgage_class,2,1.0,Non-Standard,Non-Standard,True
+commercial,security_type,5,0.6,GSR Only,GSR Only,True
+development,completion_stage,4,1.0,Early Construction,Early Construction,True

@@ -1,0 +1,4 @@
+product,source,loan_count,total_ead
+mortgage,derived_from_seasoning_months,500,444486089.71
+commercial,proxy_years_on_book_3.0y,300,2290984728.06
+development,proxy_years_on_book_2.0y,200,4154640674.45

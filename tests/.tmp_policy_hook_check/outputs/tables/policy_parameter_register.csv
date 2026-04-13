@@ -1,0 +1,21 @@
+record_type,group,parameter,value,description,fallback_hierarchy,fallback_priority
+fallback_hierarchy,fallback_hierarchy,arrears_proxy,Use observed arrears stage from collections tape.,Documented fallback step,arrears_proxy,1
+fallback_hierarchy,fallback_hierarchy,arrears_proxy,"Use proxy arrears stage from lvr,dti,credit_score bands.",Documented fallback step,arrears_proxy,2
+fallback_hierarchy,fallback_hierarchy,arrears_proxy,"If proxy inputs missing, apply conservative late-stage arrears bucket.",Documented fallback step,arrears_proxy,3
+fallback_hierarchy,fallback_hierarchy,behaviour_proxy,Use observed repayment behaviour score.,Documented fallback step,behaviour_proxy,1
+fallback_hierarchy,fallback_hierarchy,behaviour_proxy,"Use proxy behaviour from p&i flag, seasoning, dti, lvr, credit score.",Documented fallback step,behaviour_proxy,2
+fallback_hierarchy,fallback_hierarchy,behaviour_proxy,"If behaviour inputs missing, default to neutral/stable proxy.",Documented fallback step,behaviour_proxy,3
+fallback_hierarchy,fallback_hierarchy,discount_rate,Use contract_rate_proxy when available.,Documented fallback step,discount_rate,1
+fallback_hierarchy,fallback_hierarchy,discount_rate,"Use cost_of_funds_proxy as floor via max(contract_rate_proxy, cost_of_funds_proxy).",Documented fallback step,discount_rate,2
+fallback_hierarchy,fallback_hierarchy,discount_rate,"If one proxy is missing, use available proxy and flag assumption.",Documented fallback step,discount_rate,3
+fallback_hierarchy,fallback_hierarchy,secured_cure_overlay,Use observed cure rates from workout history by product/segment.,Documented fallback step,secured_cure_overlay,1
+fallback_hierarchy,fallback_hierarchy,secured_cure_overlay,Use simplified secured-product cure overlay proxy.,Documented fallback step,secured_cure_overlay,2
+fallback_hierarchy,fallback_hierarchy,secured_cure_overlay,"If overlay inputs missing, set cure overlay to zero and disclose limitation.",Documented fallback step,secured_cure_overlay,3
+policy_parameter,mortgage_cure_proxy,arrears_stage_proxy,"30-59/60-89/90+ dpd proxy from lvr,dti,credit_score",Proxy arrears stage when detailed delinquency tape is unavailable.,arrears_proxy,
+policy_parameter,mortgage_cure_proxy,repayment_behaviour_proxy,"weak/stable/strong from pii, score, seasoning, dti, lvr",Behaviour proxy for cure likelihood in mortgage workout.,behaviour_proxy,
+policy_parameter,mortgage_cure_proxy,cure_lgd_formula,lgd = (1 - cure_rate) * liquidation_loss,Two-stage mortgage LGD with explicit cure channel.,cure_model_inputs,
+policy_parameter,discount_rate_policy,discount_rate_rule,"max(contract_rate_proxy, cost_of_funds_proxy)",Workout discount rate uses contractual return floor and funding floor.,discount_rate,
+policy_parameter,aggregation,lgd_aggregation_method,ead_weighted,Portfolio LGD uses Sum(LGD_i*EAD_i)/Sum(EAD_i).,not_applicable,
+policy_parameter,validation_wording,governance_scope_note,demo_portfolio_not_production_calibration,"Validation outputs are demonstration checks, not production model approval.",not_applicable,
+policy_parameter,secured_cure_overlay,commercial_cure_rate_proxy_cap,0.30,Cap on simplified secured-commercial cure overlay.,secured_cure_overlay,
+policy_parameter,secured_cure_overlay,development_cure_rate_proxy_cap,0.25,Cap on simplified development cure overlay.,secured_cure_overlay,

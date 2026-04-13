@@ -1,0 +1,16 @@
+check_name,status,detail
+required_output::lgd_segment_summary.csv,True,present and non-empty
+required_output::recovery_waterfall.csv,True,present and non-empty
+required_output::downturn_lgd_output.csv,True,present and non-empty
+required_output::lgd_validation_report.csv,True,present and non-empty
+required_output::policy_parameter_register.csv,True,present and non-empty
+non_negative::lgd_segment_summary.csv::exposure,True,all values non-negative
+non_negative::lgd_segment_summary.csv::ead_weighted_lgd,True,all values non-negative
+non_negative::lgd_segment_summary.csv::ead_weighted_downturn_lgd,True,all values non-negative
+non_negative::recovery_waterfall.csv::ead,True,all values non-negative
+non_negative::recovery_waterfall.csv::collateral,True,all values non-negative
+non_negative::recovery_waterfall.csv::net_collateral,True,all values non-negative
+non_negative::recovery_waterfall.csv::net_recovery,True,all values non-negative
+non_negative::recovery_waterfall.csv::lgd_final,True,all values non-negative
+non_negative::downturn_lgd_output.csv::lgd_final,True,all values non-negative
+non_negative::downturn_lgd_output.csv::downturn_lgd,True,all values non-negative

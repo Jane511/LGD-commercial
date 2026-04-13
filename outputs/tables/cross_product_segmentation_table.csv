@@ -1,0 +1,9 @@
+product,repayment_source,security,drivers
+Residential Mortgage,"Borrower income, cure, property sale, LMI where eligible",First-ranking residential mortgage (with optional LMI support),"LVR, LMI, cure rate, arrears proxy, foreclosure/workout path"
+Commercial Cashflow,Operating cashflow plus collateral/workout recoveries,PPSR/GSA and other business security packages,"DSCR/ICR, leverage, security coverage, industry risk, workout strategy"
+Development Finance,Project completion and sales/refinance exit,Project assets and assignment of project cashflows/presales,"GRV decline, completion %, cost-to-complete, sell-through delay, presales"
+CRE Investment,"Rental income durability, refinance or forced sale",Stabilised investment property security,"LVR, DSCR, WALE, vacancy, tenant concentration, cap-rate expansion"
+Residual Stock,Sale of completed but unsold units,Residual completed stock inventory,"Unsold units, absorption speed, discount-to-clear, holding costs, time to sale"
+Land / Subdivision,Land lot disposal over extended sale horizon,Land/subdivision collateral with low carry income,"Zoning/stage, liquidity risk, market depth, value haircut, time to sell"
+Bridging Loan,Planned refinance or sale exit,Short-tenor property-backed bridge security,"Exit type, exit certainty, valuation risk, time to exit, failed-exit risk"
+Mezzanine / 2nd Mortgage,Residual collateral value after senior debt repayment,Subordinated lien / second-ranking security,"Total LVR, attachment point, subordination, collateral value decline"

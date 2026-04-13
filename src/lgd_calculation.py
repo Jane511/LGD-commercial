@@ -72,6 +72,78 @@ def exposure_weighted_average(df, lgd_col, ead_col="ead", group_col=None):
     return result
 
 
+def build_weighted_lgd_output(
+    df,
+    group_cols=None,
+    ead_col="ead",
+    base_col="lgd_base",
+    downturn_col="lgd_downturn",
+    final_col="lgd_final",
+):
+    """
+    Build exposure-weighted LGD outputs with explicit base/downturn/final fields.
+    """
+    if df is None or len(df) == 0:
+        cols = [
+            "facility_count",
+            "total_ead",
+            "ead_weighted_lgd_base",
+            "ead_weighted_lgd_downturn",
+            "ead_weighted_lgd_final",
+        ]
+        if group_cols is None:
+            return pd.DataFrame(columns=cols)
+        group_cols = [group_cols] if isinstance(group_cols, str) else list(group_cols)
+        return pd.DataFrame(columns=group_cols + cols)
+
+    work = df.copy()
+    if ead_col not in work.columns:
+        work[ead_col] = 1.0
+
+    resolved_base_col = base_col
+    if resolved_base_col not in work.columns and "realised_lgd" in work.columns:
+        resolved_base_col = "realised_lgd"
+
+    def _summarise(g):
+        return pd.Series(
+            {
+                "facility_count": len(g),
+                "total_ead": pd.to_numeric(g[ead_col], errors="coerce").fillna(0.0).sum(),
+                "ead_weighted_lgd_base": (
+                    exposure_weighted_average(g, resolved_base_col, ead_col)
+                    if resolved_base_col in g.columns
+                    else np.nan
+                ),
+                "ead_weighted_lgd_downturn": (
+                    exposure_weighted_average(g, downturn_col, ead_col)
+                    if downturn_col in g.columns
+                    else np.nan
+                ),
+                "ead_weighted_lgd_final": (
+                    exposure_weighted_average(g, final_col, ead_col)
+                    if final_col in g.columns
+                    else np.nan
+                ),
+            }
+        )
+
+    if group_cols is None:
+        return _summarise(work).to_frame().T
+
+    if isinstance(group_cols, str):
+        group_cols = [group_cols]
+    valid_groups = [c for c in group_cols if c in work.columns]
+    if not valid_groups:
+        return _summarise(work).to_frame().T
+
+    out = (
+        work.groupby(valid_groups, observed=True)
+        .apply(lambda g: _summarise(g), include_groups=False)
+        .reset_index()
+    )
+    return out
+
+
 def apply_downturn_overlay(lgd_series, method="scalar", scalar=1.10, addon=0.0):
     """
     Apply downturn adjustment to long-run LGD.
@@ -93,6 +165,335 @@ def apply_downturn_overlay(lgd_series, method="scalar", scalar=1.10, addon=0.0):
 def add_margin_of_conservatism(lgd_series, margin):
     """Add margin of conservatism (additive, in decimal form e.g. 0.02 = 2pp)."""
     return lgd_series + margin
+
+
+def _coerce_numeric_series(df, column, default=np.nan):
+    """Return a numeric Series for `column`, or a default-filled Series if missing."""
+    if column in df.columns:
+        return pd.to_numeric(df[column], errors="coerce")
+    return pd.Series(default, index=df.index, dtype=float)
+
+
+def _year_bucket_for_unemployment(default_dates):
+    """
+    Build a year-bucket label for fallback unemployment reporting.
+    """
+    if default_dates is None:
+        return pd.Series(dtype=object)
+    dates = pd.to_datetime(default_dates, errors="coerce")
+    if not isinstance(dates, pd.Series):
+        dates = pd.Series(dates)
+    years = dates.dt.year
+    bucket = np.where(
+        years.isin([2020, 2021]),
+        "covid_2020_2021",
+        np.where(
+            years.isin([2022, 2023]),
+            "normalising_2022_2023",
+            np.where(years.notna(), "baseline_other_year", "missing_default_date"),
+        ),
+    )
+    return pd.Series(bucket, index=years.index)
+
+
+def _year_to_unemployment_shock(default_dates):
+    """
+    Convert default year into a simple unemployment shock proxy.
+
+    This is intentionally transparent and interview-friendly:
+      - 2020-2021: COVID stress period
+      - 2022-2023: normalisation
+      - other years: neutral baseline
+    """
+    if default_dates is None:
+        return pd.Series(dtype=float)
+    dates = pd.to_datetime(default_dates, errors="coerce")
+    if not isinstance(dates, pd.Series):
+        dates = pd.Series(dates)
+    years = dates.dt.year
+    shocks = np.where(
+        years.isin([2020, 2021]),
+        0.03,
+        np.where(years.isin([2022, 2023]), 0.015, np.where(years.notna(), 0.01, 0.02)),
+    )
+    return pd.Series(shocks, index=years.index, dtype=float)
+
+
+def _resolve_discount_rate_proxy(df, product_baseline=0.05):
+    """
+    Resolve discount-rate proxy and source labels using fallback hierarchy:
+      1) max(contract_rate_proxy, cost_of_funds_proxy)
+      2) contract-only fallback
+      3) cost-of-funds-only fallback
+      4) provided discount_rate fallback
+      5) product baseline fallback
+    """
+    index = df.index
+    contract = _coerce_numeric_series(df, "contract_rate_proxy")
+    cof = _coerce_numeric_series(df, "cost_of_funds_proxy")
+    provided = _coerce_numeric_series(df, "discount_rate")
+
+    has_contract = contract.notna()
+    has_cof = cof.notna()
+    has_provided = provided.notna()
+
+    rate = pd.Series(float(product_baseline), index=index)
+    source = pd.Series("product_baseline_fallback", index=index, dtype=object)
+
+    both = has_contract & has_cof
+    rate.loc[both] = np.maximum(contract.loc[both], cof.loc[both])
+    source.loc[both] = "max_contract_vs_cost_of_funds"
+
+    contract_only = has_contract & ~has_cof
+    rate.loc[contract_only] = contract.loc[contract_only]
+    source.loc[contract_only] = "contract_only_fallback"
+
+    cof_only = ~has_contract & has_cof
+    rate.loc[cof_only] = cof.loc[cof_only]
+    source.loc[cof_only] = "cost_of_funds_only_fallback"
+
+    provided_only = ~(has_contract | has_cof) & has_provided
+    rate.loc[provided_only] = provided.loc[provided_only]
+    source.loc[provided_only] = "provided_discount_rate_fallback"
+
+    return rate.clip(lower=0.0), source
+
+
+def _resolve_mortgage_arrears_proxy(df):
+    """
+    Resolve arrears stage using observed value when present, else transparent proxy.
+    """
+    index = df.index
+    observed = df.get("arrears_stage")
+    if observed is None:
+        observed = pd.Series(np.nan, index=index)
+    observed = observed.astype("string")
+    use_proxy = observed.isna()
+
+    ltv = _coerce_numeric_series(df, "ltv_at_default", default=0.85).fillna(0.85)
+    dti = _coerce_numeric_series(df, "dti", default=0.35).fillna(0.35)
+    score = _coerce_numeric_series(df, "credit_score", default=680).fillna(680)
+    proxy = np.where(
+        (ltv >= 1.00) | (dti >= 0.50) | (score < 580),
+        "90+",
+        np.where(
+            (ltv >= 0.90) | (dti >= 0.42) | (score < 640),
+            "60-89",
+            "30-59",
+        ),
+    )
+    stage = observed.where(~use_proxy, pd.Series(proxy, index=index))
+    return stage.fillna("60-89"), use_proxy.astype(bool)
+
+
+def _resolve_mortgage_behaviour_proxy(df):
+    """
+    Resolve repayment behaviour using observed value when present, else proxy.
+    """
+    index = df.index
+    observed = df.get("repayment_behaviour")
+    if observed is None:
+        observed = pd.Series(np.nan, index=index)
+    observed = observed.astype("string")
+    use_proxy = observed.isna()
+
+    loan_type = df.get("loan_type", pd.Series("P&I", index=index)).astype(str)
+    seasoning = _coerce_numeric_series(df, "seasoning_months", default=24).fillna(24)
+    dti = _coerce_numeric_series(df, "dti", default=0.35).fillna(0.35)
+    ltv = _coerce_numeric_series(df, "ltv_at_default", default=0.85).fillna(0.85)
+    score = _coerce_numeric_series(df, "credit_score", default=680).fillna(680)
+
+    behaviour_score = (
+        np.where(loan_type.str.upper().str.contains("P&I"), 1, 0)
+        + np.where(seasoning >= 24, 1, 0)
+        + np.where(dti >= 0.45, -1, 0)
+        + np.where(ltv >= 0.90, -1, 0)
+        + np.where(score >= 700, 1, 0)
+    )
+    proxy = np.where(
+        behaviour_score >= 2,
+        "strong",
+        np.where(behaviour_score <= -1, "weak", "stable"),
+    )
+    behaviour = observed.where(~use_proxy, pd.Series(proxy, index=index))
+    return behaviour.fillna("stable"), use_proxy.astype(bool)
+
+
+def mortgage_macro_downturn_scalar(df, base_scalar=1.08, return_detail=False):
+    """
+    Mortgage downturn scalar linked to macro drivers.
+
+    Drivers:
+      - House price decline
+      - Unemployment shock
+      - Rate shock
+    """
+    if "house_price_decline" in df.columns:
+        hpd_raw = pd.to_numeric(df["house_price_decline"], errors="coerce")
+        house_price_source = np.where(
+            hpd_raw.notna(),
+            "observed_house_price_decline",
+            "house_price_fallback",
+        )
+        hpd = hpd_raw.fillna(0.0)
+    elif {"property_value_orig", "property_value_at_default"}.issubset(df.columns):
+        hpd = (
+            (df["property_value_orig"] - df["property_value_at_default"])
+            / df["property_value_orig"].replace(0, np.nan)
+        ).clip(lower=0).fillna(0.0)
+        house_price_source = pd.Series(
+            "derived_from_property_values", index=df.index
+        )
+    else:
+        # Fallback: stressed LTV above 80% often proxies collateral value decline.
+        hpd = _coerce_numeric_series(df, "ltv_at_default", default=0.0).fillna(0.0)
+        hpd = ((hpd - 0.80) / 0.40).clip(lower=0, upper=0.30)
+        house_price_source = pd.Series("ltv_proxy_fallback", index=df.index)
+
+    if "unemployment_shock" in df.columns:
+        unemp_obs = pd.to_numeric(df["unemployment_shock"], errors="coerce")
+        year_fallback = _year_to_unemployment_shock(df.get("default_date"))
+        if year_fallback.empty:
+            year_fallback = pd.Series(0.02, index=df.index, dtype=float)
+        unemp = unemp_obs.fillna(year_fallback).fillna(0.02)
+        unemployment_source = pd.Series(
+            np.where(
+                unemp_obs.notna(),
+                "observed_unemployment_shock",
+                "year_bucket_fallback",
+            ),
+            index=df.index,
+        )
+    else:
+        year_fallback = _year_to_unemployment_shock(df.get("default_date"))
+        if year_fallback.empty:
+            unemp = pd.Series(0.02, index=df.index, dtype=float)
+            unemployment_source = pd.Series(
+                "neutral_constant_fallback", index=df.index
+            )
+        else:
+            unemp = year_fallback.fillna(0.02)
+            dates = pd.to_datetime(df.get("default_date"), errors="coerce")
+            unemployment_source = pd.Series(
+                np.where(
+                    dates.notna(),
+                    "year_bucket_fallback",
+                    "neutral_constant_fallback",
+                ),
+                index=df.index,
+            )
+    unemp = np.clip(unemp, 0, 0.06)
+    unemployment_year_bucket = _year_bucket_for_unemployment(df.get("default_date"))
+
+    if "rate_shock" in df.columns:
+        rate_obs = pd.to_numeric(df["rate_shock"], errors="coerce")
+        if {"discount_rate", "contract_rate_proxy"}.issubset(df.columns):
+            fallback_rate = (
+                pd.to_numeric(df["discount_rate"], errors="coerce")
+                - pd.to_numeric(df["contract_rate_proxy"], errors="coerce")
+            ).clip(lower=0).fillna(0.0)
+        else:
+            fallback_rate = pd.Series(0.0, index=df.index)
+        rate = rate_obs.fillna(fallback_rate).fillna(0.0)
+        rate_source = pd.Series(
+            np.where(rate_obs.notna(), "observed_rate_shock", "rate_shock_fallback"),
+            index=df.index,
+        )
+    elif {"discount_rate", "contract_rate_proxy"}.issubset(df.columns):
+        rate = (df["discount_rate"] - df["contract_rate_proxy"]).clip(lower=0)
+        rate_source = pd.Series("derived_discount_minus_contract", index=df.index)
+    elif "discount_rate" in df.columns:
+        rate = (pd.to_numeric(df["discount_rate"], errors="coerce") - 0.04).clip(lower=0)
+        rate_source = pd.Series("derived_discount_minus_baseline", index=df.index)
+    else:
+        rate = pd.Series(0.0, index=df.index)
+        rate_source = pd.Series("neutral_zero_rate_shock", index=df.index)
+    rate = np.clip(rate, 0, 0.05)
+
+    macro_multiplier = 1 + 0.40 * hpd + 1.20 * unemp + 1.60 * rate
+    scalar = np.clip(base_scalar * macro_multiplier, 1.00, 1.60)
+
+    if not return_detail:
+        return scalar
+
+    detail = pd.DataFrame(
+        {
+            "house_price_driver": hpd,
+            "house_price_source": house_price_source,
+            "unemployment_driver": unemp,
+            "unemployment_source": unemployment_source,
+            "unemployment_year_bucket": unemployment_year_bucket,
+            "rate_shock_driver": rate,
+            "rate_shock_source": rate_source,
+        },
+        index=df.index,
+    )
+    return scalar, detail
+
+
+def commercial_macro_downturn_scalar(df, base_scalar):
+    """
+    Commercial downturn scalar linked to macro drivers.
+
+    Drivers:
+      - Collateral value decline proxy
+      - Weaker cashflow (ICR stress)
+      - Longer time to recovery
+    """
+    if "value_decline" in df.columns:
+        value_decline = pd.to_numeric(df["value_decline"], errors="coerce").fillna(0.0)
+    elif "security_coverage_ratio" in df.columns:
+        value_decline = (1 - pd.to_numeric(df["security_coverage_ratio"], errors="coerce")).clip(lower=0)
+    else:
+        value_decline = pd.Series(0.10, index=df.index)
+    value_decline = np.clip(value_decline, 0, 0.50)
+
+    if "icr" in df.columns:
+        icr_vals = pd.to_numeric(df["icr"], errors="coerce").fillna(1.5)
+    else:
+        icr_vals = pd.Series(1.5, index=df.index)
+    cashflow_weakness = ((1.5 - icr_vals) / 1.5).clip(lower=0, upper=1)
+
+    if "workout_months" in df.columns:
+        workout = pd.to_numeric(df["workout_months"], errors="coerce").fillna(18)
+    else:
+        workout = pd.Series(18, index=df.index)
+    recovery_delay = ((workout - 18) / 24).clip(lower=0, upper=1)
+
+    macro_multiplier = 1 + 0.30 * value_decline + 0.10 * cashflow_weakness + 0.08 * recovery_delay
+    return np.clip(base_scalar * macro_multiplier, 1.00, 1.70)
+
+
+def development_macro_downturn_scalar(df, base_scalar):
+    """
+    Development downturn scalar linked to macro drivers.
+
+    Drivers:
+      - GRV decline
+      - Cost overrun
+      - Slower sell-through (longer workout period)
+    """
+    if "grv_decline" in df.columns:
+        grv_decline = pd.to_numeric(df["grv_decline"], errors="coerce").fillna(0.0)
+    elif {"grv", "as_is_value"}.issubset(df.columns):
+        grv_decline = (
+            (df["grv"] - df["as_is_value"]) / df["grv"].replace(0, np.nan)
+        ).clip(lower=0).fillna(0.0)
+    else:
+        grv_decline = pd.Series(0.10, index=df.index)
+    grv_decline = np.clip(grv_decline, 0, 0.60)
+
+    if {"cost_to_complete", "ead"}.issubset(df.columns):
+        cost_overrun = (df["cost_to_complete"] / df["ead"].replace(0, np.nan)).clip(lower=0).fillna(0.0)
+    else:
+        cost_overrun = pd.Series(0.10, index=df.index)
+    cost_overrun = np.clip(cost_overrun, 0, 0.40)
+
+    workout = _coerce_numeric_series(df, "workout_months", default=18).fillna(18)
+    sell_through_delay = ((workout - 18) / 18).clip(lower=0, upper=1)
+
+    macro_multiplier = 1 + 0.35 * grv_decline + 0.25 * cost_overrun + 0.12 * sell_through_delay
+    return np.clip(base_scalar * macro_multiplier, 1.00, 1.90)
 
 
 # ==========================================================================
@@ -118,7 +519,7 @@ class MortgageLGDEngine:
     APRA_SCALAR = 1.10  # applied to RWA, not LGD
 
     # Default model parameters
-    DEFAULT_DOWNTURN_SCALAR = 1.15
+    DEFAULT_DOWNTURN_SCALAR = 1.08
     DEFAULT_MOC = 0.02  # 2 percentage points
 
     def __init__(self, downturn_scalar=None, moc=None):
@@ -166,13 +567,28 @@ class MortgageLGDEngine:
             segmented, lgd_col="realised_lgd", ead_col="ead", group_col=segments
         )
 
+    def compute_weighted_outputs(self, df, group_cols=None):
+        """
+        Compute weighted base/downturn/final LGD outputs for mortgage.
+        """
+        if group_cols is None:
+            group_cols = ["mortgage_class", "ltv_band", "lmi_eligible"]
+        segmented = self.segment_loans(df)
+        return build_weighted_lgd_output(
+            segmented,
+            group_cols=group_cols,
+            base_col="lgd_base",
+            downturn_col="lgd_downturn",
+            final_col="lgd_final",
+        )
+
     def apply_apra_overlays(self, df):
         """
         Apply full APRA overlay chain to loan-level LGD estimates.
 
         Pipeline:
-          1. Start with realised_lgd (or model-predicted LGD)
-          2. Apply downturn scalar
+          1. Build cure-aware base LGD (`lgd_base`)
+          2. Apply macro-linked downturn scalar
           3. Add margin of conservatism
           4. Apply LMI benefit (for eligible loans)
           5. Apply LGD floor (10% standard, 15% non-standard)
@@ -181,10 +597,72 @@ class MortgageLGDEngine:
         """
         out = df.copy()
 
-        # Step 1: Downturn
-        out["lgd_downturn"] = apply_downturn_overlay(
-            out["realised_lgd"], method="scalar", scalar=self.downturn_scalar
+        # Governance hooks: discount-rate fallback source.
+        discount_rate_proxy_used, discount_rate_source = _resolve_discount_rate_proxy(
+            out, product_baseline=0.05
         )
+        out["discount_rate_proxy_used"] = discount_rate_proxy_used
+        out["discount_rate_source"] = discount_rate_source
+
+        # Governance hooks: arrears and repayment-behaviour proxy flags.
+        arrears_stage_proxy, arrears_proxy_flag = _resolve_mortgage_arrears_proxy(out)
+        behaviour_proxy, behaviour_proxy_flag = _resolve_mortgage_behaviour_proxy(out)
+        out["arrears_stage_proxy"] = arrears_stage_proxy
+        out["proxy_arrears_flag"] = arrears_proxy_flag
+        out["repayment_behaviour_proxy"] = behaviour_proxy
+        out["proxy_behaviour_flag"] = behaviour_proxy_flag
+        out["borrower_type_proxy"] = (
+            out.get("occupancy", pd.Series("Unknown", index=out.index))
+            .astype(str)
+            .str.lower()
+            .str.replace("-", "_", regex=False)
+        )
+
+        # Mortgage cure proxy for reporting.
+        arrears_num = out["arrears_stage_proxy"].map(
+            {"30-59": 0, "60-89": 1, "90+": 2}
+        ).fillna(1)
+        behaviour_num = out["repayment_behaviour_proxy"].map(
+            {"weak": -1, "stable": 0, "strong": 1}
+        ).fillna(0)
+        owner_bonus = np.where(
+            out["borrower_type_proxy"].str.contains("owner"), 0.04, 0.0
+        )
+        ltv = _coerce_numeric_series(out, "ltv_at_default", default=0.85).fillna(0.85)
+        dti = _coerce_numeric_series(out, "dti", default=0.35).fillna(0.35)
+        cure_rate_proxy = (
+            0.36
+            - 0.20 * (ltv - 0.80).clip(lower=0, upper=0.50)
+            - 0.08 * arrears_num
+            - 0.12 * (dti - 0.35).clip(lower=0, upper=0.25)
+            + 0.06 * behaviour_num
+            + owner_bonus
+        ).clip(0.02, 0.75)
+        out["cure_rate_proxy"] = cure_rate_proxy
+        out["liquidation_loss_proxy"] = (
+            out["realised_lgd"] / (1 - cure_rate_proxy).replace(0, np.nan)
+        ).fillna(out["realised_lgd"]).clip(0, 1)
+        out["lgd_cure_proxy"] = (
+            (1 - out["cure_rate_proxy"]) * out["liquidation_loss_proxy"]
+        ).clip(0, 1)
+        out["foreclosure_channel_flag"] = np.where(
+            out.get("resolution_type", pd.Series("Property Sale", index=out.index))
+            .astype(str)
+            .str.lower()
+            .eq("cure"),
+            0,
+            1,
+        )
+        out["cure_overlay_applied_flag"] = True
+        out["cure_overlay_source"] = "mortgage_proxy_two_stage"
+        out["lgd_base"] = out["lgd_cure_proxy"].clip(0, 1)
+
+        # Step 1: Macro-linked downturn (house prices, unemployment, rate shock)
+        out["downturn_scalar"], macro_detail = mortgage_macro_downturn_scalar(
+            out, base_scalar=self.downturn_scalar, return_detail=True
+        )
+        out = pd.concat([out, macro_detail], axis=1)
+        out["lgd_downturn"] = out["lgd_base"] * out["downturn_scalar"]
 
         # Step 2: MoC
         out["lgd_with_moc"] = add_margin_of_conservatism(
@@ -338,12 +816,28 @@ class CommercialLGDEngine:
             segmented, lgd_col="realised_lgd", ead_col="ead", group_col=segments
         )
 
+    def compute_weighted_outputs(self, df, group_cols=None):
+        """
+        Compute weighted base/downturn/final LGD outputs for commercial.
+        """
+        if group_cols is None:
+            group_cols = ["security_type", "industry"]
+        segmented = self.segment_loans(df)
+        return build_weighted_lgd_output(
+            segmented,
+            group_cols=group_cols,
+            base_col="lgd_base",
+            downturn_col="lgd_downturn",
+            final_col="lgd_final",
+        )
+
     def apply_overlays(self, df):
         """
         Apply downturn, MoC, and regulatory overlays with industry risk adjustments.
 
         Enhanced pipeline:
           1. Apply industry recovery haircut to realised LGD (if available)
+             and set base LGD (`lgd_base`)
           2. Map base downturn scalar by security type, then adjust for industry risk
           3. Apply industry-adjusted MoC
           4. Add working capital LGD adjustment (if available)
@@ -352,6 +846,18 @@ class CommercialLGDEngine:
         """
         out = df.copy()
         has_industry = "industry_risk_score" in out.columns
+
+        # Governance hook: discount-rate fallback source tracking.
+        discount_rate_proxy_used, discount_rate_source = _resolve_discount_rate_proxy(
+            out, product_baseline=0.06
+        )
+        out["discount_rate_proxy_used"] = discount_rate_proxy_used
+        out["discount_rate_source"] = discount_rate_source
+        out["icr_driver"] = _coerce_numeric_series(out, "icr")
+        out["dscr_driver"] = _coerce_numeric_series(out, "dscr")
+        out["industry_driver"] = out.get(
+            "industry", pd.Series("Unknown", index=out.index)
+        ).astype(str)
 
         # Step 1: Industry recovery haircut (raises effective LGD pre-overlays)
         if has_industry:
@@ -363,16 +869,18 @@ class CommercialLGDEngine:
             )
         else:
             out["lgd_industry_adjusted"] = out["realised_lgd"]
+        out["lgd_base"] = out["lgd_industry_adjusted"].clip(0, 1)
 
-        # Step 2: Downturn scalar (base from security type, adjusted by industry)
+        # Step 2: Macro-linked downturn scalar by product drivers
         base_scalar = out["security_type"].map(self.DOWNTURN_SCALARS).fillna(1.15)
+        base_scalar = commercial_macro_downturn_scalar(out, base_scalar=base_scalar)
         if has_industry:
             out["downturn_scalar"] = compute_industry_downturn_scalar(
                 out["industry_risk_score"], base_scalar
             )
         else:
             out["downturn_scalar"] = base_scalar
-        out["lgd_downturn"] = out["lgd_industry_adjusted"] * out["downturn_scalar"]
+        out["lgd_downturn"] = out["lgd_base"] * out["downturn_scalar"]
 
         # Step 3: MoC (adjusted by industry risk)
         if has_industry:
@@ -390,8 +898,37 @@ class CommercialLGDEngine:
             )
             out["lgd_with_moc"] = out["lgd_with_moc"] + out["wc_lgd_adjustment"]
 
+        # Step 4b: Simplified cure overlay proxy for reporting.
+        secured_mask = out["security_type"].isin(
+            ["Property", "PPSR - P&E", "PPSR - Receivables", "PPSR - Mixed"]
+        )
+        coverage = _coerce_numeric_series(
+            out, "security_coverage_ratio", default=1.0
+        ).fillna(1.0)
+        icr = _coerce_numeric_series(out, "icr", default=1.5).fillna(1.5)
+        workout = _coerce_numeric_series(out, "workout_months", default=18).fillna(18)
+        cure_proxy = (
+            0.08
+            + 0.20 * (coverage - 0.80).clip(lower=0, upper=0.60)
+            + 0.10 * ((icr - 1.20) / 1.80).clip(lower=0, upper=1.0)
+            - 0.10 * ((workout - 18) / 24).clip(lower=0, upper=1.0)
+        )
+        cure_proxy = np.where(secured_mask, cure_proxy, cure_proxy * 0.35)
+        out["cure_overlay_rate_proxy"] = pd.Series(cure_proxy, index=out.index).clip(0.0, 0.30)
+        out["liquidation_loss_proxy"] = out["lgd_with_moc"].clip(0, 1)
+        out["lgd_after_cure_overlay_proxy"] = (
+            (1 - out["cure_overlay_rate_proxy"]) * out["liquidation_loss_proxy"]
+        ).clip(0, 1)
+        out["cure_overlay_applied_flag"] = True
+        out["cure_overlay_source"] = np.where(
+            secured_mask,
+            "secured_proxy",
+            "dampened_unsecured_proxy",
+        )
+
         # Step 5: Supervisory LGD floor by seniority
         out["supervisory_lgd"] = out["seniority"].map(self.SUPERVISORY_LGD).fillna(0.45)
+        out["lgd_with_moc"] = np.maximum(out["lgd_with_moc"], out["supervisory_lgd"])
 
         # Step 6: Final -- cap at 100%
         out["lgd_final"] = out["lgd_with_moc"].clip(0, 1)
@@ -501,18 +1038,42 @@ class DevelopmentLGDEngine:
             segmented, lgd_col="realised_lgd", ead_col="ead", group_col=segments
         )
 
+    def compute_weighted_outputs(self, df, group_cols=None):
+        """
+        Compute weighted base/downturn/final LGD outputs for development.
+        """
+        if group_cols is None:
+            group_cols = ["completion_stage", "development_type"]
+        segmented = self.segment_loans(df)
+        return build_weighted_lgd_output(
+            segmented,
+            group_cols=group_cols,
+            base_col="lgd_base",
+            downturn_col="lgd_downturn",
+            final_col="lgd_final",
+        )
+
     def apply_overlays(self, df):
         """
         Apply downturn, MoC, and regulatory overlays with industry risk adjustments.
 
         Enhanced pipeline:
           1. Apply industry recovery haircut (if available)
+             and set base LGD (`lgd_base`)
           2. Map base downturn scalar by completion stage, adjust for industry risk
           3. Apply industry-adjusted MoC
           4. Cap at 100%
         """
         out = df.copy()
         has_industry = "industry_risk_score" in out.columns
+        discount_rate_proxy_used, discount_rate_source = _resolve_discount_rate_proxy(
+            out, product_baseline=0.07
+        )
+        out["discount_rate_proxy_used"] = discount_rate_proxy_used
+        out["discount_rate_source"] = discount_rate_source
+        out["grv_driver"] = _coerce_numeric_series(out, "grv")
+        out["completion_pct_driver"] = _coerce_numeric_series(out, "completion_pct")
+        out["cost_to_complete_driver"] = _coerce_numeric_series(out, "cost_to_complete")
 
         # Step 1: Industry recovery haircut
         if has_industry:
@@ -524,18 +1085,20 @@ class DevelopmentLGDEngine:
             )
         else:
             out["lgd_industry_adjusted"] = out["realised_lgd"]
+        out["lgd_base"] = out["lgd_industry_adjusted"].clip(0, 1)
 
-        # Step 2: Downturn scalar (base from completion stage, adjusted by industry)
+        # Step 2: Macro-linked downturn scalar by product drivers
         base_scalar = out["completion_stage"].map(
             self.DOWNTURN_SCALARS
         ).fillna(1.25)
+        base_scalar = development_macro_downturn_scalar(out, base_scalar=base_scalar)
         if has_industry:
             out["downturn_scalar"] = compute_industry_downturn_scalar(
                 out["industry_risk_score"], base_scalar
             )
         else:
             out["downturn_scalar"] = base_scalar
-        out["lgd_downturn"] = out["lgd_industry_adjusted"] * out["downturn_scalar"]
+        out["lgd_downturn"] = out["lgd_base"] * out["downturn_scalar"]
 
         # Step 3: MoC (adjusted by industry risk)
         if has_industry:
@@ -545,6 +1108,30 @@ class DevelopmentLGDEngine:
         else:
             out["industry_moc"] = self.moc
         out["lgd_with_moc"] = out["lgd_downturn"] + out["industry_moc"]
+
+        # Step 3b: Simplified cure overlay proxy for reporting.
+        stage_base = {
+            "Pre-Construction": 0.03,
+            "Early Construction": 0.05,
+            "Mid-Construction": 0.08,
+            "Near-Complete": 0.14,
+            "Complete Unsold": 0.10,
+        }
+        stage_component = out["completion_stage"].map(stage_base).fillna(0.05)
+        presale = _coerce_numeric_series(out, "presale_coverage", default=0.50).fillna(0.50)
+        lvr = _coerce_numeric_series(out, "lvr_as_if_complete", default=0.70).fillna(0.70)
+        cure_proxy = (
+            stage_component
+            + 0.12 * (presale - 0.50).clip(lower=0, upper=0.50)
+            - 0.15 * (lvr - 0.70).clip(lower=0, upper=0.40)
+        ).clip(0.01, 0.25)
+        out["cure_overlay_rate_proxy"] = cure_proxy
+        out["liquidation_loss_proxy"] = out["lgd_with_moc"].clip(0, 1)
+        out["lgd_after_cure_overlay_proxy"] = (
+            (1 - out["cure_overlay_rate_proxy"]) * out["liquidation_loss_proxy"]
+        ).clip(0, 1)
+        out["cure_overlay_applied_flag"] = True
+        out["cure_overlay_source"] = "development_stage_presale_lvr_proxy"
 
         # Step 4: Cap at 100%
         out["lgd_final"] = out["lgd_with_moc"].clip(0, 1)
@@ -878,10 +1465,180 @@ class CashFlowLendingLGDEngine:
 
 
 # ==========================================================================
+# GOVERNANCE REPORTING HOOKS
+# ==========================================================================
+
+def _summarise_usage_counts(df, product, topic, column):
+    """Summarise usage counts and exposure by category for a reporting column."""
+    if column not in df.columns:
+        return pd.DataFrame(columns=[
+            "product", "topic", "usage_value", "loan_count", "total_ead", "ead_share"
+        ])
+    work = df.copy()
+    work["usage_value"] = work[column].astype(str).fillna("missing")
+    if "ead" not in work.columns:
+        work["ead"] = 1.0
+    grouped = (
+        work.groupby("usage_value", observed=True)
+        .agg(loan_count=("usage_value", "size"), total_ead=("ead", "sum"))
+        .reset_index()
+    )
+    total_ead = grouped["total_ead"].sum()
+    grouped["ead_share"] = grouped["total_ead"] / total_ead if total_ead > 0 else 0.0
+    grouped.insert(0, "topic", topic)
+    grouped.insert(0, "product", product)
+    return grouped
+
+
+def build_fallback_usage_report(results):
+    """
+    Build fallback usage counts across products from overlay outputs.
+    """
+    rows = []
+    topic_map = {
+        "discount_rate_source": "discount_rate_fallback",
+        "house_price_source": "house_price_fallback",
+        "unemployment_source": "unemployment_fallback",
+        "rate_shock_source": "rate_shock_fallback",
+    }
+    for product, payload in results.items():
+        if not isinstance(payload, dict) or "loans_with_overlays" not in payload:
+            continue
+        df = payload["loans_with_overlays"]
+        for col, topic in topic_map.items():
+            part = _summarise_usage_counts(df, product, topic, col)
+            if not part.empty:
+                rows.append(part)
+    if not rows:
+        return pd.DataFrame(
+            columns=["product", "topic", "usage_value", "loan_count", "total_ead", "ead_share"]
+        )
+    out = pd.concat(rows, ignore_index=True)
+    return out.sort_values(["product", "topic", "usage_value"]).reset_index(drop=True)
+
+
+def build_unemployment_fallback_report(results):
+    """
+    Build mortgage year-bucket unemployment fallback report.
+    """
+    mtg = results.get("mortgage", {}).get("loans_with_overlays")
+    if mtg is None or len(mtg) == 0:
+        return pd.DataFrame(columns=[
+            "year_bucket", "unemployment_source", "loan_count", "total_ead",
+            "mean_unemployment_shock", "ead_weighted_unemployment_shock",
+        ])
+
+    df = mtg.copy()
+    if "unemployment_year_bucket" not in df.columns:
+        df["unemployment_year_bucket"] = _year_bucket_for_unemployment(df.get("default_date"))
+    if "unemployment_source" not in df.columns:
+        df["unemployment_source"] = "unreported"
+    if "ead" not in df.columns:
+        df["ead"] = 1.0
+    if "unemployment_driver" not in df.columns:
+        df["unemployment_driver"] = _year_to_unemployment_shock(df.get("default_date"))
+
+    grouped = (
+        df.groupby(["unemployment_year_bucket", "unemployment_source"], observed=True)
+        .apply(
+            lambda g: pd.Series(
+                {
+                    "loan_count": len(g),
+                    "total_ead": pd.to_numeric(g["ead"], errors="coerce").fillna(0.0).sum(),
+                    "mean_unemployment_shock": pd.to_numeric(
+                        g["unemployment_driver"], errors="coerce"
+                    ).fillna(0.0).mean(),
+                    "ead_weighted_unemployment_shock": exposure_weighted_average(
+                        g.assign(
+                            unemployment_driver=pd.to_numeric(
+                                g["unemployment_driver"], errors="coerce"
+                            ).fillna(0.0)
+                        ),
+                        "unemployment_driver",
+                        "ead",
+                    ),
+                }
+            ),
+            include_groups=False,
+        )
+        .reset_index()
+    )
+    grouped = grouped.rename(
+        columns={"unemployment_year_bucket": "year_bucket"}
+    )
+    return grouped.sort_values(["year_bucket", "unemployment_source"]).reset_index(drop=True)
+
+
+def build_proxy_flag_report(results):
+    """
+    Build proxy arrears and behavioural flag report for mortgage.
+    """
+    mtg = results.get("mortgage", {}).get("loans_with_overlays")
+    if mtg is None or len(mtg) == 0:
+        return pd.DataFrame(columns=[
+            "flag_type", "flag_value", "loan_count", "total_ead", "ead_share"
+        ])
+    rows = [
+        _summarise_usage_counts(
+            mtg, "mortgage", "proxy_arrears_flag", "proxy_arrears_flag"
+        ),
+        _summarise_usage_counts(
+            mtg, "mortgage", "proxy_behaviour_flag", "proxy_behaviour_flag"
+        ),
+    ]
+    out = pd.concat(rows, ignore_index=True).rename(
+        columns={"topic": "flag_type", "usage_value": "flag_value"}
+    )
+    return out[["flag_type", "flag_value", "loan_count", "total_ead", "ead_share"]]
+
+
+def build_cure_overlay_flag_report(results):
+    """
+    Build cure overlay reporting flag summary across products.
+    """
+    rows = []
+    for product in ["mortgage", "commercial", "development", "cashflow_lending"]:
+        payload = results.get(product)
+        if not isinstance(payload, dict):
+            continue
+        df = payload.get("loans_with_overlays")
+        if df is None or len(df) == 0:
+            continue
+        part_flag = _summarise_usage_counts(
+            df, product, "cure_overlay_applied_flag", "cure_overlay_applied_flag"
+        )
+        if not part_flag.empty:
+            rows.append(part_flag)
+        part_source = _summarise_usage_counts(
+            df, product, "cure_overlay_source", "cure_overlay_source"
+        )
+        if not part_source.empty:
+            rows.append(part_source)
+    if not rows:
+        return pd.DataFrame(columns=[
+            "product", "topic", "usage_value", "loan_count", "total_ead", "ead_share"
+        ])
+    out = pd.concat(rows, ignore_index=True)
+    return out.sort_values(["product", "topic", "usage_value"]).reset_index(drop=True)
+
+
+def build_governance_reporting_tables(results):
+    """
+    Build all governance reporting tables used for remediation reporting.
+    """
+    return {
+        "fallback_usage_report.csv": build_fallback_usage_report(results),
+        "unemployment_year_bucket_report.csv": build_unemployment_fallback_report(results),
+        "proxy_flags_report.csv": build_proxy_flag_report(results),
+        "cure_overlay_report.csv": build_cure_overlay_flag_report(results),
+    }
+
+
+# ==========================================================================
 # FULL PIPELINE: Run all products
 # ==========================================================================
 
-def run_full_pipeline(datasets):
+def run_full_pipeline(datasets, include_reporting=False):
     """
     Run the complete LGD pipeline for all products.
 
@@ -892,7 +1649,10 @@ def run_full_pipeline(datasets):
     Returns
     -------
     dict with keys 'mortgage', 'commercial', 'development', 'cashflow_lending',
-    each containing 'loans_with_overlays' and 'segment_summary' DataFrames.
+    each containing 'loans_with_overlays', 'segment_summary', and (for core
+    products) 'weighted_output' DataFrames.
+    When include_reporting=True, adds key 'reporting_tables' with governance
+    remediation outputs.
     """
     results = {}
 
@@ -902,9 +1662,11 @@ def run_full_pipeline(datasets):
     mtg_with_overlays = mtg.apply_apra_overlays(mtg_loans)
     mtg_with_overlays = mtg.compute_illustrative_rwa(mtg_with_overlays)
     mtg_segments = mtg.compute_long_run_lgd(mtg_loans)
+    mtg_weighted = mtg.compute_weighted_outputs(mtg_with_overlays)
     results["mortgage"] = {
         "loans_with_overlays": mtg_with_overlays,
         "segment_summary": mtg_segments,
+        "weighted_output": mtg_weighted,
     }
 
     # --- Commercial ---
@@ -912,9 +1674,11 @@ def run_full_pipeline(datasets):
     com_loans = datasets["commercial"]["loans"]
     com_with_overlays = com.apply_overlays(com_loans)
     com_segments = com.compute_long_run_lgd(com_loans)
+    com_weighted = com.compute_weighted_outputs(com_with_overlays)
     results["commercial"] = {
         "loans_with_overlays": com_with_overlays,
         "segment_summary": com_segments,
+        "weighted_output": com_weighted,
     }
 
     # --- Development ---
@@ -923,9 +1687,11 @@ def run_full_pipeline(datasets):
     dev_with_overlays = dev.apply_overlays(dev_loans)
     dev_with_overlays = dev.assign_slotting(dev_with_overlays)
     dev_segments = dev.compute_long_run_lgd(dev_loans)
+    dev_weighted = dev.compute_weighted_outputs(dev_with_overlays)
     results["development"] = {
         "loans_with_overlays": dev_with_overlays,
         "segment_summary": dev_segments,
+        "weighted_output": dev_weighted,
     }
 
     # --- Cash Flow Lending ---
@@ -938,5 +1704,8 @@ def run_full_pipeline(datasets):
             "loans_with_overlays": cfl_with_overlays,
             "segment_summary": cfl_segments,
         }
+
+    if include_reporting:
+        results["reporting_tables"] = build_governance_reporting_tables(results)
 
     return results

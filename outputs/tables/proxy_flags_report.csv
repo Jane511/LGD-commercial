@@ -1,0 +1,3 @@
+flag_type,flag_value,loan_count,total_ead,ead_share
+proxy_arrears_flag,True,500,444486089.71,1.0
+proxy_behaviour_flag,True,500,444486089.71,1.0

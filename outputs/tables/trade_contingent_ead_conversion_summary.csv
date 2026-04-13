@@ -1,0 +1,3 @@
+security_level,loan_count,total_contingent_commitment,total_already_drawn,total_ead_base,total_ead_downturn,ead_weighted_claim_prob_base,ead_weighted_claim_prob_downturn,ead_weighted_conversion_uplift_pct
+Unsecured / Weakly Secured,23.0,106411810.14441335,44957368.52744863,92056096.19434786,120993870.15617925,0.4107490555551969,0.6027666616880032,1.6017182488718675
+Partially Secured,13.0,59070126.826550454,20947658.15843975,50752346.206068836,67416191.60156061,0.5000054915112746,0.709351950694557,1.6648407112448955

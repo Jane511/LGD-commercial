@@ -1,0 +1,4 @@
+year_bucket,unemployment_source,loan_count,total_ead,mean_unemployment_shock,ead_weighted_unemployment_shock
+baseline_other_year,observed_unemployment_shock,198.0,175361454.59999996,0.009999999999999998,0.010000000000000002
+covid_2020_2021,observed_unemployment_shock,152.0,138861234.35999998,0.030000000000000002,0.030000000000000002
+normalising_2022_2023,observed_unemployment_shock,150.0,130263400.75,0.014999999999999998,0.015

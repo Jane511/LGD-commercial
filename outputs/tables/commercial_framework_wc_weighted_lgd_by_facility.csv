@@ -1,0 +1,7 @@
+facility_type,wc_sub_type,loan_count,total_ead,ead_weighted_lgd_base,ead_weighted_lgd_downturn,ead_weighted_lgd_final
+Revolving Credit,Unsecured WC - Weaker Quality,4.0,32788406.289999995,0.9900000000000001,1.0,1.0
+Overdraft,Unsecured WC - Weaker Quality,5.0,22912688.299999997,0.9900000000000002,0.9974328654926974,1.0
+Revolving Credit,Committed Working-Capital Line,49.0,325249180.55,0.7898456235564244,0.8386840174454528,0.8713596158042904
+Overdraft,Other Revolver / Overdraft,62.0,469292433.55999994,0.6725768916081245,0.7102856534834662,0.791888779775673
+Revolving Credit,Other Revolver / Overdraft,78.0,464937760.64,0.6611137901936212,0.6956961318306555,0.7761316432725265
+Overdraft,Overdraft with Transactional Evidence,5.0,13048947.620000001,0.6622180533364086,0.6666099360467977,0.7297193161181557

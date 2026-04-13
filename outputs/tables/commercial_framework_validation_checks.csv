@@ -1,0 +1,12 @@
+check_name,passed,failed_rows,detail
+framework_base_between_0_and_1,True,0,"lgd_base_framework in [0,1]"
+framework_downturn_between_0_and_1,True,0,"lgd_downturn_framework in [0,1]"
+framework_final_between_0_and_1,True,0,"lgd_final_framework in [0,1]"
+downturn_not_below_base,True,0,downturn >= base
+final_not_below_downturn,True,0,final >= downturn
+required_fields_present,True,0,none
+no_impossible_balances,True,0,facility_limit/drawn_balance/ead must be numeric and non-negative
+ead_not_below_drawn_balance,True,0,ead >= drawn_balance
+drawn_not_above_facility_limit,True,0,drawn_balance <= facility_limit
+segment_assignment_consistency,True,0,framework segment matches standard mapping
+recoveries_not_before_default_date,True,0,cashflow_date >= default_date

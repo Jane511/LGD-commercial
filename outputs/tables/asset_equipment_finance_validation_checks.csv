@@ -1,0 +1,19 @@
+check_name,passed,failed_rows,detail
+required_fields_present,True,0,none
+no_impossible_balances,True,0,facility_limit/drawn_balance/ead must be numeric and non-negative
+ead_not_below_drawn_balance,True,0,ead >= drawn_balance
+drawn_not_above_facility_limit,True,0,drawn_balance <= facility_limit
+segment_assignment_consistency,True,0,framework segment matches standard mapping
+range_check_secondary_market_liquidity,True,0,"secondary_market_liquidity in [0,1]"
+range_check_asset_condition_location_score,True,0,"asset_condition_location_score in [0,1]"
+range_check_operational_dependence_score,True,0,"operational_dependence_score in [0,1]"
+range_check_remarketing_discount_pct,True,0,"remarketing_discount_pct in [0,1]"
+range_check_asset_haircut_proxy,True,0,"asset_haircut_proxy in [0,1]"
+range_check_residual_balloon_pct,True,0,"residual_balloon_pct in [0,1]"
+range_check_remarketing_discount_pct,True,0,"remarketing_discount_pct in [0,1]"
+range_check_asset_haircut_proxy,True,0,"asset_haircut_proxy in [0,1]"
+range_check_residual_balloon_pct,True,0,"residual_balloon_pct in [0,1]"
+ead_base_not_below_drawn,True,0,ead_base >= drawn_balance
+ead_downturn_not_below_drawn,True,0,ead_downturn >= drawn_balance
+downturn_sale_timing_not_shorter,True,0,downturn sale timing >= base sale timing
+lgd_downturn_not_below_base,True,0,downturn LGD >= base LGD

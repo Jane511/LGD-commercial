@@ -18,6 +18,104 @@ from scipy import stats
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 
+def _weighted_mean(values, weights=None):
+    """Return weighted mean with safe fallbacks."""
+    v = pd.to_numeric(pd.Series(values), errors="coerce")
+    mask = np.isfinite(v)
+    if weights is None:
+        return float(v[mask].mean()) if mask.any() else np.nan
+    w = pd.to_numeric(pd.Series(weights), errors="coerce").fillna(0.0)
+    mask = mask & np.isfinite(w)
+    w_sum = w[mask].sum()
+    if w_sum <= 0:
+        return float(v[mask].mean()) if mask.any() else np.nan
+    return float((v[mask] * w[mask]).sum() / w_sum)
+
+
+def _weighted_rmse(actual, predicted, weights=None):
+    """Return weighted RMSE with safe fallback to unweighted RMSE."""
+    a = pd.to_numeric(pd.Series(actual), errors="coerce")
+    p = pd.to_numeric(pd.Series(predicted), errors="coerce")
+    mask = np.isfinite(a) & np.isfinite(p)
+    if not mask.any():
+        return np.nan
+    if weights is None:
+        return float(np.sqrt(np.mean((a[mask] - p[mask]) ** 2)))
+    w = pd.to_numeric(pd.Series(weights), errors="coerce").fillna(0.0)
+    mask = mask & np.isfinite(w)
+    if not mask.any():
+        return np.nan
+    w_sum = w[mask].sum()
+    if w_sum <= 0:
+        return float(np.sqrt(np.mean((a[mask] - p[mask]) ** 2)))
+    return float(np.sqrt(np.sum(w[mask] * (a[mask] - p[mask]) ** 2) / w_sum))
+
+
+def weighted_accuracy_metrics(actual, predicted, exposure=None):
+    """
+    Exposure-weighted accuracy metrics for LGD validation reporting.
+    """
+    mae = _weighted_mean(np.abs(pd.Series(predicted) - pd.Series(actual)), exposure)
+    rmse = _weighted_rmse(actual, predicted, exposure)
+    mean_actual = _weighted_mean(actual, exposure)
+    mean_predicted = _weighted_mean(predicted, exposure)
+    return {
+        "Weighted_MAE": round(mae, 6) if np.isfinite(mae) else np.nan,
+        "Weighted_RMSE": round(rmse, 6) if np.isfinite(rmse) else np.nan,
+        "Weighted_Mean_Actual": round(mean_actual, 6) if np.isfinite(mean_actual) else np.nan,
+        "Weighted_Mean_Predicted": round(mean_predicted, 6) if np.isfinite(mean_predicted) else np.nan,
+        "Weighted_Bias": (
+            round(mean_predicted - mean_actual, 6)
+            if np.isfinite(mean_actual) and np.isfinite(mean_predicted)
+            else np.nan
+        ),
+    }
+
+
+def governance_flag_summary(df, ead_col="ead"):
+    """
+    Summarise governance proxy/fallback columns when present.
+    """
+    if len(df) == 0:
+        return pd.DataFrame(columns=[
+            "column", "value", "loan_count", "total_ead", "ead_share"
+        ])
+
+    work = df.copy()
+    if ead_col not in work.columns:
+        work[ead_col] = 1.0
+
+    candidate_cols = [
+        col for col in work.columns
+        if col.endswith("_source")
+        or col.endswith("_flag")
+        or col in {"unemployment_year_bucket", "arrears_stage_proxy", "repayment_behaviour_proxy"}
+    ]
+    if not candidate_cols:
+        return pd.DataFrame(columns=[
+            "column", "value", "loan_count", "total_ead", "ead_share"
+        ])
+
+    parts = []
+    for col in candidate_cols:
+        tmp = work[[col, ead_col]].copy()
+        tmp[col] = tmp[col].astype(str).fillna("missing")
+        grouped = (
+            tmp.groupby(col, observed=True)
+            .agg(loan_count=(col, "size"), total_ead=(ead_col, "sum"))
+            .reset_index()
+            .rename(columns={col: "value"})
+        )
+        total_ead = grouped["total_ead"].sum()
+        grouped["ead_share"] = grouped["total_ead"] / total_ead if total_ead > 0 else 0.0
+        grouped.insert(0, "column", col)
+        parts.append(grouped)
+
+    return pd.concat(parts, ignore_index=True).sort_values(
+        ["column", "value"]
+    ).reset_index(drop=True)
+
+
 # ==========================================================================
 # 1. ACCURACY METRICS
 # ==========================================================================
@@ -77,18 +175,35 @@ def discriminatory_power(actual, predicted):
 # 3. CALIBRATION BY SEGMENT
 # ==========================================================================
 
-def calibration_by_segment(df, actual_col, predicted_col, segment_col):
+def calibration_by_segment(df, actual_col, predicted_col, segment_col, ead_col="ead"):
     """
     Compare mean predicted vs mean actual LGD by segment.
 
     Returns DataFrame with:
       - segment, count, mean_actual, mean_predicted, ratio, difference
     """
-    grouped = df.groupby(segment_col).agg(
-        count=(actual_col, "size"),
-        mean_actual=(actual_col, "mean"),
-        mean_predicted=(predicted_col, "mean"),
-    ).reset_index()
+    if ead_col in df.columns:
+        grouped = (
+            df.groupby(segment_col, observed=True)
+            .apply(
+                lambda g: pd.Series(
+                    {
+                        "count": len(g),
+                        "total_ead": pd.to_numeric(g[ead_col], errors="coerce").fillna(0.0).sum(),
+                        "mean_actual": _weighted_mean(g[actual_col], g[ead_col]),
+                        "mean_predicted": _weighted_mean(g[predicted_col], g[ead_col]),
+                    }
+                ),
+                include_groups=False,
+            )
+            .reset_index()
+        )
+    else:
+        grouped = df.groupby(segment_col, observed=True).agg(
+            count=(actual_col, "size"),
+            mean_actual=(actual_col, "mean"),
+            mean_predicted=(predicted_col, "mean"),
+        ).reset_index()
 
     grouped["ratio"] = grouped["mean_predicted"] / grouped["mean_actual"].replace(0, np.nan)
     grouped["difference"] = grouped["mean_predicted"] - grouped["mean_actual"]
@@ -101,7 +216,7 @@ def calibration_by_segment(df, actual_col, predicted_col, segment_col):
 # 4. CONSERVATISM TESTING
 # ==========================================================================
 
-def conservatism_test(actual, predicted, confidence=0.95):
+def conservatism_test(actual, predicted, exposure=None, confidence=0.95):
     """
     Test whether predicted LGD is conservative (>= actual).
 
@@ -115,8 +230,14 @@ def conservatism_test(actual, predicted, confidence=0.95):
     mask = np.isfinite(actual) & np.isfinite(predicted)
     a, p = actual[mask], predicted[mask]
 
-    mean_a = a.mean()
-    mean_p = p.mean()
+    if exposure is not None:
+        exp = np.asarray(exposure)
+        exp = exp[mask] if len(exp) == len(mask) else np.ones(len(a))
+        mean_a = _weighted_mean(a, exp)
+        mean_p = _weighted_mean(p, exp)
+    else:
+        mean_a = a.mean()
+        mean_p = p.mean()
 
     # One-sided paired t-test: H0: predicted <= actual, H1: predicted > actual
     if len(a) > 1:
@@ -209,6 +330,270 @@ def out_of_time_split(df, date_col="default_date", holdout_start="2023-01-01"):
     return train, test
 
 
+def add_vintage_columns(
+    df,
+    date_col="default_date",
+    origination_date_col="origination_date",
+    seasoning_months_col="seasoning_months",
+    fallback_years_on_book=2.5,
+):
+    """
+    Add origination/default year fields with transparent fallback lineage.
+
+    Fallback order:
+      1) observed origination_date (if present)
+      2) derive using seasoning_months (if present)
+      3) proxy years-on-book fallback (constant years by product config)
+    """
+    out = df.copy()
+    default_dates = pd.to_datetime(out.get(date_col), errors="coerce")
+    out[date_col] = default_dates
+    out["default_year"] = default_dates.dt.year.astype("Int64")
+
+    observed_orig = (
+        pd.to_datetime(out[origination_date_col], errors="coerce")
+        if origination_date_col in out.columns
+        else pd.Series(pd.NaT, index=out.index)
+    )
+    orig_dates = observed_orig.copy()
+    source = pd.Series(
+        np.where(observed_orig.notna(), "observed_origination_date", "missing"),
+        index=out.index,
+        dtype="object",
+    )
+
+    if seasoning_months_col in out.columns:
+        seasoning = pd.to_numeric(out[seasoning_months_col], errors="coerce")
+        mask = (
+            orig_dates.isna()
+            & default_dates.notna()
+            & seasoning.notna()
+            & (seasoning >= 0)
+        )
+        if mask.any():
+            days = (seasoning.loc[mask] * 30.4375).round().astype(int)
+            orig_dates.loc[mask] = default_dates.loc[mask] - pd.to_timedelta(days, unit="D")
+            source.loc[mask] = "derived_from_seasoning_months"
+
+    mask = orig_dates.isna() & default_dates.notna()
+    if mask.any():
+        fallback_days = int(round(max(float(fallback_years_on_book), 0.0) * 365.25))
+        orig_dates.loc[mask] = default_dates.loc[mask] - pd.to_timedelta(fallback_days, unit="D")
+        source.loc[mask] = f"proxy_years_on_book_{float(fallback_years_on_book):.1f}y"
+
+    source.loc[default_dates.isna()] = "missing_default_date"
+
+    out["origination_date_derived"] = orig_dates
+    out["origination_year"] = orig_dates.dt.year.astype("Int64")
+    out["origination_year_source"] = source
+    return out
+
+
+def _weighted_group_summary(df, group_cols, actual_col, predicted_col, ead_col="ead"):
+    """Weighted LGD summary helper by arbitrary grouping columns."""
+    if len(df) == 0:
+        cols = list(group_cols) + [
+            "loan_count",
+            "total_ead",
+            "ead_weighted_actual_lgd",
+            "ead_weighted_predicted_lgd",
+            "weighted_lgd_gap_pred_minus_actual",
+        ]
+        return pd.DataFrame(columns=cols)
+
+    work = df.copy()
+    if ead_col not in work.columns:
+        work[ead_col] = 1.0
+    for col in [actual_col, predicted_col, ead_col]:
+        work[col] = pd.to_numeric(work[col], errors="coerce")
+
+    grouped = (
+        work.groupby(group_cols, observed=True)
+        .apply(
+            lambda g: pd.Series(
+                {
+                    "loan_count": len(g),
+                    "total_ead": pd.to_numeric(g[ead_col], errors="coerce").fillna(0.0).sum(),
+                    "ead_weighted_actual_lgd": _weighted_mean(g[actual_col], g[ead_col]),
+                    "ead_weighted_predicted_lgd": _weighted_mean(g[predicted_col], g[ead_col]),
+                }
+            ),
+            include_groups=False,
+        )
+        .reset_index()
+    )
+    grouped["weighted_lgd_gap_pred_minus_actual"] = (
+        grouped["ead_weighted_predicted_lgd"] - grouped["ead_weighted_actual_lgd"]
+    )
+    return grouped
+
+
+def build_vintage_lgd_summary(
+    df,
+    actual_col="realised_lgd",
+    predicted_col="lgd_final",
+    ead_col="ead",
+    vintage_col="origination_year",
+    default_year_col="default_year",
+):
+    """
+    Build exposure-weighted LGD by origination/default year vintage.
+    """
+    cols = [vintage_col, default_year_col]
+    work = df.copy()
+    if vintage_col not in work.columns:
+        work[vintage_col] = pd.NA
+    if default_year_col not in work.columns:
+        work[default_year_col] = pd.NA
+    out = _weighted_group_summary(work, cols, actual_col, predicted_col, ead_col=ead_col)
+    return out.sort_values(cols).reset_index(drop=True)
+
+
+def build_weighted_lgd_over_time(
+    df,
+    actual_col="realised_lgd",
+    predicted_col="lgd_final",
+    ead_col="ead",
+    time_col="default_year",
+):
+    """
+    Build exposure-weighted LGD time series using default-year buckets.
+    """
+    work = df.copy()
+    if time_col not in work.columns:
+        work[time_col] = pd.NA
+    group_cols = [time_col]
+    if "product" in work.columns:
+        group_cols = ["product", time_col]
+    out = _weighted_group_summary(work, group_cols, actual_col, predicted_col, ead_col=ead_col)
+    return out.sort_values(group_cols).reset_index(drop=True)
+
+
+def summarise_oot_stability(
+    train_df,
+    test_df,
+    actual_col="realised_lgd",
+    predicted_col="lgd_final",
+    ead_col="ead",
+):
+    """
+    Summarise train/test weighted LGD stability for out-of-time validation.
+    """
+    train_w_actual = _weighted_mean(
+        train_df[actual_col],
+        train_df[ead_col] if ead_col in train_df.columns else None,
+    )
+    test_w_actual = _weighted_mean(
+        test_df[actual_col],
+        test_df[ead_col] if ead_col in test_df.columns else None,
+    )
+    train_w_pred = _weighted_mean(
+        train_df[predicted_col],
+        train_df[ead_col] if ead_col in train_df.columns else None,
+    )
+    test_w_pred = _weighted_mean(
+        test_df[predicted_col],
+        test_df[ead_col] if ead_col in test_df.columns else None,
+    )
+
+    shift = test_w_actual - train_w_actual if np.isfinite(train_w_actual) and np.isfinite(test_w_actual) else np.nan
+    rel_shift = (
+        shift / train_w_actual
+        if np.isfinite(shift) and np.isfinite(train_w_actual) and abs(train_w_actual) > 1e-12
+        else np.nan
+    )
+    return {
+        "train_weighted_actual_lgd": round(train_w_actual, 6) if np.isfinite(train_w_actual) else np.nan,
+        "test_weighted_actual_lgd": round(test_w_actual, 6) if np.isfinite(test_w_actual) else np.nan,
+        "train_weighted_predicted_lgd": round(train_w_pred, 6) if np.isfinite(train_w_pred) else np.nan,
+        "test_weighted_predicted_lgd": round(test_w_pred, 6) if np.isfinite(test_w_pred) else np.nan,
+        "weighted_actual_shift_test_minus_train": round(shift, 6) if np.isfinite(shift) else np.nan,
+        "weighted_actual_shift_pct": round(rel_shift, 6) if np.isfinite(rel_shift) else np.nan,
+    }
+
+
+def ranking_consistency_summary(
+    train_df,
+    test_df,
+    segment_col,
+    lgd_col="realised_lgd",
+    ead_col="ead",
+):
+    """
+    Compare segment LGD rank ordering between train and out-of-time test periods.
+    """
+    if segment_col is None:
+        return {
+            "segment_col": None,
+            "common_segments": 0,
+            "spearman_rank_corr": np.nan,
+            "top_segment_train": None,
+            "top_segment_test": None,
+            "top_segment_match": np.nan,
+        }
+
+    if isinstance(segment_col, (list, tuple)):
+        if len(segment_col) != 1:
+            return {
+                "segment_col": str(segment_col),
+                "common_segments": 0,
+                "spearman_rank_corr": np.nan,
+                "top_segment_train": None,
+                "top_segment_test": None,
+                "top_segment_match": np.nan,
+            }
+        segment_col = segment_col[0]
+
+    if segment_col not in train_df.columns or segment_col not in test_df.columns:
+        return {
+            "segment_col": segment_col,
+            "common_segments": 0,
+            "spearman_rank_corr": np.nan,
+            "top_segment_train": None,
+            "top_segment_test": None,
+            "top_segment_match": np.nan,
+        }
+
+    train_seg = _weighted_group_summary(
+        train_df, [segment_col], lgd_col, lgd_col, ead_col=ead_col
+    ).rename(columns={"ead_weighted_actual_lgd": "train_weighted_lgd"})
+    test_seg = _weighted_group_summary(
+        test_df, [segment_col], lgd_col, lgd_col, ead_col=ead_col
+    ).rename(columns={"ead_weighted_actual_lgd": "test_weighted_lgd"})
+
+    merged = train_seg[[segment_col, "train_weighted_lgd"]].merge(
+        test_seg[[segment_col, "test_weighted_lgd"]],
+        on=segment_col,
+        how="inner",
+    )
+    merged = merged.dropna(subset=["train_weighted_lgd", "test_weighted_lgd"])
+    n_common = len(merged)
+
+    if n_common >= 2:
+        corr, _ = stats.spearmanr(merged["train_weighted_lgd"], merged["test_weighted_lgd"])
+    else:
+        corr = np.nan
+
+    top_train = None
+    top_test = None
+    if n_common >= 1:
+        top_train = str(
+            merged.sort_values("train_weighted_lgd", ascending=False).iloc[0][segment_col]
+        )
+        top_test = str(
+            merged.sort_values("test_weighted_lgd", ascending=False).iloc[0][segment_col]
+        )
+
+    return {
+        "segment_col": segment_col,
+        "common_segments": int(n_common),
+        "spearman_rank_corr": round(corr, 6) if np.isfinite(corr) else np.nan,
+        "top_segment_train": top_train,
+        "top_segment_test": top_test,
+        "top_segment_match": bool(top_train == top_test) if top_train is not None and top_test is not None else np.nan,
+    }
+
+
 def out_of_time_backtest(train_df, test_df, lgd_col="realised_lgd",
                          segment_col=None, ead_col="ead"):
     """
@@ -217,22 +602,46 @@ def out_of_time_backtest(train_df, test_df, lgd_col="realised_lgd",
     Returns dict with accuracy metrics and calibration.
     """
     if segment_col is None:
-        # Portfolio-level: use training mean as prediction
-        train_mean = train_df[lgd_col].mean()
+        # Portfolio-level: use training exposure-weighted LGD as prediction
+        train_mean = _weighted_mean(
+            train_df[lgd_col],
+            train_df[ead_col] if ead_col in train_df.columns else None,
+        )
         test_df = test_df.copy()
         test_df["predicted_lgd"] = train_mean
     else:
         # Segment-level
         if isinstance(segment_col, str):
             segment_col = [segment_col]
-        seg_means = train_df.groupby(segment_col)[lgd_col].mean().reset_index()
-        seg_means.columns = list(segment_col) + ["predicted_lgd"]
+        if ead_col in train_df.columns:
+            seg_means = (
+                train_df.groupby(segment_col, observed=True)
+                .apply(
+                    lambda g: _weighted_mean(g[lgd_col], g[ead_col]),
+                    include_groups=False,
+                )
+                .reset_index(name="predicted_lgd")
+            )
+        else:
+            seg_means = (
+                train_df.groupby(segment_col, observed=True)
+                .apply(lambda g: _weighted_mean(g[lgd_col]), include_groups=False)
+                .reset_index(name="predicted_lgd")
+            )
         test_df = test_df.merge(seg_means, on=segment_col, how="left")
         # Fill missing segments with portfolio average
-        test_df["predicted_lgd"] = test_df["predicted_lgd"].fillna(train_df[lgd_col].mean())
+        portfolio_lgd = _weighted_mean(
+            train_df[lgd_col],
+            train_df[ead_col] if ead_col in train_df.columns else None,
+        )
+        test_df["predicted_lgd"] = test_df["predicted_lgd"].fillna(portfolio_lgd)
 
     metrics = accuracy_metrics(test_df[lgd_col], test_df["predicted_lgd"])
-    cons = conservatism_test(test_df[lgd_col], test_df["predicted_lgd"])
+    cons = conservatism_test(
+        test_df[lgd_col],
+        test_df["predicted_lgd"],
+        exposure=test_df[ead_col] if ead_col in test_df.columns else None,
+    )
     disc = discriminatory_power(test_df[lgd_col], test_df["predicted_lgd"])
 
     return {
@@ -284,18 +693,36 @@ def sensitivity_analysis(base_lgd, parameter_name, parameter_values, compute_fn)
 # FULL VALIDATION REPORT
 # ==========================================================================
 
-def generate_validation_report(df, actual_col="realised_lgd",
-                               predicted_col="lgd_final",
-                               segment_col=None, date_col="default_date"):
+def generate_validation_report(
+    df,
+    actual_col="realised_lgd",
+    predicted_col="lgd_final",
+    segment_col=None,
+    date_col="default_date",
+    oot_holdout_start="2023-01-01",
+    fallback_years_on_book=2.5,
+    ranking_segment_col=None,
+):
     """
     Generate a comprehensive validation report for an LGD model.
 
     Returns dict with all validation components.
     """
     report = {}
+    df = add_vintage_columns(
+        df,
+        date_col=date_col,
+        fallback_years_on_book=fallback_years_on_book,
+    )
+    ead_col = "ead" if "ead" in df.columns else None
 
     # Accuracy
     report["accuracy"] = accuracy_metrics(df[actual_col], df[predicted_col])
+    report["weighted_accuracy"] = weighted_accuracy_metrics(
+        df[actual_col],
+        df[predicted_col],
+        exposure=df[ead_col] if ead_col is not None else None,
+    )
 
     # Discriminatory power
     report["discriminatory_power"] = discriminatory_power(
@@ -303,12 +730,48 @@ def generate_validation_report(df, actual_col="realised_lgd",
     )
 
     # Conservatism
-    report["conservatism"] = conservatism_test(df[actual_col], df[predicted_col])
+    report["conservatism"] = conservatism_test(
+        df[actual_col],
+        df[predicted_col],
+        exposure=df[ead_col] if ead_col is not None else None,
+    )
 
     # Calibration by segment
     if segment_col:
         report["calibration"] = calibration_by_segment(
-            df, actual_col, predicted_col, segment_col
+            df, actual_col, predicted_col, segment_col, ead_col="ead"
+        )
+
+    # Vintage and time-series weighted LGD views
+    report["vintage_summary"] = build_vintage_lgd_summary(
+        df,
+        actual_col=actual_col,
+        predicted_col=predicted_col,
+        ead_col=ead_col or "ead",
+        vintage_col="origination_year",
+        default_year_col="default_year",
+    )
+    report["weighted_lgd_over_time"] = build_weighted_lgd_over_time(
+        df,
+        actual_col=actual_col,
+        predicted_col=predicted_col,
+        ead_col=ead_col or "ead",
+        time_col="default_year",
+    )
+    if "origination_year_source" in df.columns:
+        source_df = df.copy()
+        if ead_col is None:
+            source_df["ead"] = 1.0
+        report["origination_year_source_summary"] = (
+            source_df.groupby("origination_year_source", observed=True)
+            .agg(
+                loan_count=("origination_year_source", "size"),
+                total_ead=("ead", "sum"),
+            )
+            .reset_index()
+            .rename(columns={"origination_year_source": "source"})
+            .sort_values("source")
+            .reset_index(drop=True)
         )
 
     # PSI (split at median date for illustration)
@@ -322,20 +785,61 @@ def generate_validation_report(df, actual_col="realised_lgd",
 
     # Out-of-time
     if date_col in df.columns:
-        train, test = out_of_time_split(df, date_col)
-        if len(test) > 5:
-            report["out_of_time"] = out_of_time_backtest(
-                train, test, lgd_col=actual_col, segment_col=segment_col
+        train, test = out_of_time_split(df, date_col, holdout_start=oot_holdout_start)
+        if len(test) > 5 and len(train) > 5:
+            oot = out_of_time_backtest(
+                train,
+                test,
+                lgd_col=actual_col,
+                segment_col=segment_col,
+                ead_col="ead",
             )
+            oot["holdout_start"] = str(pd.Timestamp(oot_holdout_start).date())
+            oot["train_period_start"] = (
+                str(pd.to_datetime(train[date_col]).min().date())
+                if len(train)
+                else None
+            )
+            oot["train_period_end"] = (
+                str(pd.to_datetime(train[date_col]).max().date())
+                if len(train)
+                else None
+            )
+            oot["test_period_start"] = (
+                str(pd.to_datetime(test[date_col]).min().date())
+                if len(test)
+                else None
+            )
+            oot["test_period_end"] = (
+                str(pd.to_datetime(test[date_col]).max().date())
+                if len(test)
+                else None
+            )
+            oot["stability_summary"] = summarise_oot_stability(
+                train,
+                test,
+                actual_col=actual_col,
+                predicted_col=predicted_col,
+                ead_col="ead",
+            )
+            ranking_col = ranking_segment_col if ranking_segment_col is not None else segment_col
+            oot["ranking_consistency"] = ranking_consistency_summary(
+                train,
+                test,
+                segment_col=ranking_col,
+                lgd_col=actual_col,
+                ead_col="ead",
+            )
+            report["out_of_time"] = oot
 
     # Calibration by industry (if available)
     if "industry_risk_band" in df.columns:
         report["calibration_by_industry"] = calibration_by_segment(
-            df, actual_col, predicted_col, "industry_risk_band"
+            df, actual_col, predicted_col, "industry_risk_band", ead_col="ead"
         )
     elif "industry" in df.columns:
         report["calibration_by_industry"] = calibration_by_segment(
-            df, actual_col, predicted_col, "industry"
+            df, actual_col, predicted_col, "industry", ead_col="ead"
         )
 
     # PD score band calibration (for cash flow lending)
@@ -348,6 +852,11 @@ def generate_validation_report(df, actual_col="realised_lgd",
             df, pd_col="pd_estimate", lgd_col=predicted_col,
             band_col="pd_score_band"
         )
+
+    # Governance and fallback transparency section
+    report["governance_flags"] = governance_flag_summary(
+        df, ead_col="ead" if "ead" in df.columns else "ead"
+    )
 
     return report
 
@@ -372,6 +881,7 @@ def industry_attribution_analysis(df, actual_col="realised_lgd",
 
     result = {}
     df_clean = df.dropna(subset=[actual_col, industry_col])
+    has_ead = "ead" in df_clean.columns
 
     if len(df_clean) < 10:
         return {"error": "Insufficient data for attribution analysis"}
@@ -379,24 +889,66 @@ def industry_attribution_analysis(df, actual_col="realised_lgd",
     le_ind = LabelEncoder()
     ind_encoded = le_ind.fit_transform(df_clean[industry_col])
 
-    # Industry alone: group-mean model
-    ind_means = df_clean.groupby(industry_col)[actual_col].transform("mean")
-    ss_total = ((df_clean[actual_col] - df_clean[actual_col].mean()) ** 2).sum()
+    # Industry alone: group-mean model (EAD-weighted when available)
+    if has_ead:
+        ind_lookup = (
+            df_clean.groupby(industry_col, observed=True)
+            .apply(
+                lambda g: _weighted_mean(g[actual_col], g["ead"]),
+                include_groups=False,
+            )
+            .to_dict()
+        )
+        ind_means = df_clean[industry_col].map(ind_lookup)
+        portfolio_mean = _weighted_mean(df_clean[actual_col], df_clean["ead"])
+    else:
+        ind_means = df_clean.groupby(industry_col)[actual_col].transform("mean")
+        portfolio_mean = df_clean[actual_col].mean()
+
+    ss_total = ((df_clean[actual_col] - portfolio_mean) ** 2).sum()
     ss_resid_ind = ((df_clean[actual_col] - ind_means) ** 2).sum()
     r2_industry = 1 - ss_resid_ind / ss_total if ss_total > 0 else 0.0
     result["r2_industry_alone"] = round(r2_industry, 6)
 
     # Security type alone (if available)
     if security_col in df_clean.columns:
-        sec_means = df_clean.groupby(security_col)[actual_col].transform("mean")
+        if has_ead:
+            sec_lookup = (
+                df_clean.groupby(security_col, observed=True)
+                .apply(
+                    lambda g: _weighted_mean(g[actual_col], g["ead"]),
+                    include_groups=False,
+                )
+                .to_dict()
+            )
+            sec_means = df_clean[security_col].map(sec_lookup)
+        else:
+            sec_means = df_clean.groupby(security_col)[actual_col].transform("mean")
         ss_resid_sec = ((df_clean[actual_col] - sec_means) ** 2).sum()
         r2_security = 1 - ss_resid_sec / ss_total if ss_total > 0 else 0.0
         result["r2_security_alone"] = round(r2_security, 6)
 
         # Combined: security + industry group means
-        combined_means = df_clean.groupby(
-            [security_col, industry_col]
-        )[actual_col].transform("mean")
+        if has_ead:
+            combo_lookup = (
+                df_clean.groupby([security_col, industry_col], observed=True)
+                .apply(
+                    lambda g: _weighted_mean(g[actual_col], g["ead"]),
+                    include_groups=False,
+                )
+                .to_dict()
+            )
+            combined_means = pd.Series(
+                [
+                    combo_lookup.get((sec, ind), np.nan)
+                    for sec, ind in zip(df_clean[security_col], df_clean[industry_col])
+                ],
+                index=df_clean.index,
+            )
+        else:
+            combined_means = df_clean.groupby(
+                [security_col, industry_col]
+            )[actual_col].transform("mean")
         ss_resid_combined = ((df_clean[actual_col] - combined_means) ** 2).sum()
         r2_combined = 1 - ss_resid_combined / ss_total if ss_total > 0 else 0.0
         result["r2_combined"] = round(r2_combined, 6)
@@ -406,7 +958,8 @@ def industry_attribution_analysis(df, actual_col="realised_lgd",
     result["calibration_by_industry"] = calibration_by_segment(
         df_clean, actual_col,
         predicted_col if predicted_col in df_clean.columns else actual_col,
-        industry_col
+        industry_col,
+        ead_col="ead",
     )
 
     return result
@@ -434,7 +987,9 @@ def calibration_by_score_band(df, actual_col="realised_lgd",
     result = {}
 
     # Calibration table by PD band
-    cal = calibration_by_segment(df, actual_col, predicted_col, band_col)
+    cal = calibration_by_segment(
+        df, actual_col, predicted_col, band_col, ead_col="ead"
+    )
     band_order = ["A", "B", "C", "D", "E"]
     cal[band_col] = pd.Categorical(cal[band_col], categories=band_order, ordered=True)
     cal = cal.sort_values(band_col)
@@ -461,11 +1016,37 @@ def calibration_by_score_band(df, actual_col="realised_lgd",
 
     # Mean PD and LGD by band for EL computation
     if pd_col in df.columns:
-        el_table = df.groupby(band_col).agg(
-            mean_pd=(pd_col, "mean"),
-            mean_lgd=(predicted_col, "mean"),
-            count=(actual_col, "size"),
-        ).reset_index()
+        if "ead" in df.columns:
+            el_table = (
+                df.groupby(band_col, observed=True)
+                .apply(
+                    lambda g: pd.Series(
+                        {
+                            "mean_pd": _weighted_mean(g[pd_col], g["ead"]),
+                            "mean_lgd": _weighted_mean(g[predicted_col], g["ead"]),
+                            "total_ead": pd.to_numeric(g["ead"], errors="coerce").fillna(0.0).sum(),
+                            "count": len(g),
+                        }
+                    ),
+                    include_groups=False,
+                )
+                .reset_index()
+            )
+        else:
+            el_table = (
+                df.groupby(band_col, observed=True)
+                .apply(
+                    lambda g: pd.Series(
+                        {
+                            "mean_pd": _weighted_mean(g[pd_col]),
+                            "mean_lgd": _weighted_mean(g[predicted_col]),
+                            "count": len(g),
+                        }
+                    ),
+                    include_groups=False,
+                )
+                .reset_index()
+            )
         el_table["implied_el"] = el_table["mean_pd"] * el_table["mean_lgd"]
         el_table[band_col] = pd.Categorical(
             el_table[band_col], categories=band_order, ordered=True
@@ -510,12 +1091,38 @@ def pd_lgd_consistency_check(df, pd_col="pd_estimate",
 
     # 2. Implied EL by score band
     band_order = ["A", "B", "C", "D", "E"]
-    band_stats = df_clean.groupby(band_col).agg(
-        n=(pd_col, "size"),
-        mean_pd=(pd_col, "mean"),
-        mean_lgd=(lgd_col, "mean"),
-        total_ead=("ead", "sum") if "ead" in df_clean.columns else (pd_col, "size"),
-    ).reset_index()
+    if "ead" in df_clean.columns:
+        band_stats = (
+            df_clean.groupby(band_col, observed=True)
+            .apply(
+                lambda g: pd.Series(
+                    {
+                        "n": len(g),
+                        "mean_pd": _weighted_mean(g[pd_col], g["ead"]),
+                        "mean_lgd": _weighted_mean(g[lgd_col], g["ead"]),
+                        "total_ead": pd.to_numeric(g["ead"], errors="coerce").fillna(0.0).sum(),
+                    }
+                ),
+                include_groups=False,
+            )
+            .reset_index()
+        )
+    else:
+        band_stats = (
+            df_clean.groupby(band_col, observed=True)
+            .apply(
+                lambda g: pd.Series(
+                    {
+                        "n": len(g),
+                        "mean_pd": _weighted_mean(g[pd_col]),
+                        "mean_lgd": _weighted_mean(g[lgd_col]),
+                        "total_ead": len(g),
+                    }
+                ),
+                include_groups=False,
+            )
+            .reset_index()
+        )
     band_stats["implied_el"] = band_stats["mean_pd"] * band_stats["mean_lgd"]
     band_stats[band_col] = pd.Categorical(
         band_stats[band_col], categories=band_order, ordered=True
@@ -523,7 +1130,13 @@ def pd_lgd_consistency_check(df, pd_col="pd_estimate",
     result["el_by_band"] = band_stats.sort_values(band_col)
 
     # 3. Portfolio-level implied EL
-    portfolio_el = (df_clean[pd_col] * df_clean[lgd_col]).mean()
+    if "ead" in df_clean.columns:
+        portfolio_el = _weighted_mean(
+            df_clean[pd_col] * df_clean[lgd_col],
+            df_clean["ead"],
+        )
+    else:
+        portfolio_el = _weighted_mean(df_clean[pd_col] * df_clean[lgd_col])
     result["portfolio_implied_el"] = round(portfolio_el, 6)
 
     # 4. Joint conservatism: is EL increasing across bands?
@@ -568,8 +1181,9 @@ def compare_models(df, actual_col="realised_lgd",
     })
 
     # Conservatism
-    cons_base = conservatism_test(df[actual_col], df[baseline_col])
-    cons_enh = conservatism_test(df[actual_col], df[enhanced_col])
+    exposure = df["ead"] if "ead" in df.columns else None
+    cons_base = conservatism_test(df[actual_col], df[baseline_col], exposure=exposure)
+    cons_enh = conservatism_test(df[actual_col], df[enhanced_col], exposure=exposure)
     comparison["conservatism"] = pd.DataFrame({
         "Metric": list(cons_base.keys()),
         "Baseline": list(cons_base.values()),
