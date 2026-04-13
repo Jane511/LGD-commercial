@@ -1,10 +1,10 @@
-# Commercial Loss Given Default & Recovery Project
+# Commercial LGD, Recovery & Loss Estimation Project
 
-This repository is the LGD and recovery layer in the public commercial credit-risk stack. It uses borrower risk context, synthetic facility data, and collateral and recovery assumptions to produce downturn LGD tables, recovery waterfalls, and validation outputs for downstream loss, stress, pricing, and capital workflows.
+This repository is the LGD and recovery layer in the public commercial credit-risk stack. It uses borrower risk context, synthetic facility data, and collateral and recovery assumptions to produce downturn LGD tables, recovery waterfalls, and validation outputs for downstream loss, stress, pricing, and capital workflows across both bank and non-bank lending environments.
 
 ## What this repo is
 
-This project demonstrates how a bank-style commercial LGD workflow can be presented in a clear, portfolio-ready format. It focuses on severity, recoveries, and downturn treatment using transparent assumptions so the repo is easy to review without needing internal workout data.
+This project demonstrates how a commercial LGD workflow can be presented in a clear, portfolio-ready format. It focuses on severity, recoveries, and downturn treatment using transparent assumptions so the repo is easy to review without needing internal workout data.
 
 ## Where it sits in the stack
 
@@ -17,6 +17,22 @@ Downstream consumers:
 - `stress-testing-commercial`
 - `RAROC-pricing-and-return-hurdle`
 - `RWA-capital-commercial`
+
+## How this is used in practice
+
+This project can be applied in:
+
+### Bank / Institutional context
+
+- LGD estimation for expected loss, stress testing, and capital-style risk frameworks
+- Recovery and collateral analysis for structured risk review
+- Portfolio severity analysis by segment, facility type, or collateral class
+
+### Non-bank / Fintech context
+
+- Loss estimation inputs for pricing, provisioning, and return-hurdle analysis
+- Recovery-rate assumptions for collections and workout strategy
+- Vintage and product-level severity views for portfolio performance management
 
 ## Key inputs
 
