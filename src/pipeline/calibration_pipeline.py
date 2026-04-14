@@ -18,11 +18,11 @@ Runs the complete calibration sequence for each product:
 Outputs to outputs/tables/. Parquet source data in data/generated/historical/.
 
 Usage:
-    python scripts/run_calibration_pipeline.py
-    python scripts/run_calibration_pipeline.py --module mortgage
-    python scripts/run_calibration_pipeline.py --products mortgage development_finance
-    python scripts/run_calibration_pipeline.py --force-regen  (regenerate data)
-    python scripts/run_calibration_pipeline.py --skip-validation
+    python -m src.pipeline.calibration_pipeline
+    python -m src.pipeline.calibration_pipeline --module mortgage
+    python -m src.pipeline.calibration_pipeline --products mortgage development_finance
+    python -m src.pipeline.calibration_pipeline --force-regen  (regenerate data)
+    python -m src.pipeline.calibration_pipeline --skip-validation
 
 APS 113: All methodology steps cite relevant sections in module docstrings.
 SYNTHETIC DATA: All workout data is synthetically generated for demonstration only.
@@ -34,8 +34,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).parent.parent
-sys.path.insert(0, str(REPO_ROOT))
+REPO_ROOT = Path(__file__).parent.parent.parent
 
 from src.calibration_utils import (
     compute_realised_lgd,
@@ -66,7 +65,7 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
 )
-logger = logging.getLogger("run_calibration_pipeline")
+logger = logging.getLogger("calibration_pipeline")
 
 # Product-specific segment keys
 PRODUCT_SEGMENT_KEYS: dict[str, list[str]] = {
@@ -236,12 +235,10 @@ def run_product_calibration(
 
     # Step 4-10: Run calibration pipeline (segments, LR-LGD, downturn, MoC, floor)
     segment_keys = PRODUCT_SEGMENT_KEYS.get(product, ["macro_regime"])
-    # Filter to valid segment keys
     segment_keys = [k for k in segment_keys if k in loans.columns]
     if not segment_keys:
         segment_keys = ["macro_regime"]
 
-    # Model LGD column: use existing proxy engine output if available
     model_col = "lgd_final" if "lgd_final" in loans.columns else "realised_lgd"
 
     cal_results = run_calibration_pipeline(
@@ -270,47 +267,39 @@ def run_product_calibration(
     prefix = product
     exports = {}
 
-    # 1. Historical workouts
     hw_path = OUTPUTS_DIR / f"{prefix}_historical_workouts.csv"
     loans.to_csv(hw_path, index=False)
     exports["historical_workouts"] = hw_path
 
-    # 2. Long-run LGD by segment
     lr_df = cal_results["long_run_lgd_by_segment"]
     lr_path = OUTPUTS_DIR / f"{prefix}_long_run_lgd_by_segment.csv"
     lr_df.to_csv(lr_path, index=False)
     exports["long_run_lgd_by_segment"] = lr_path
 
-    # 3. Model vs actual
     mv_path = OUTPUTS_DIR / f"{prefix}_model_vs_actual_comparison.csv"
     backtest_df.to_csv(mv_path, index=False)
     exports["model_vs_actual_comparison"] = mv_path
 
-    # 4. Calibration adjustments
     cal_steps = cal_results["calibration_steps"]
     ca_path = OUTPUTS_DIR / f"{prefix}_calibration_adjustments.csv"
     cal_steps.to_csv(ca_path, index=False)
     exports["calibration_adjustments"] = ca_path
 
-    # 5. MoC register
     moc_df = cal_results["moc_register"]
     moc_path = OUTPUTS_DIR / f"{prefix}_moc_register.csv"
     moc_df.to_csv(moc_path, index=False)
     exports["moc_register"] = moc_path
 
-    # 6. Downturn LGD
     dt_path = OUTPUTS_DIR / f"{prefix}_downturn_lgd_by_segment.csv"
     lr_df[["segment_key_concat", "long_run_lgd", "downturn_lgd"]].to_csv(dt_path, index=False)
     exports["downturn_lgd_by_segment"] = dt_path
 
-    # 7. Final calibrated LGD
     fc_path = OUTPUTS_DIR / f"{prefix}_final_calibrated_lgd.csv"
     lr_df[["segment_key_concat", "long_run_lgd", "downturn_lgd",
            "total_moc", "lgd_with_moc", "policy_floor", "final_lgd",
            "aps113_pipeline"]].to_csv(fc_path, index=False)
     exports["final_calibrated_lgd"] = fc_path
 
-    # 8. Backtest results
     bt_path = OUTPUTS_DIR / f"{prefix}_backtest_results.csv"
     if val_results and "summary_table" in val_results:
         val_results["summary_table"].to_csv(bt_path, index=False)
@@ -318,7 +307,6 @@ def run_product_calibration(
         pd.DataFrame([{"note": "Validation skipped or insufficient data"}]).to_csv(bt_path, index=False)
     exports["backtest_results"] = bt_path
 
-    # 9. Validation report
     vr_path = OUTPUTS_DIR / f"{prefix}_validation_report.csv"
     if val_results and "validation_report" in val_results:
         val_results["validation_report"].to_csv(vr_path, index=False)
@@ -349,16 +337,13 @@ def main() -> None:
     logger.info("=" * 70)
     logger.info("Products: %s | Seed: %d", products, args.seed)
 
-    # Validate product names
     unknown = [p for p in products if p not in GENERATOR_MAP]
     if unknown:
         logger.error("Unknown product(s): %s", unknown)
         sys.exit(1)
 
-    # Load RBA rates once
     rates_df = load_rba_lending_rates()
 
-    # Classify economic regimes (use upstream if available)
     regimes = classify_economic_regime(
         upstream_parquet_path=args.upstream_path,
         method="upstream_first",
@@ -370,7 +355,6 @@ def main() -> None:
         regimes["is_downturn_period"].sum(),
     )
 
-    # Run pipeline per product
     all_results = {}
     all_final_lgd = []
     all_moc_registers = {}
@@ -388,7 +372,6 @@ def main() -> None:
             )
             all_results[product] = result
 
-            # Collect final LGD for consolidated output
             fc_df = result["calibration"]["long_run_lgd_by_segment"][
                 ["segment_key_concat", "final_lgd"]
             ].copy()
@@ -403,7 +386,6 @@ def main() -> None:
             logger.error("Pipeline failed for %s: %s", product, exc, exc_info=True)
             sys.exit(1)
 
-    # Consolidated outputs
     OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
 
     if all_final_lgd:
@@ -416,7 +398,6 @@ def main() -> None:
         moc_all.to_csv(OUTPUTS_DIR / "moc_summary_all_products.csv", index=False)
         logger.info("Written: moc_summary_all_products.csv (%d rows)", len(moc_all))
 
-    # APRA benchmark comparison
     try:
         apra_benchmarks = load_apra_adi_benchmarks()
         all_cal = pd.concat(
@@ -432,7 +413,6 @@ def main() -> None:
     except Exception as e:
         logger.warning("APRA benchmark comparison skipped: %s", e)
 
-    # APS 113 compliance map
     regime_source = regimes["data_source"].iloc[0] if len(regimes) > 0 else "synthetic"
     compliance_df = generate_compliance_map(
         calibration_results={p: r["calibration"] for p, r in all_results.items()},
@@ -442,7 +422,6 @@ def main() -> None:
     )
     export_compliance_map(compliance_df, OUTPUTS_DIR / "aps113_compliance_map.csv")
 
-    # Calibration summary dashboard
     summary_rows = []
     for product, result in all_results.items():
         lr_df = result["calibration"].get("long_run_lgd_by_segment", pd.DataFrame())
@@ -464,7 +443,6 @@ def main() -> None:
     dashboard.to_csv(OUTPUTS_DIR / "calibration_summary_dashboard.csv", index=False)
     logger.info("Written: calibration_summary_dashboard.csv")
 
-    # Summary
     logger.info("")
     logger.info("=" * 70)
     logger.info("Calibration complete. Key outputs:")
@@ -472,9 +450,7 @@ def main() -> None:
     logger.info("  outputs/tables/aps113_compliance_map.csv")
     logger.info("  outputs/tables/calibration_summary_dashboard.csv")
     logger.info("  outputs/tables/apra_benchmark_comparison.csv")
-    n_csv = sum(
-        len(r["exports"]) for r in all_results.values()
-    )
+    n_csv = sum(len(r["exports"]) for r in all_results.values())
     logger.info("  + %d per-module CSV files (9 per product)", n_csv)
     logger.info("=" * 70)
 

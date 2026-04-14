@@ -6,7 +6,7 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from src.demo_run_pipeline import run_pipeline  # noqa: E402
+from src.demo_pipeline import run_pipeline  # noqa: E402
 
 
 def _non_blank(series: pd.Series) -> pd.Series:

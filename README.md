@@ -13,7 +13,24 @@ full **APS 113-aligned calibration layer** on top of the existing infrastructure
 ## What this repo is
 
 - A multi-product structure with consistent output contracts so a cross-product view can be built.
-- A repo-safe validation standard that is **script-first** (no reliance on interactive notebook plotting).
+- A repo-safe validation standard that is **module-first** (no reliance on interactive notebook plotting).
+
+## Repository layout
+
+All maintained code lives under `src/`. There is no separate `scripts/` folder.
+
+Library modules live in `src/` flat. CLI entry points are organised into domain subpackages:
+
+```
+src/
+├── pipeline/   — demo_pipeline, calibration_pipeline, validation_pipeline
+├── scoring/    — scoring
+├── data/       — generator
+├── governance/ — gap_matrix
+└── generators/ — 11 per-product workout generators (library; not entry points)
+```
+
+Entry points are run as `python -m src.<subpackage>.<module>` from the repo root.
 
 ## LGD concepts used (foundation)
 
@@ -88,23 +105,20 @@ Realised LGD (2014-2024) → Long-run LGD (vintage-EWA, s.43)
 | Bridging | ✓ | ✓ | ✓ | ✓ | ✓ (25%) | ✓ |
 | Mezz / 2nd Mortgage | ✓ | ✓ | ✓ | ✓ | ✓ (40%) | ✓ |
 
-**New scripts:**
+**Entry points:**
 
 ```bash
 # Generate synthetic 2014-2024 workout histories for all products
-python scripts/generate_historical_workout_data.py --seed 42
-
-# Classify economic regimes (uses real RBA/ABS if macro_regime_flags.parquet available)
-python scripts/classify_economic_regimes.py
+python -m src.data.generator --seed 42
 
 # Run full APS 113 calibration pipeline (all products)
-python scripts/run_calibration_pipeline.py --products all
+python -m src.pipeline.calibration_pipeline --products all
 
 # Single-product isolation
-python scripts/run_calibration_pipeline.py --module mortgage
+python -m src.pipeline.calibration_pipeline --module mortgage
 
 # Demo pipeline + calibration (combined)
-python scripts/run_demo_pipeline.py --with-calibration
+python -m src.pipeline.demo_pipeline --with-calibration
 ```
 
 **Expected calibration outputs** (`outputs/tables/`):
@@ -200,32 +214,20 @@ Note: some historical duplicate CSV exports were removed so the repo exports one
 Run the end-to-end demo pipeline:
 
 ```powershell
-python scripts/run_demo_pipeline.py
+python -m src.pipeline.demo_pipeline
 ```
 
-Repo-safe validation standard (script-first):
+Repo-safe validation standard (module-first):
 
 ```powershell
-python scripts/run_validation_sequence.py
+python -m src.pipeline.validation_pipeline
 ```
 
 Validation sequence with explicit source selection:
 
 ```powershell
-python scripts/run_validation_sequence.py --source generated
-python scripts/run_validation_sequence.py --source controlled --controlled-root data/controlled
-```
-
-Stage 7 (Bridging Loan) repo-safe validation (non-interactive plotting backend, `plt.show()` disabled):
-
-```powershell
-python scripts/run_stage7_bridging_validation.py
-```
-
-Stage 9 (Cross-product integration) repo-safe validation:
-
-```powershell
-python scripts/run_stage9_cross_product_validation.py
+python -m src.pipeline.validation_pipeline --source generated
+python -m src.pipeline.validation_pipeline --source controlled --controlled-root data/controlled
 ```
 
 ## New-loan scoring interface (API + CLI)
@@ -251,20 +253,20 @@ result = score_single_loan(
 CLI (single loan JSON):
 
 ```powershell
-python scripts/score_new_loan.py --product-type mortgage --single-json data\sample_loan.json --output outputs\tables\single_loan_scored.json
+python -m src.scoring.scoring --product-type mortgage --single-json data\sample_loan.json --output outputs\tables\single_loan_scored.json
 ```
 
 CLI (batch CSV):
 
 ```powershell
-python scripts/score_new_loan.py --product-type commercial --input-csv data\sample_commercial_loans.csv --output outputs\tables\commercial_scored.csv
+python -m src.scoring.scoring --product-type commercial --input-csv data\sample_commercial_loans.csv --output outputs\tables\commercial_scored.csv
 ```
 
 CLI (score directly from generated/controlled source adapters):
 
 ```powershell
-python scripts/score_new_loan.py --product-type development --batch-from-source --source-mode generated --output outputs\tables\development_scored.csv
-python scripts/score_new_loan.py --product-type mortgage --single-json data\sample_loan.json --use-source-template --source-mode controlled --controlled-root data/controlled --output outputs\tables\mortgage_scored.json
+python -m src.scoring.scoring --product-type development --batch-from-source --source-mode generated --output outputs\tables\development_scored.csv
+python -m src.scoring.scoring --product-type mortgage --single-json data\sample_loan.json --use-source-template --source-mode controlled --controlled-root data/controlled --output outputs\tables\mortgage_scored.json
 ```
 
 Normalized scoring outputs include:
@@ -279,8 +281,10 @@ Goal: keep model structure fixed and only swap input source + recalibration asse
 1. Prepare canonical controlled input templates:
 
 ```powershell
-python scripts/prepare_controlled_input_templates.py --output-root data/controlled/templates
+python -m src.data_source_adapter --output-root data/controlled/templates
 ```
+
+   (or use `python -m src.pipeline.demo_pipeline --source controlled --controlled-root data/controlled` to run directly)
 
 2. Populate controlled-system files in `data/controlled/` with canonical names:
 - `{product}_loans.csv` or `.parquet`
@@ -290,7 +294,7 @@ python scripts/prepare_controlled_input_templates.py --output-root data/controll
 3. Run with controlled source using the same pipeline contract:
 
 ```powershell
-python scripts/run_pipeline_with_source.py --source controlled --controlled-root data/controlled --include-reporting
+python -m src.pipeline.demo_pipeline --source controlled --controlled-root data/controlled --include-reporting
 ```
 
 4. Verify governance and determinism outputs are still produced:

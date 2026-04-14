@@ -11,8 +11,7 @@ import pandas as pd
 sys.dont_write_bytecode = True
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(PROJECT_ROOT))
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 TABLE_DIR = PROJECT_ROOT / "outputs" / "tables"
 REPORT_DIR = PROJECT_ROOT / "outputs" / "reports"
 RUNTIME_SOURCE = "generated"
@@ -296,7 +295,6 @@ def _step_validation_report_hooks():
     ranking_summary.to_csv(TABLE_DIR / "lgd_out_of_time_ranking_consistency.csv", index=False)
     source_summary.to_csv(TABLE_DIR / "origination_year_source_summary.csv", index=False)
 
-    # Backward-compatible mortgage-only governance file
     governance_flags.loc[
         governance_flags["product"] == "mortgage"
     ].to_csv(TABLE_DIR / "mortgage_validation_governance_flags.csv", index=False)
@@ -351,10 +349,6 @@ def _step_final_lgd_layer():
 def _step_aps113_calibration_validation():
     """
     Step 7: APS 113 extended validation suite (Gini, Hosmer-Lemeshow, PSI, OOT).
-
-    Runs run_full_validation_suite() from src.validation_suite for each product
-    that has calibrated LGD outputs in outputs/tables/. Reports pass/fail against
-    APS 113 s.66-68 thresholds: Gini > 0.5, CalibRatio 0.85-1.15, PSI < 0.10.
     """
     from src.validation_suite import run_full_validation_suite
 
@@ -431,7 +425,7 @@ def _step_aps113_calibration_validation():
     products_run = sum(1 for r in rows if r["status"] != "SKIPPED")
     products_pass = sum(1 for r in rows if r["status"] == "PASS")
     products_skip = sum(1 for r in rows if r["status"] == "SKIPPED")
-    passed = products_run == 0 or products_pass >= products_run * 0.8  # >=80% pass rate
+    passed = products_run == 0 or products_pass >= products_run * 0.8
     detail = (
         f"products_run={products_run}; passed={products_pass}; "
         f"skipped={products_skip}; "
@@ -519,7 +513,6 @@ def main():
         ("final_lgd_layer", _step_final_lgd_layer),
         ("reproducibility_determinism", _step_reproducibility_determinism),
         ("notebook_reproducibility_scan", _step_notebook_reproducibility_scan),
-        # Step 7: APS 113 extended validation (Gini, HL, PSI, OOT) — s.66-68
         ("aps113_calibration_validation", _step_aps113_calibration_validation),
     ]
 

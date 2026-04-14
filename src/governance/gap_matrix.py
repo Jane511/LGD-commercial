@@ -4,7 +4,7 @@ from pathlib import Path
 import pandas as pd
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 TABLE_DIR = PROJECT_ROOT / "outputs" / "tables"
 REPORT_DIR = PROJECT_ROOT / "outputs" / "reports"
 
@@ -324,7 +324,7 @@ def build_matrix() -> pd.DataFrame:
         "evidence_code_paths": _fmt_paths([
             "src/lgd_calculation.py",
             "src/overlay_parameters.py",
-            "scripts/run_validation_sequence.py",
+            "src/pipeline/validation_pipeline.py",
         ]),
         "evidence_output_tables": _fmt_tables([
             "downturn_lgd_output.csv",
@@ -346,7 +346,7 @@ def build_matrix() -> pd.DataFrame:
         ], set()),
         "evidence_code_paths": _fmt_paths([
             "src/lgd_calculation.py",
-            "scripts/run_validation_sequence.py",
+            "src/pipeline/validation_pipeline.py",
             "outputs/tables/validation_sequence_report.csv",
         ]),
         "evidence_output_tables": _fmt_tables([
@@ -541,7 +541,7 @@ def build_matrix() -> pd.DataFrame:
         "evidence_code_paths": _fmt_paths([
             "src/lgd_calculation.py",
             "src/overlay_parameters.py",
-            "scripts/run_stage9_cross_product_validation.py",
+            "src/pipeline/validation_pipeline.py",
         ]),
         "evidence_output_tables": _fmt_tables([
             "overlay_trace_report.csv",

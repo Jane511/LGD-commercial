@@ -6,10 +6,10 @@ Runs as an idempotent script: re-running with the same seed overwrites files
 with identical output (deterministic generation).
 
 Usage:
-    python scripts/generate_historical_workout_data.py
-    python scripts/generate_historical_workout_data.py --seed 42
-    python scripts/generate_historical_workout_data.py --module mortgage
-    python scripts/generate_historical_workout_data.py --products mortgage development_finance
+    python -m src.data.generator
+    python -m src.data.generator --seed 42
+    python -m src.data.generator --module mortgage
+    python -m src.data.generator --products mortgage development_finance
 
 Output:
     data/generated/historical/
@@ -36,9 +36,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-# Add repo root to path
-REPO_ROOT = Path(__file__).parent.parent
-sys.path.insert(0, str(REPO_ROOT))
+REPO_ROOT = Path(__file__).parent.parent.parent
 
 from src.generators import generate_all_historical_workouts, GENERATOR_MAP
 
@@ -47,7 +45,7 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
 )
-logger = logging.getLogger("generate_historical_workout_data")
+logger = logging.getLogger("data.generator")
 
 
 def parse_args() -> argparse.Namespace:
@@ -87,7 +85,6 @@ def main() -> None:
     logger.info("=" * 65)
     logger.info("Seed: %d | Start: %s", args.seed, start_ts.strftime("%Y-%m-%d %H:%M:%S"))
 
-    # Resolve products list
     if args.module:
         products = [args.module]
         logger.info("Single-module mode: %s", args.module)
@@ -98,7 +95,6 @@ def main() -> None:
         products = list(GENERATOR_MAP.keys())
         logger.info("Generating all %d products.", len(products))
 
-    # Validate product names
     unknown = [p for p in products if p not in GENERATOR_MAP]
     if unknown:
         logger.error("Unknown product(s): %s. Valid: %s", unknown, list(GENERATOR_MAP.keys()))
@@ -106,7 +102,6 @@ def main() -> None:
 
     output_dir = Path(args.output_dir) if args.output_dir else REPO_ROOT / "data" / "generated" / "historical"
 
-    # Run generation
     t0 = time.time()
     results = generate_all_historical_workouts(
         seed=args.seed,
@@ -116,7 +111,6 @@ def main() -> None:
     )
     elapsed = time.time() - t0
 
-    # Summary report
     logger.info("")
     logger.info("Generation complete (%.1fs):", elapsed)
     total_loans = 0

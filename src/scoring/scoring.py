@@ -1,14 +1,18 @@
+"""
+Score LGD for single or batch loan inputs.
+
+Usage:
+    python -m src.scoring.scoring --product-type mortgage --single-json data/sample_loan.json --output outputs/tables/scored.json
+    python -m src.scoring.scoring --product-type commercial --input-csv data/loans.csv --output outputs/tables/scored.csv
+    python -m src.scoring.scoring --product-type development --batch-from-source --output outputs/tables/scored.csv
+"""
 from __future__ import annotations
 
 import argparse
 import json
 from pathlib import Path
-import sys
 
 import pandas as pd
-
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.lgd_scoring import (  # noqa: E402
     score_batch_loans,

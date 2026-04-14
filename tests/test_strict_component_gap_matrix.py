@@ -5,7 +5,7 @@ import importlib.util
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPT_PATH = ROOT / "scripts" / "build_strict_component_gap_matrix.py"
+SCRIPT_PATH = ROOT / "src" / "governance" / "gap_matrix.py"
 
 
 def _load_module():
