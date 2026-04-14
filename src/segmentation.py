@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import logging
 import numpy as np
 import pandas as pd
+
+logger = logging.getLogger(__name__)
 
 
 def _industry_risk_band(series: pd.Series) -> pd.Series:
@@ -11,9 +14,26 @@ def _industry_risk_band(series: pd.Series) -> pd.Series:
     return pd.cut(vals, bins=bins, labels=labels, right=True).astype("object")
 
 
-def _series_or_default(df: pd.DataFrame, col: str, default: str) -> pd.Series:
+def _series_or_default(df: pd.DataFrame, col: str, default: str, seg_col: str = "") -> pd.Series:
     if col in df.columns:
-        return df[col].astype(str)
+        result = df[col].astype(str)
+        unknown_count = (result == default).sum() if default == "Unknown" else 0
+        if unknown_count > 0 and seg_col:
+            logger.warning(
+                "Segment '%s': %d row(s) have unrecognised/null source values in '%s' — defaulting to 'Unknown'",
+                seg_col,
+                unknown_count,
+                col,
+            )
+        return result
+    if seg_col:
+        logger.warning(
+            "Segment '%s': source column '%s' is absent — all %d row(s) default to %r",
+            seg_col,
+            col,
+            len(df),
+            default,
+        )
     return pd.Series(default, index=df.index, dtype=object)
 
 
@@ -28,24 +48,24 @@ def apply_standard_segments(df: pd.DataFrame, product: str) -> pd.DataFrame:
     out["std_property_backed_subtype"] = "NotApplicable"
 
     if product == "mortgage":
-        out["std_product_segment"] = _series_or_default(out, "mortgage_class", "Unknown")
-        out["std_security_or_stage_band"] = _series_or_default(out, "ltv_band", "Unknown")
+        out["std_product_segment"] = _series_or_default(out, "mortgage_class", "Unknown", "std_product_segment")
+        out["std_security_or_stage_band"] = _series_or_default(out, "ltv_band", "Unknown", "std_security_or_stage_band")
         out["std_property_backed_subtype"] = "Residential Mortgage"
 
     elif product == "commercial":
-        out["std_product_segment"] = _series_or_default(out, "security_type", "Unknown")
-        out["std_security_or_stage_band"] = _series_or_default(out, "coverage_band", "Unknown")
-        out["std_cashflow_family"] = _series_or_default(out, "security_type", "Unknown")
+        out["std_product_segment"] = _series_or_default(out, "security_type", "Unknown", "std_product_segment")
+        out["std_security_or_stage_band"] = _series_or_default(out, "coverage_band", "Unknown", "std_security_or_stage_band")
+        out["std_cashflow_family"] = _series_or_default(out, "security_type", "Unknown", "std_cashflow_family")
 
     elif product == "development":
-        out["std_product_segment"] = _series_or_default(out, "completion_stage", "Unknown")
-        out["std_security_or_stage_band"] = _series_or_default(out, "presale_band", "Unknown")
-        out["std_property_backed_subtype"] = _series_or_default(out, "development_type", "Unknown")
+        out["std_product_segment"] = _series_or_default(out, "completion_stage", "Unknown", "std_product_segment")
+        out["std_security_or_stage_band"] = _series_or_default(out, "presale_band", "Unknown", "std_security_or_stage_band")
+        out["std_property_backed_subtype"] = _series_or_default(out, "development_type", "Unknown", "std_property_backed_subtype")
 
     elif product == "cashflow_lending":
-        out["std_product_segment"] = _series_or_default(out, "cashflow_product", "Unknown")
-        out["std_security_or_stage_band"] = _series_or_default(out, "pd_score_band", "Unknown")
-        out["std_cashflow_family"] = _series_or_default(out, "cashflow_product", "Unknown")
+        out["std_product_segment"] = _series_or_default(out, "cashflow_product", "Unknown", "std_product_segment")
+        out["std_security_or_stage_band"] = _series_or_default(out, "pd_score_band", "Unknown", "std_security_or_stage_band")
+        out["std_cashflow_family"] = _series_or_default(out, "cashflow_product", "Unknown", "std_cashflow_family")
 
     if "industry_risk_score" in out.columns:
         out["std_industry_risk_band"] = _industry_risk_band(out["industry_risk_score"]).fillna("Unknown")

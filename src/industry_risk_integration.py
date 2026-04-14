@@ -142,7 +142,16 @@ class IndustryRiskLoader:
     def _load_parquet(self, filename: str) -> pd.DataFrame:
         if filename not in self._cache:
             path = self._path_for(filename)
-            self._cache[filename] = pd.read_parquet(path)
+            try:
+                self._cache[filename] = pd.read_parquet(path)
+            except FileNotFoundError as e:
+                raise FileNotFoundError(
+                    f"Upstream export file not found: {path}"
+                ) from e
+            except Exception as e:
+                raise ValueError(
+                    f"Error reading upstream export file {path}: {e}"
+                ) from e
         return self._cache[filename].copy()
 
     def _normalise_industry_col(self, df: pd.DataFrame, col: str = "industry") -> pd.DataFrame:

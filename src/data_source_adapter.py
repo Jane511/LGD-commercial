@@ -19,11 +19,14 @@ Canonical contract
 """
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 import pandas as pd
+
+logger = logging.getLogger(__name__)
 
 from .data_generation import generate_all_datasets
 
@@ -47,11 +50,22 @@ def _normalise_source(source: str) -> str:
 
 
 def _read_table(path: Path) -> pd.DataFrame:
-    if path.suffix.lower() == ".parquet":
-        return pd.read_parquet(path)
-    if path.suffix.lower() == ".csv":
-        return pd.read_csv(path)
-    raise ValueError(f"Unsupported file type for controlled input: {path.name}")
+    logger.info("Loading controlled input: %s", path)
+    try:
+        if path.suffix.lower() == ".parquet":
+            df = pd.read_parquet(path)
+        elif path.suffix.lower() == ".csv":
+            df = pd.read_csv(path)
+        else:
+            raise ValueError(f"Unsupported file type for controlled input: {path.name}")
+        logger.info("Loaded %s — %d rows, %d columns", path.name, len(df), len(df.columns))
+        return df
+    except ValueError:
+        raise
+    except FileNotFoundError as e:
+        raise FileNotFoundError(f"Controlled input file not found: {path}") from e
+    except Exception as e:
+        raise ValueError(f"Error reading controlled input file {path}: {e}") from e
 
 
 def _find_table_path(root: Path, product: str, subset: str) -> Path | None:

@@ -2,10 +2,13 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 
 import pandas as pd
+
+logger = logging.getLogger(__name__)
 
 
 REQUIRED_COLUMNS = [
@@ -41,12 +44,28 @@ class OverlayParameterManager:
         self.manifest_path = Path(
             manifest_path or repo_root / "data" / "config" / "overlay_parameters_manifest.json"
         )
+        logger.info("Loading overlay parameters from: %s", self.csv_path)
         self._df = self._load_and_validate()
         self.meta = self._build_meta()
         self._validate_manifest()
+        logger.info(
+            "Overlay parameters loaded — version=%s, %d rows, hash=%s",
+            self.meta.version,
+            len(self._df),
+            self.meta.parameter_hash[:12],
+        )
 
     def _load_and_validate(self) -> pd.DataFrame:
-        df = pd.read_csv(self.csv_path)
+        try:
+            df = pd.read_csv(self.csv_path)
+        except FileNotFoundError as e:
+            raise FileNotFoundError(
+                f"Overlay parameter file not found: {self.csv_path}"
+            ) from e
+        except Exception as e:
+            raise ValueError(
+                f"Error reading overlay parameter file {self.csv_path}: {e}"
+            ) from e
 
         missing = [c for c in REQUIRED_COLUMNS if c not in df.columns]
         if missing:
@@ -138,6 +157,13 @@ class OverlayParameterManager:
         )
         hits = df.loc[mask].copy()
         if hits.empty:
+            logger.debug(
+                "get_value: no match for parameter_name=%r product_scope=%r segment_scope=%r — returning default %r",
+                parameter_name,
+                product_scope,
+                segment_scope,
+                default,
+            )
             return default
 
         # Deterministic precedence: exact product+segment, exact product+all, all+segment, all+all

@@ -12,9 +12,12 @@ Products:
 Common pipeline:
   Realised LGD -> Exposure-weighted long-run -> Downturn adjustment -> MoC -> Regulatory overlays
 """
+import logging
 import numpy as np
 import pandas as pd
 from scipy.special import expit  # logistic function
+
+logger = logging.getLogger(__name__)
 
 from .industry_risk_integration import (
     compute_industry_downturn_scalar,
@@ -169,11 +172,63 @@ def add_margin_of_conservatism(lgd_series, margin):
     return lgd_series + margin
 
 
+def _validate_final_lgd(df: pd.DataFrame, product: str) -> None:
+    """
+    Sanity-check lgd_final after all overlays are applied.
+
+    Hard failures (raise ValueError):
+      - any lgd_final outside [0, 1]
+
+    Soft warnings (log WARNING):
+      - portfolio mean outside [5%, 70%]
+      - lgd_final < lgd_base where a downturn scalar > 1 was applied
+    """
+    lgd = df["lgd_final"]
+
+    out_of_range = ((lgd < 0) | (lgd > 1)).sum()
+    if out_of_range:
+        raise ValueError(
+            f"{product}: {out_of_range} lgd_final value(s) are outside [0, 1] after clipping — "
+            f"check overlay logic."
+        )
+
+    mean_lgd = lgd.mean()
+    if mean_lgd < 0.05 or mean_lgd > 0.70:
+        logger.warning(
+            "%s: portfolio mean lgd_final = %.1f%% is outside the plausible range [5%%, 70%%]. "
+            "Review overlay parameters.",
+            product,
+            mean_lgd * 100,
+        )
+
+    if "lgd_base" in df.columns and "combined_downturn_scalar" in df.columns:
+        scalar = pd.to_numeric(df["combined_downturn_scalar"], errors="coerce").fillna(1.0)
+        uplift_mask = scalar > 1.0
+        if uplift_mask.any():
+            violation = (df.loc[uplift_mask, "lgd_final"] < df.loc[uplift_mask, "lgd_base"]).sum()
+            if violation:
+                logger.warning(
+                    "%s: %d row(s) have lgd_final < lgd_base despite combined_downturn_scalar > 1. "
+                    "Check floor/clip interactions.",
+                    product,
+                    violation,
+                )
+
+
 def _coerce_numeric_series(df, column, default=np.nan):
     """Return a numeric Series for `column`, or a default-filled Series if missing."""
-    if column in df.columns:
-        return pd.to_numeric(df[column], errors="coerce")
-    return pd.Series(default, index=df.index, dtype=float)
+    if column not in df.columns:
+        return pd.Series(default, index=df.index, dtype=float)
+    original_na_count = df[column].isna().sum()
+    numeric = pd.to_numeric(df[column], errors="coerce")
+    new_na_count = numeric.isna().sum() - original_na_count
+    if new_na_count > 0:
+        logger.warning(
+            "Column '%s': %d value(s) could not be converted to numeric and were set to NaN",
+            column,
+            new_na_count,
+        )
+    return numeric
 
 
 def _year_bucket_for_unemployment(default_dates):
@@ -258,7 +313,31 @@ def _resolve_discount_rate_proxy(df, product_baseline=0.05):
     rate.loc[provided_only] = provided.loc[provided_only]
     source.loc[provided_only] = "provided_discount_rate_fallback"
 
-    return rate.clip(lower=0.0), source
+    # Warn when low-priority fallbacks (tiers 4 & 5) are used
+    n_provided_fallback = int(provided_only.sum())
+    n_baseline_fallback = int((source == "product_baseline_fallback").sum())
+    if n_provided_fallback:
+        logger.warning(
+            "_resolve_discount_rate_proxy: %d row(s) are using tier-4 provided_discount_rate_fallback "
+            "— no contract_rate_proxy or cost_of_funds_proxy available.",
+            n_provided_fallback,
+        )
+    if n_baseline_fallback:
+        logger.warning(
+            "_resolve_discount_rate_proxy: %d row(s) are using tier-5 product_baseline_fallback (%.1f%%) "
+            "— no rate data available at all. Review input data quality.",
+            n_baseline_fallback,
+            product_baseline * 100,
+        )
+
+    clipped = rate.clip(lower=0.0)
+    n_clipped = (rate < 0).sum()
+    if n_clipped:
+        logger.warning(
+            "_resolve_discount_rate_proxy: %d row(s) had negative rates and were clipped to 0.",
+            n_clipped,
+        )
+    return clipped, source
 
 
 def _resolve_mortgage_arrears_proxy(df):
@@ -420,7 +499,7 @@ def mortgage_macro_downturn_scalar(
     rate = np.clip(rate, 0, 0.05)
 
     macro_multiplier = 1 + house_price_coeff * hpd + unemployment_coeff * unemp + rate_shock_coeff * rate
-    scalar = np.clip(base_scalar * macro_multiplier, 1.00, 1.60)
+    scalar = _apply_downturn_scalar(base_scalar, macro_multiplier, lower=1.00, upper=1.60)
 
     if not return_detail:
         return scalar
@@ -481,7 +560,7 @@ def commercial_macro_downturn_scalar(
         + cashflow_weakness_coeff * cashflow_weakness
         + recovery_delay_coeff * recovery_delay
     )
-    return np.clip(base_scalar * macro_multiplier, 1.00, 1.70)
+    return _apply_downturn_scalar(base_scalar, macro_multiplier, lower=1.00, upper=1.70)
 
 
 def development_macro_downturn_scalar(
@@ -524,7 +603,7 @@ def development_macro_downturn_scalar(
         + cost_overrun_coeff * cost_overrun
         + sell_through_delay_coeff * sell_through_delay
     )
-    return np.clip(base_scalar * macro_multiplier, 1.00, 1.90)
+    return _apply_downturn_scalar(base_scalar, macro_multiplier, lower=1.00, upper=1.90)
 
 
 def cashflow_macro_downturn_scalar(
@@ -551,7 +630,22 @@ def cashflow_macro_downturn_scalar(
         + utilisation_coeff * util_pressure
         + recovery_delay_coeff * recovery_delay
     )
-    return np.clip(base_scalar * macro_multiplier, 1.00, 1.90)
+    return _apply_downturn_scalar(base_scalar, macro_multiplier, lower=1.00, upper=1.90)
+
+
+def _apply_downturn_scalar(
+    base_scalar,
+    macro_multiplier,
+    lower: float = 1.00,
+    upper: float = 1.90,
+):
+    """
+    Compute the final downturn scalar: clip(base_scalar * macro_multiplier, lower, upper).
+
+    Centralises the clip bounds logic that is otherwise duplicated across the
+    mortgage, commercial, development, and cashflow product scalar functions.
+    """
+    return np.clip(base_scalar * macro_multiplier, lower, upper)
 
 
 def _resolve_base_scalar_from_parameters(out, product, params):
@@ -882,6 +976,7 @@ class MortgageLGDEngine:
         # Cap at 100%
         out["lgd_final"] = out["lgd_final"].clip(0, 1)
 
+        _validate_final_lgd(out, product="mortgage")
         return apply_standard_segments(out, product="mortgage")
 
     def compute_illustrative_rwa(self, df, pd_estimate=0.02, maturity=5):
@@ -1140,6 +1235,7 @@ class CommercialLGDEngine:
         # Step 6: Final -- cap at 100%
         out["lgd_final"] = out["lgd_with_moc"].clip(0, 1)
 
+        _validate_final_lgd(out, product="commercial")
         return apply_standard_segments(out, product="commercial")
 
     @staticmethod
@@ -1353,6 +1449,7 @@ class DevelopmentLGDEngine:
         # Step 4: Cap at 100%
         out["lgd_final"] = out["lgd_with_moc"].clip(0, 1)
 
+        _validate_final_lgd(out, product="development")
         return apply_standard_segments(out, product="development")
 
     def assign_slotting(self, df):
@@ -1688,6 +1785,7 @@ class CashFlowLendingLGDEngine:
         # Step 8: Cap at 100%
         out["lgd_final"] = out["lgd_with_moc"].clip(0, 1)
 
+        _validate_final_lgd(out, product="cashflow_lending")
         return apply_standard_segments(out, product="cashflow_lending")
 
 

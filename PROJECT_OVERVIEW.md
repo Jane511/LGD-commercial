@@ -132,6 +132,20 @@ Validation outputs include:
 - year-bucket macro fallback reporting
 - structural checks (non-empty outputs, required columns present, plausible ranges)
 
+### 5.1 Runtime diagnostics and hardening
+
+The pipeline emits structured `logging` output for operational observability. Key events:
+
+- **File I/O errors** — all CSV/Parquet loads raise descriptive `FileNotFoundError` or `ValueError` with the file path; no silent failures
+- **Numeric coercion** — `WARNING` logged whenever `pd.to_numeric(..., errors=”coerce”)` silently converts values to NaN, with a count of affected rows
+- **Explicit defaults** — `WARNING` logged when a schema column is absent from input or NaN rows are filled with a default value, so QA can track imputation rates
+- **Segmentation** — `WARNING` logged when any segment column falls back to `”Unknown”` due to a missing or unrecognised source column
+- **Vintage / OOT fallback** — origination-date fallback tier usage is logged as an `INFO` summary on every run; a `WARNING` is raised if the constant years-on-book proxy is applied; `require_observed=True` can be passed to `add_vintage_columns()` to enforce observed dates in production
+- **Validation error messages** — bounds violations in `_validate_bounds()` now include offending row indices and violation counts, not just column names
+- **Post-overlay sanity checks** — `_validate_final_lgd()` is called after every product overlay chain: hard `ValueError` if `lgd_final` is outside [0, 1]; advisory `WARNING` if portfolio mean LGD is outside [5%, 70%] or downturn scalar direction is contradicted by floor interactions
+- **Discount-rate fallback** — `WARNING` logged when tier-4 or tier-5 fallbacks are used and when rates are clipped from negative values
+- **Overlay parameter load** — version, row count, and hash prefix logged on every load; missing parameter matches logged at `DEBUG`
+
 ## 6. Documentation set
 
 - `docs/methodology_cashflow_lending.md` (training manual)

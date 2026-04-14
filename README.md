@@ -221,9 +221,35 @@ Documentation policy (portfolio repo):
 - Keep documentation concise and implementation-linked.
 - Prefer one canonical section per topic rather than multiple note files.
 
+## Logging and diagnostics
+
+The pipeline emits structured `logging` output at key decision points. To see it, configure logging before running scripts:
+
+```python
+import logging
+logging.basicConfig(level=logging.INFO)
+```
+
+Key log events include:
+
+- **Overlay parameter load** — version, row count, and hash prefix on every run
+- **File I/O** — file path and shape (rows × columns) on successful load; descriptive `FileNotFoundError` / `ValueError` if a file is missing or corrupt
+- **Numeric coercion** — `WARNING` if any `pd.to_numeric(..., errors="coerce")` call silently converts values to NaN
+- **Explicit defaults** — `WARNING` when a required column is absent or NaN rows are filled with a schema default
+- **Segmentation** — `WARNING` when any segment column falls back to `"Unknown"` because the source column is missing
+- **Vintage / OOT fallback** — `INFO` summary of how many rows used each origination-date tier (observed / seasoning / proxy); `WARNING` if the constant years-on-book fallback is used
+- **Discount-rate fallback** — `WARNING` when tier-4 or tier-5 fallbacks are used (no rate data available)
+- **Post-overlay validation** — hard `ValueError` if `lgd_final` is outside [0, 1]; `WARNING` if portfolio mean LGD is implausible or downturn scalar direction is contradicted by floor interactions
+
+To run `lgd_final` as a standalone script:
+
+```powershell
+python -m src.lgd_final
+```
+
 ## Limitations (portfolio project)
 
 - All portfolio data is synthetic and included for demonstration only.
 - Recovery timing, cure overlays, and downturn logic use transparent proxies; they are not calibrated to internal workout datasets.
-- Vintage/out-of-time validation is simulated using proxy origination-year logic when observed origination dates are unavailable.
+- Vintage/out-of-time validation is simulated using proxy origination-year logic when observed origination dates are unavailable. Use `require_observed=True` in `add_vintage_columns()` to enforce observed origination dates in production contexts.
 - This is not a production model approval pack; it is an integrated portfolio framework for discussion and demonstration.

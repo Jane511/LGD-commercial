@@ -12,10 +12,13 @@ expectations for IRB LGD models:
   6. Out-of-time testing    (vintage-based holdout performance)
   7. Sensitivity analysis   (parameter perturbation)
 """
+import logging
 import numpy as np
 import pandas as pd
 from scipy import stats
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+
+logger = logging.getLogger(__name__)
 
 
 def _weighted_mean(values, weights=None):
@@ -336,6 +339,7 @@ def add_vintage_columns(
     origination_date_col="origination_date",
     seasoning_months_col="seasoning_months",
     fallback_years_on_book=2.5,
+    require_observed=False,
 ):
     """
     Add origination/default year fields with transparent fallback lineage.
@@ -344,6 +348,13 @@ def add_vintage_columns(
       1) observed origination_date (if present)
       2) derive using seasoning_months (if present)
       3) proxy years-on-book fallback (constant years by product config)
+
+    Parameters
+    ----------
+    require_observed : bool
+        If True, raise ValueError when any row reaches the constant
+        years-on-book fallback (tier 3). Use this in production/OOT contexts
+        where imputed vintages would corrupt holdout analysis.
     """
     out = df.copy()
     default_dates = pd.to_datetime(out.get(date_col), errors="coerce")
@@ -377,11 +388,29 @@ def add_vintage_columns(
 
     mask = orig_dates.isna() & default_dates.notna()
     if mask.any():
+        n_fallback = int(mask.sum())
+        if require_observed:
+            raise ValueError(
+                f"add_vintage_columns: {n_fallback} row(s) have no origination_date and no "
+                f"seasoning_months, so the constant {fallback_years_on_book}y proxy would be "
+                f"applied. Set require_observed=False to allow this fallback, or supply "
+                f"origination_date / seasoning_months for all rows."
+            )
+        logger.warning(
+            "add_vintage_columns: %d row(s) are using the constant %.1fy years-on-book fallback "
+            "for origination_date. OOT validation using these rows may be unreliable.",
+            n_fallback,
+            fallback_years_on_book,
+        )
         fallback_days = int(round(max(float(fallback_years_on_book), 0.0) * 365.25))
         orig_dates.loc[mask] = default_dates.loc[mask] - pd.to_timedelta(fallback_days, unit="D")
         source.loc[mask] = f"proxy_years_on_book_{float(fallback_years_on_book):.1f}y"
 
     source.loc[default_dates.isna()] = "missing_default_date"
+
+    # Log fallback tier summary for audit trail
+    tier_counts = source.value_counts().to_dict()
+    logger.info("add_vintage_columns origination_date fallback summary: %s", tier_counts)
 
     out["origination_date_derived"] = orig_dates
     out["origination_year"] = orig_dates.dt.year.astype("Int64")

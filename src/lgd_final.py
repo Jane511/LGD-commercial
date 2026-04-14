@@ -13,10 +13,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-try:
-    from .data_generation import generate_all_datasets
-except ImportError:  # pragma: no cover - enables direct script execution
-    from data_generation import generate_all_datasets
+from .data_generation import generate_all_datasets
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -586,6 +583,15 @@ def build_and_save_repo_final_lgd(
     checks.to_csv(target_dir / "lgd_final_validation_checks.csv", index=False)
 
     return final_lgd, summary, checks
+
+
+if __name__ == "__main__":  # pragma: no cover
+    # Run via: python -m src.lgd_final
+    import sys
+    _final, _summary, _checks = build_and_save_repo_final_lgd()
+    print(f"Final LGD built: {len(_final)} rows")
+    print(_summary.to_string(index=False))
+    sys.exit(0)
 
 
 def main() -> None:

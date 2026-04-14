@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 import pandas as pd
+
+logger = logging.getLogger(__name__)
 
 from .data_source_adapter import load_datasets
 from .lgd_calculation import (
@@ -145,11 +148,23 @@ def _validate_bounds(df: pd.DataFrame, product: str, schema: ProductSchema) -> N
             continue
         series = pd.to_numeric(df[col], errors="coerce")
         if series.isna().any():
-            raise ValueError(f"{product}: column '{col}' has non-numeric/null values")
+            bad_idx = df.index[series.isna()].tolist()[:10]
+            raise ValueError(
+                f"{product}: column '{col}' has non-numeric/null values. "
+                f"Count: {series.isna().sum()}. First offending indices: {bad_idx}"
+            )
         if lo is not None and (series < lo).any():
-            raise ValueError(f"{product}: column '{col}' has values below {lo}")
+            bad_idx = df.index[series < lo].tolist()[:10]
+            raise ValueError(
+                f"{product}: column '{col}' has {(series < lo).sum()} value(s) below {lo}. "
+                f"First offending indices: {bad_idx}"
+            )
         if hi is not None and (series > hi).any():
-            raise ValueError(f"{product}: column '{col}' has values above {hi}")
+            bad_idx = df.index[series > hi].tolist()[:10]
+            raise ValueError(
+                f"{product}: column '{col}' has {(series > hi).sum()} value(s) above {hi}. "
+                f"First offending indices: {bad_idx}"
+            )
 
 
 def _validate_categories(df: pd.DataFrame, product: str, schema: ProductSchema) -> None:
@@ -166,8 +181,21 @@ def _apply_explicit_defaults(df: pd.DataFrame, schema: ProductSchema) -> pd.Data
     out = df.copy()
     for col, default in schema.explicit_defaults.items():
         if col not in out.columns:
+            logger.warning(
+                "Column '%s' is absent from input; filling all rows with default value %r",
+                col,
+                default,
+            )
             out[col] = default
         else:
+            na_count = out[col].isna().sum()
+            if na_count > 0:
+                logger.warning(
+                    "Column '%s': %d null value(s) filled with default %r",
+                    col,
+                    na_count,
+                    default,
+                )
             out[col] = out[col].fillna(default)
     return out
 
