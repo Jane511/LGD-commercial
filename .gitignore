@@ -35,3 +35,4 @@ outputs/figures/.gitkeep
 
 # Claude Code
 .claude/
+CLAUDE.md

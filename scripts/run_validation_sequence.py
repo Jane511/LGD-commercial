@@ -348,6 +348,98 @@ def _step_final_lgd_layer():
     return {"passed": passed, "detail": detail}
 
 
+def _step_aps113_calibration_validation():
+    """
+    Step 7: APS 113 extended validation suite (Gini, Hosmer-Lemeshow, PSI, OOT).
+
+    Runs run_full_validation_suite() from src.validation_suite for each product
+    that has calibrated LGD outputs in outputs/tables/. Reports pass/fail against
+    APS 113 s.66-68 thresholds: Gini > 0.5, CalibRatio 0.85-1.15, PSI < 0.10.
+    """
+    from src.validation_suite import run_full_validation_suite
+
+    PRODUCTS = [
+        "mortgage", "commercial_cashflow", "receivables", "trade_contingent",
+        "asset_equipment", "development_finance", "cre_investment",
+        "residual_stock", "land_subdivision", "bridging", "mezz_second_mortgage",
+    ]
+
+    rows = []
+    for product in PRODUCTS:
+        cal_path = TABLE_DIR / f"{product}_final_calibrated_lgd.csv"
+        if not cal_path.exists():
+            rows.append({
+                "product": product, "status": "SKIPPED",
+                "gini": None, "calibration_ratio": None, "psi": None,
+                "hl_pvalue": None, "detail": "No calibrated LGD output found",
+            })
+            continue
+
+        try:
+            loans = pd.read_csv(cal_path)
+            if "lgd_final_calibrated" not in loans.columns or "realised_lgd" not in loans.columns:
+                rows.append({
+                    "product": product, "status": "SKIPPED",
+                    "gini": None, "calibration_ratio": None, "psi": None,
+                    "hl_pvalue": None, "detail": "Missing required columns",
+                })
+                continue
+
+            result = run_full_validation_suite(
+                loans=loans,
+                predicted_col="lgd_final_calibrated",
+                actual_col="realised_lgd",
+                product=product,
+            )
+            gini = result.get("gini")
+            cal_ratio = result.get("calibration_ratio")
+            psi = result.get("psi")
+            hl_p = result.get("hl_pvalue")
+
+            pass_gini = gini is None or gini > 0.50
+            pass_cal = cal_ratio is None or (0.85 <= cal_ratio <= 1.15)
+            pass_psi = psi is None or psi < 0.10
+            step_passed = pass_gini and pass_cal and pass_psi
+
+            if "summary_table" in result:
+                result["summary_table"].to_csv(
+                    TABLE_DIR / f"{product}_aps113_validation_summary.csv", index=False
+                )
+
+            rows.append({
+                "product": product,
+                "status": "PASS" if step_passed else "FAIL",
+                "gini": round(gini, 4) if gini is not None else None,
+                "calibration_ratio": round(cal_ratio, 4) if cal_ratio is not None else None,
+                "psi": round(psi, 4) if psi is not None else None,
+                "hl_pvalue": round(hl_p, 4) if hl_p is not None else None,
+                "detail": (
+                    f"gini_ok={pass_gini}; cal_ratio_ok={pass_cal}; psi_ok={pass_psi}"
+                ),
+            })
+        except Exception as exc:
+            rows.append({
+                "product": product, "status": "FAIL",
+                "gini": None, "calibration_ratio": None, "psi": None,
+                "hl_pvalue": None, "detail": f"{type(exc).__name__}: {exc}",
+            })
+
+    summary = pd.DataFrame(rows)
+    TABLE_DIR.mkdir(parents=True, exist_ok=True)
+    summary.to_csv(TABLE_DIR / "aps113_extended_validation_summary.csv", index=False)
+
+    products_run = sum(1 for r in rows if r["status"] != "SKIPPED")
+    products_pass = sum(1 for r in rows if r["status"] == "PASS")
+    products_skip = sum(1 for r in rows if r["status"] == "SKIPPED")
+    passed = products_run == 0 or products_pass >= products_run * 0.8  # >=80% pass rate
+    detail = (
+        f"products_run={products_run}; passed={products_pass}; "
+        f"skipped={products_skip}; "
+        f"pass_rate={products_pass / max(products_run, 1):.0%}"
+    )
+    return {"passed": passed, "detail": detail}
+
+
 def _step_notebook_reproducibility_scan():
     notebooks = sorted((PROJECT_ROOT / "notebooks").glob("*.ipynb"))
     records = []
@@ -427,6 +519,8 @@ def main():
         ("final_lgd_layer", _step_final_lgd_layer),
         ("reproducibility_determinism", _step_reproducibility_determinism),
         ("notebook_reproducibility_scan", _step_notebook_reproducibility_scan),
+        # Step 7: APS 113 extended validation (Gini, HL, PSI, OOT) — s.66-68
+        ("aps113_calibration_validation", _step_aps113_calibration_validation),
     ]
 
     results = [_run_step(name, fn) for name, fn in steps]

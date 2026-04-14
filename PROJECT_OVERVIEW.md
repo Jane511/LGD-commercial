@@ -49,6 +49,8 @@ In this repo’s mortgage module, cure probability is modelled using proxy drive
 
 `LGD_final = (1 - P(cure)) * LGD_liquidation`
 
+`LGD_liquidation` is estimated using a lightweight cashflow-style proxy when collateral value inputs are available (property value, sale haircut, costs, time-to-sell, discounting). If those fields are not available, the demo pipeline falls back to a back-solve from `realised_lgd` for continuity with synthetic datasets.
+
 ### 2.4 Non-cure resolution paths
 
 If a loan does not cure, it can still resolve via multiple pathways (restructure, liquidation/forced sale, guarantor, etc.). Expected non-cure recovery is path-weighted:

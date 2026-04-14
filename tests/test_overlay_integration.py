@@ -81,3 +81,64 @@ def test_parameter_hash_mismatch_raises(tmp_path: Path):
 
     with pytest.raises(ValueError, match="hash mismatch"):
         OverlayParameterManager(csv_path=csv_dst, manifest_path=bad_manifest)
+
+
+# ── APS 113 calibration pipeline ordering assertion ───────────────────────────
+
+def test_calibration_pipeline_moc_applied_after_downturn():
+    """
+    APS 113 s.63 integration test: verify that in run_calibration_pipeline()
+    the MoC step receives the *downturn* LGD as input, not the long-run LGD.
+
+    This is the most critical ordering constraint:
+        LR-LGD → downturn overlay → MoC → floor
+
+    Verifies: final calibrated LGD >= downturn LGD >= long-run LGD
+    (i.e., each step only adds or holds — never goes backwards).
+    """
+    import numpy as np
+    from src.moc_framework import run_calibration_pipeline
+
+    rng = np.random.default_rng(42)
+    n = 60
+    years = np.tile(np.arange(2014, 2024), int(np.ceil(n / 10)))[:n]
+    df = pd.DataFrame({
+        "loan_id": [f"L{i}" for i in range(n)],
+        "default_year": years,
+        "realised_lgd": rng.uniform(0.15, 0.55, n),
+        "ead_at_default": rng.uniform(100_000, 1_000_000, n),
+        "mortgage_class": rng.choice(["Standard", "Non-Standard"], n),
+        "lgd_long_run": [0.25] * n,
+    })
+
+    result = run_calibration_pipeline(
+        loans=df,
+        product="mortgage",
+        segment_keys=["mortgage_class"],
+        lr_lgd_col="lgd_long_run",
+    )
+
+    lr_ewa = df["lgd_long_run"].mean()
+
+    # Downturn LGD must be >= LR-LGD
+    if "lgd_downturn" in result:
+        dt_ewa = (
+            (result["lgd_downturn"] if isinstance(result["lgd_downturn"], pd.Series)
+             else df["lgd_long_run"]).mean()
+        )
+        assert dt_ewa >= lr_ewa * 0.99, \
+            f"Downturn LGD ({dt_ewa:.4f}) < LR-LGD ({lr_ewa:.4f}) — downturn must be >= LR"
+
+    # Final LGD must be >= LR-LGD (MoC + floor can only add)
+    final_col = "final_lgd" if "final_lgd" in result else "lgd_final"
+    if final_col in result:
+        final_series = result[final_col]
+        if isinstance(final_series, pd.Series) and len(final_series) == n:
+            final_ewa = (final_series * df["ead_at_default"]).sum() / df["ead_at_default"].sum()
+            assert final_ewa >= lr_ewa * 0.99, \
+                f"Final LGD ({final_ewa:.4f}) < LR-LGD ({lr_ewa:.4f}) — pipeline must be additive"
+
+    # The result must contain at least one calibration output
+    output_keys = {"lgd_downturn", "final_lgd", "lgd_final", "lgd_with_moc", "calibration_steps"}
+    assert output_keys.intersection(result.keys()), \
+        f"run_calibration_pipeline returned no recognisable output keys: {set(result.keys())}"

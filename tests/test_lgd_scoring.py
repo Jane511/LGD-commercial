@@ -137,3 +137,51 @@ def test_cli_and_api_parity_single_payload(tmp_path: Path):
 
     for col in ["loan_id", "product_type", "lgd_base", "lgd_downturn", "lgd_final", "parameter_version", "scenario_id"]:
         assert api[col] == cli[col]
+
+
+# ── Integration seam: proxy engine ↔ calibration layer ───────────────────────
+
+def test_calibration_imports_do_not_conflict_with_scoring():
+    """
+    APS 113 integration seam test.
+
+    The new calibration modules (src.lgd_calculations, src.moc_framework, etc.)
+    must coexist with the existing proxy scoring engine (src.lgd_scoring,
+    src.lgd_calculation) in the same Python process without import conflicts.
+
+    Specifically: src.lgd_calculations (with 's') must not shadow or overwrite
+    anything from src.lgd_calculation (without 's').
+    """
+    # Import both modules in the same process
+    import src.lgd_calculation as proxy_engine
+    import src.lgd_calculations as calib_engine  # noqa: F401 — import test
+
+    # Proxy engine functions must still be accessible
+    assert hasattr(proxy_engine, "apply_downturn_overlay"), \
+        "apply_downturn_overlay missing from proxy engine after calibration import"
+    assert hasattr(proxy_engine, "exposure_weighted_average"), \
+        "exposure_weighted_average missing from proxy engine after calibration import"
+    assert hasattr(proxy_engine, "build_weighted_lgd_output"), \
+        "build_weighted_lgd_output missing from proxy engine after calibration import"
+
+    # Calibration engine functions must be present
+    assert hasattr(calib_engine, "compute_realised_lgd"), \
+        "compute_realised_lgd missing from calibration engine"
+    assert hasattr(calib_engine, "compute_long_run_lgd"), \
+        "compute_long_run_lgd missing from calibration engine"
+
+
+def test_scoring_output_stable_after_calibration_import():
+    """
+    Proxy scoring results must be unchanged after calibration modules are imported.
+    This guards against any accidental monkey-patching or import side effects.
+    """
+    import src.lgd_calculations  # noqa: F401 — trigger import side effects (if any)
+    import src.moc_framework  # noqa: F401
+
+    row = _sample_row("mortgage")
+    result = score_single_loan(row, product_type="mortgage", seed=42)
+    # Proxy engine should still produce non-zero outputs
+    assert result["lgd_base"] > 0
+    assert result["lgd_final"] > 0
+    assert result["lgd_downturn"] >= result["lgd_base"]

@@ -1,10 +1,17 @@
 ﻿# LGD-commercial: Integrated LGD Framework (AU Bank-Style)
 
-This repository is an integrated Australian bank-style LGD portfolio project. It produces **base / downturn / final LGD** outputs and recovery metrics across mortgage, cash-flow lending, and property-backed lending products using **transparent proxy assumptions** (no internal workout tape is included).
+> **SYNTHETIC HISTORICAL CALIBRATION DATA — FOR DEMONSTRATION ONLY**
+> All workout data in `data/generated/historical/` is synthetically generated to
+> demonstrate APS 113 methodology. Real production calibration requires an internal
+> workout tape and APRA Model Risk Committee sign-off.
+
+This repository is an integrated Australian bank-style LGD portfolio project. It
+produces **base / downturn / final LGD** outputs and recovery metrics across 11
+commercial and mortgage products using both a **transparent proxy baseline** and a
+full **APS 113-aligned calibration layer** on top of the existing infrastructure.
 
 ## What this repo is
 
-- A practical, auditable LGD framework designed to be interview-ready and easy to review.
 - A multi-product structure with consistent output contracts so a cross-product view can be built.
 - A repo-safe validation standard that is **script-first** (no reliance on interactive notebook plotting).
 
@@ -35,6 +42,97 @@ The modelling approach follows a simple but bank-standard LGD decomposition (as 
    `WeightedLGD = Sum(LGD_i * EAD_i) / Sum(EAD_i)` (no simple mean LGD).
 
 In this repo, where detailed workout cashflows are not available, the above concepts are implemented with transparent proxies (recovery haircuts, recovery time proxies, explicit costs, and discounting rules).
+
+## APS 113 Calibration Layer (New)
+
+A full IRB calibration loop has been added on top of the proxy baseline for all 11
+product notebooks. The calibration layer follows the correct APS 113 pipeline order:
+
+```
+Realised LGD (2014-2024) → Long-run LGD (vintage-EWA, s.43)
+  → Downturn overlay (s.46-50)
+  → Frye-Jacobs correlation adjustment (s.55-57)
+  → MoC — five APS 113 s.65 sources (s.63-65)   ← applied to downturn LGD, NOT LR-LGD
+  → Regulatory floor (s.58)
+  → Final calibrated LGD
+```
+
+**Key module additions:**
+
+| Module | Description |
+|--------|-------------|
+| `src/lgd_calculations.py` | Workout LGD engine — LIP costs, cure leg, vintage-EWA |
+| `src/moc_framework.py` | MoCRegister with 5 APS 113 s.65 sources |
+| `src/regime_classifier.py` | Economic regime classification — real RBA/ABS upstream or synthetic |
+| `src/rba_rates_loader.py` | RBA B6 indicator lending rates → real discount rates |
+| `src/apra_benchmarks.py` | APRA ADI peer benchmarking (directional only) |
+| `src/lgd_pd_correlation.py` | Frye-Jacobs LGD-PD systematic factor model |
+| `src/validation_suite.py` | Extended validation — Gini, Hosmer-Lemeshow, PSI, OOT |
+| `src/aps113_compliance.py` | APS 113 compliance map generator |
+| `src/calibration_utils.py` | Thin re-export wrapper for notebooks |
+| `src/generators/` | 11 product generators (2014-2024, 10-year window) |
+
+**Module status:**
+
+| Product | Proxy Baseline | Calibration Layer | MoC | Downturn | Floor | Validation |
+|---------|---------------|-------------------|-----|----------|-------|------------|
+| Mortgage | ✓ | ✓ | ✓ | ✓ | ✓ (10%/15%) | ✓ |
+| Commercial Cashflow | ✓ | ✓ | ✓ | ✓ | ✓ (25-30%) | ✓ |
+| Receivables | ✓ | ✓ | ✓ | ✓ | ✓ (15%) | ✓ |
+| Trade Contingent | ✓ | ✓ | ✓ | ✓ | ✓ (15%) | ✓ |
+| Asset & Equipment | ✓ | ✓ | ✓ | ✓ | ✓ (20%) | ✓ |
+| Development Finance | ✓ | ✓ | ✓ | ✓ | ✓ (25-40%) | ✓ |
+| CRE Investment | ✓ | ✓ | ✓ | ✓ | ✓ (25%) | ✓ |
+| Residual Stock | ✓ | ✓ | ✓ | ✓ | ✓ (30%) | ✓ |
+| Land Subdivision | ✓ | ✓ | ✓ | ✓ | ✓ (35%) | ✓ |
+| Bridging | ✓ | ✓ | ✓ | ✓ | ✓ (25%) | ✓ |
+| Mezz / 2nd Mortgage | ✓ | ✓ | ✓ | ✓ | ✓ (40%) | ✓ |
+
+**New scripts:**
+
+```bash
+# Generate synthetic 2014-2024 workout histories for all products
+python scripts/generate_historical_workout_data.py --seed 42
+
+# Classify economic regimes (uses real RBA/ABS if macro_regime_flags.parquet available)
+python scripts/classify_economic_regimes.py
+
+# Run full APS 113 calibration pipeline (all products)
+python scripts/run_calibration_pipeline.py --products all
+
+# Single-product isolation
+python scripts/run_calibration_pipeline.py --module mortgage
+
+# Demo pipeline + calibration (combined)
+python scripts/run_demo_pipeline.py --with-calibration
+```
+
+**Expected calibration outputs** (`outputs/tables/`):
+- Per-product (9 files × 11 products = 99): `{product}_historical_workouts.csv`,
+  `{product}_long_run_lgd_by_segment.csv`, `{product}_model_vs_actual_comparison.csv`,
+  `{product}_calibration_adjustments.csv`, `{product}_moc_register.csv`,
+  `{product}_downturn_lgd_by_segment.csv`, `{product}_final_calibrated_lgd.csv`,
+  `{product}_backtest_results.csv`, `{product}_validation_report.csv`
+- Shared: `aps113_compliance_map.csv`, `moc_summary_all_products.csv`,
+  `apra_benchmark_comparison.csv`, `lgd_pd_correlation_report.csv`,
+  `rba_discount_rate_register.csv`, `calibration_summary_dashboard.csv`,
+  `lgd_final_calibrated.csv`, `cross_product_rwa_impact.csv`
+
+**Data layout:**
+
+```
+data/
+├── raw/                          UNCHANGED — existing proxy demo CSVs
+├── config/
+│   └── overlay_parameters.csv   Updated — floors + MoC params for all 11 products
+├── external/
+│   ├── rba_b6_rates.csv          RBA B6 indicator lending rates (2014-2024)
+│   └── apra_adi_statistics.csv   APRA ADI quarterly impairment statistics
+└── generated/
+    └── historical/               NEW — synthetic Parquet workout histories
+        ├── mortgage_workouts.parquet
+        └── ...  (11 product files)
+```
 
 ## Module map (notebooks)
 
@@ -249,7 +347,19 @@ python -m src.lgd_final
 
 ## Limitations (portfolio project)
 
-- All portfolio data is synthetic and included for demonstration only.
+- All portfolio data (both proxy demo and calibration layer) is synthetic and included for demonstration only.
 - Recovery timing, cure overlays, and downturn logic use transparent proxies; they are not calibrated to internal workout datasets.
+- The APS 113 calibration layer demonstrates the correct methodology (LR → downturn → MoC → floor) but uses synthetically generated workout data — it is not a real APRA-validated IRB calibration.
+- APRA ADI benchmark comparison uses impairment ratios as a directional proxy only, not a direct LGD benchmark.
+- LGD-PD correlation (Frye-Jacobs) is estimated from synthetic workout series using real macro drivers where available.
+- MoC values are illustrative; they require Model Risk Committee sign-off and internal data validation in production.
 - Vintage/out-of-time validation is simulated using proxy origination-year logic when observed origination dates are unavailable. Use `require_observed=True` in `add_vintage_columns()` to enforce observed origination dates in production contexts.
 - This is not a production model approval pack; it is an integrated portfolio framework for discussion and demonstration.
+
+**Remaining gaps vs a true APRA-validated IRB production model:**
+
+1. Workout data is synthetic — no real internal workout tape
+2. APRA benchmark is impairment ratio proxy, not institution-specific LGD
+3. LGD-PD correlation estimated from synthetic workout series (real macro drivers used)
+4. MoC values are illustrative; require Model Risk Committee sign-off in production
+5. Compliance map shows 'partial' for s.60 and s.66 because data is synthetic

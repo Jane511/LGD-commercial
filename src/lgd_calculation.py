@@ -355,7 +355,9 @@ def _resolve_discount_rate_proxy(df, product_baseline=0.05):
 
 def _resolve_mortgage_arrears_proxy(df):
     """
-    Resolve arrears stage using observed value when present, else transparent proxy.
+    Resolve arrears stage using observed value when present, else:
+      1) a fitted/modelled estimate if provided (`arrears_stage_model`), else
+      2) transparent proxy rules.
     """
     index = df.index
     observed = df.get("arrears_stage")
@@ -363,6 +365,17 @@ def _resolve_mortgage_arrears_proxy(df):
         observed = pd.Series(np.nan, index=index)
     observed = observed.astype("string")
     use_proxy = observed.isna()
+
+    # Optional hook: allow an upstream fitted model to provide an estimate.
+    # This keeps the engine deterministic while supporting bank-style calibration workflows.
+    modelled = df.get("arrears_stage_model")
+    if modelled is not None:
+        modelled = modelled.astype("string")
+        use_modelled = use_proxy & modelled.notna()
+        stage = observed.where(~use_modelled, modelled)
+        # Only treat remaining missing as proxy-required.
+        use_proxy = stage.isna()
+        observed = stage
 
     ltv = _coerce_numeric_series(df, "ltv_at_default", default=0.85).fillna(0.85)
     dti = _coerce_numeric_series(df, "dti", default=0.35).fillna(0.35)
@@ -382,7 +395,9 @@ def _resolve_mortgage_arrears_proxy(df):
 
 def _resolve_mortgage_behaviour_proxy(df):
     """
-    Resolve repayment behaviour using observed value when present, else proxy.
+    Resolve repayment behaviour using observed value when present, else:
+      1) a fitted/modelled estimate if provided (`repayment_behaviour_model`), else
+      2) proxy scorecard rules.
     """
     index = df.index
     observed = df.get("repayment_behaviour")
@@ -390,6 +405,15 @@ def _resolve_mortgage_behaviour_proxy(df):
         observed = pd.Series(np.nan, index=index)
     observed = observed.astype("string")
     use_proxy = observed.isna()
+
+    # Optional hook: allow an upstream fitted model to provide an estimate.
+    modelled = df.get("repayment_behaviour_model")
+    if modelled is not None:
+        modelled = modelled.astype("string")
+        use_modelled = use_proxy & modelled.notna()
+        behaviour = observed.where(~use_modelled, modelled)
+        use_proxy = behaviour.isna()
+        observed = behaviour
 
     loan_type = df.get("loan_type", pd.Series("P&I", index=index)).astype(str)
     seasoning = _coerce_numeric_series(df, "seasoning_months", default=24).fillna(24)
@@ -411,6 +435,68 @@ def _resolve_mortgage_behaviour_proxy(df):
     )
     behaviour = observed.where(~use_proxy, pd.Series(proxy, index=index))
     return behaviour.fillna("stable"), use_proxy.astype(bool)
+
+
+def _resolve_mortgage_liquidation_loss(df, discount_rate_series: pd.Series) -> tuple[pd.Series, pd.Series]:
+    """
+    Estimate liquidation loss (LGD conditional on property sale) from simple cashflow proxies.
+
+    This is closer to bank practice than back-solving from realised_lgd, but still designed to
+    run with sparse demo inputs. If required fields are missing, returns NaNs and a source label.
+
+    Required (at least one collateral value):
+      - `property_value_forced_sale` OR `property_value_at_default`
+    Also uses:
+      - `ead`
+      - optional cost/timing inputs: `selling_cost_rate`, `legal_cost_rate`, `holding_cost_rate_pa`,
+        `time_to_sell_months`, `sale_price_haircut`
+
+    Returns:
+      - liquidation_loss (0..1)
+      - liquidation_loss_source (string label per row)
+    """
+    index = df.index
+    ead = _coerce_numeric_series(df, "ead", default=np.nan)
+    ead = ead.replace(0, np.nan)
+
+    forced_sale_value = _coerce_numeric_series(df, "property_value_forced_sale", default=np.nan)
+    at_default_value = _coerce_numeric_series(df, "property_value_at_default", default=np.nan)
+
+    has_forced = forced_sale_value.notna()
+    has_default = at_default_value.notna()
+    collateral = forced_sale_value.where(has_forced, at_default_value)
+    source = pd.Series(
+        np.where(has_forced, "property_value_forced_sale", np.where(has_default, "property_value_at_default", "missing_collateral_value")),
+        index=index,
+        dtype="string",
+    )
+
+    selling_cost_rate = _coerce_numeric_series(df, "selling_cost_rate", default=0.08).fillna(0.08).clip(0, 0.20)
+    legal_cost_rate = _coerce_numeric_series(df, "legal_cost_rate", default=0.01).fillna(0.01).clip(0, 0.10)
+    holding_cost_rate_pa = _coerce_numeric_series(df, "holding_cost_rate_pa", default=0.02).fillna(0.02).clip(0, 0.20)
+    time_to_sell_months = _coerce_numeric_series(df, "time_to_sell_months", default=9.0).fillna(9.0).clip(0, 60)
+
+    haircut = _coerce_numeric_series(df, "sale_price_haircut", default=0.10).fillna(0.10).clip(0, 0.50)
+
+    # Approximate cashflows:
+    # - Sale proceeds realised at time_to_sell_months
+    # - Holding cost accrues over the period on collateral (simple approximation)
+    gross_sale_proceeds = collateral * (1 - haircut)
+    selling_cost = gross_sale_proceeds * selling_cost_rate
+    legal_cost = gross_sale_proceeds * legal_cost_rate
+    holding_cost = gross_sale_proceeds * holding_cost_rate_pa * (time_to_sell_months / 12.0)
+    net_proceeds = (gross_sale_proceeds - selling_cost - legal_cost - holding_cost).clip(lower=0.0)
+
+    discount_rate = pd.to_numeric(discount_rate_series, errors="coerce").fillna(0.05).clip(0, 0.30)
+    discount_factor = 1 / (1 + discount_rate) ** (time_to_sell_months / 12.0)
+    pv_recovery = net_proceeds * discount_factor
+
+    recovery_rate = (pv_recovery / ead).clip(0, 2.0)
+    liquidation_loss = (1 - recovery_rate).clip(0, 1)
+
+    # If we have no collateral value, mark output NaN to allow fallback to other methods.
+    liquidation_loss = liquidation_loss.where(source != "missing_collateral_value", np.nan)
+    return liquidation_loss, source
 
 
 def mortgage_macro_downturn_scalar(
@@ -892,6 +978,12 @@ class MortgageLGDEngine:
         )
         ltv = _coerce_numeric_series(out, "ltv_at_default", default=0.85).fillna(0.85)
         dti = _coerce_numeric_series(out, "dti", default=0.35).fillna(0.35)
+
+        # Optional hook: allow an upstream fitted model to provide P(cure).
+        # If present, this becomes the primary estimate; the proxy scorecard remains a fallback.
+        cure_rate_model = out.get("cure_rate_model")
+        if cure_rate_model is not None:
+            cure_rate_model = pd.to_numeric(cure_rate_model, errors="coerce")
         cure_rate_proxy = (
             0.36
             - 0.20 * (ltv - 0.80).clip(lower=0, upper=0.50)
@@ -899,11 +991,27 @@ class MortgageLGDEngine:
             - 0.12 * (dti - 0.35).clip(lower=0, upper=0.25)
             + 0.06 * behaviour_num
             + owner_bonus
-        ).clip(0.02, 0.75)
-        out["cure_rate_proxy"] = cure_rate_proxy
-        out["liquidation_loss_proxy"] = (
-            out["realised_lgd"] / (1 - cure_rate_proxy).replace(0, np.nan)
+        )
+        cure_rate = pd.Series(cure_rate_proxy, index=out.index, dtype=float)
+        if cure_rate_model is not None:
+            cure_rate = cure_rate.where(cure_rate_model.isna(), cure_rate_model)
+        cure_rate = cure_rate.clip(0.02, 0.75)
+        out["cure_rate_proxy"] = cure_rate
+
+        # Prefer a cashflow-style liquidation estimate if collateral value inputs are present;
+        # otherwise fall back to the original demo back-solve using realised_lgd.
+        liquidation_loss_cf, liquidation_source = _resolve_mortgage_liquidation_loss(
+            out, discount_rate_series=out["discount_rate_proxy_used"]
+        )
+        liquidation_backsolve = (
+            out["realised_lgd"] / (1 - out["cure_rate_proxy"]).replace(0, np.nan)
         ).fillna(out["realised_lgd"]).clip(0, 1)
+        out["liquidation_loss_proxy"] = liquidation_backsolve.where(
+            liquidation_loss_cf.isna(), liquidation_loss_cf
+        ).clip(0, 1)
+        out["liquidation_loss_source"] = liquidation_source.where(
+            liquidation_loss_cf.notna(), "backsolved_from_realised_lgd"
+        )
         out["lgd_cure_proxy"] = (
             (1 - out["cure_rate_proxy"]) * out["liquidation_loss_proxy"]
         ).clip(0, 1)

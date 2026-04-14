@@ -49,3 +49,27 @@ overlay_coeff,development,all,macro_sell_through_delay_coeff,0.12,2026-04-14,v1.
 overlay_coeff,cashflow_lending,all,macro_dscr_weakness_coeff,0.12,2026-04-14,v1.0,LGD-Model-Risk,Cashflow macro DSCR-weakness coefficient
 overlay_coeff,cashflow_lending,all,macro_utilisation_coeff,0.06,2026-04-14,v1.0,LGD-Model-Risk,Cashflow macro utilisation coefficient
 overlay_coeff,cashflow_lending,all,macro_recovery_delay_coeff,0.08,2026-04-14,v1.0,LGD-Model-Risk,Cashflow macro recovery-delay coefficient
+overlay,receivables,all,base_downturn_scalar,1.15,2026-04-14,v1.0,LGD-Model-Risk,Receivables base downturn scalar — short-term self-liquidating asset
+overlay,trade_contingent,all,base_downturn_scalar,1.10,2026-04-14,v1.0,LGD-Model-Risk,Trade contingent base downturn scalar — low historical loss severity
+overlay,asset_equipment,all,base_downturn_scalar,1.20,2026-04-14,v1.0,LGD-Model-Risk,Asset and equipment base downturn scalar — depreciating collateral
+overlay,cre_investment,all,base_downturn_scalar,1.25,2026-04-14,v1.0,LGD-Model-Risk,CRE investment base downturn scalar — capital value sensitive to macro
+overlay,residual_stock,all,base_downturn_scalar,1.30,2026-04-14,v1.0,LGD-Model-Risk,Residual stock base downturn scalar — completed unsold developer stock
+overlay,land_subdivision,all,base_downturn_scalar,1.35,2026-04-14,v1.0,LGD-Model-Risk,Land subdivision base downturn scalar — raw land longest workout
+overlay,bridging,all,base_downturn_scalar,1.25,2026-04-14,v1.0,LGD-Model-Risk,Bridging base downturn scalar — exit dependent on refinance availability
+overlay,mezz_second_mortgage,all,base_downturn_scalar,1.35,2026-04-14,v1.0,LGD-Model-Risk,Mezz/2nd mortgage base downturn scalar — second ranking absorbed after 1st
+moc,receivables,all,base_moc,0.035,2026-04-14,v1.0,LGD-Model-Risk,Base MoC for receivables — moderate data depth for SME receivables
+moc,trade_contingent,all,base_moc,0.030,2026-04-14,v1.0,LGD-Model-Risk,Base MoC for trade contingent — relatively low model uncertainty
+moc,asset_equipment,all,base_moc,0.040,2026-04-14,v1.0,LGD-Model-Risk,Base MoC for asset and equipment — collateral valuation uncertainty
+moc,cre_investment,all,base_moc,0.040,2026-04-14,v1.0,LGD-Model-Risk,Base MoC for CRE investment — valuation and liquidity uncertainty
+moc,residual_stock,all,base_moc,0.050,2026-04-14,v1.0,LGD-Model-Risk,Base MoC for residual stock — limited workout history for this segment
+moc,land_subdivision,all,base_moc,0.060,2026-04-14,v1.0,LGD-Model-Risk,Base MoC for land subdivision — thin data and long workout cycles
+moc,bridging,all,base_moc,0.050,2026-04-14,v1.0,LGD-Model-Risk,Base MoC for bridging — exit risk and short-form data limitations
+moc,mezz_second_mortgage,all,base_moc,0.060,2026-04-14,v1.0,LGD-Model-Risk,Base MoC for mezz/2nd mortgage — structurally thin data and junior ranking
+floor,receivables,all,lgd_floor,0.15,2026-04-14,v1.0,LGD-Model-Risk,APS 113 s.58 floor for receivables
+floor,trade_contingent,all,lgd_floor,0.15,2026-04-14,v1.0,LGD-Model-Risk,APS 113 s.58 floor for trade contingent
+floor,asset_equipment,all,lgd_floor,0.20,2026-04-14,v1.0,LGD-Model-Risk,APS 113 s.58 floor for asset and equipment — depreciating collateral
+floor,cre_investment,all,lgd_floor,0.25,2026-04-14,v1.0,LGD-Model-Risk,APS 113 s.58 floor for CRE investment
+floor,residual_stock,all,lgd_floor,0.30,2026-04-14,v1.0,LGD-Model-Risk,APS 113 s.58 floor for residual stock — completed unsold stock
+floor,land_subdivision,all,lgd_floor,0.35,2026-04-14,v1.0,LGD-Model-Risk,APS 113 s.58 floor for land subdivision — raw land highest floor
+floor,bridging,all,lgd_floor,0.25,2026-04-14,v1.0,LGD-Model-Risk,APS 113 s.58 floor for bridging
+floor,mezz_second_mortgage,all,lgd_floor,0.40,2026-04-14,v1.0,LGD-Model-Risk,APS 113 s.58 floor for mezz/2nd mortgage — junior ranking highest floor

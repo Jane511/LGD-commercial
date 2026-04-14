@@ -1,0 +1,20 @@
+# RBA B6 Indicator Lending Rates — Annual averages (% p.a.)
+# Source: Reserve Bank of Australia, Table B6 (Lending Rates)
+# URL: https://www.rba.gov.au/statistics/tables/
+# Last updated: April 2025
+# Note: Annual averages computed from monthly RBA B6 data.
+# These rates are used as per-vintage contractual rate proxies per APS 113 s.50.
+# Where a specific product rate is unavailable, fallback = RBA cash rate + 300bps.
+# SYNTHETIC DEMONSTRATION REPO — rates are based on publicly available RBA data.
+year,mortgage_owner_occupier_variable,mortgage_investor_variable,mortgage_fixed_3yr,small_business_variable,large_business_variable,personal_variable,rba_cash_rate_avg,cash_plus_300bps
+2014,5.45,5.75,5.20,6.90,5.45,13.25,2.50,5.50
+2015,5.25,5.65,4.85,6.65,5.20,13.25,2.06,5.06
+2016,5.25,5.65,4.50,6.45,5.05,13.25,1.75,4.75
+2017,5.25,5.60,4.35,6.40,5.10,13.25,1.50,4.50
+2018,5.20,5.55,4.30,6.35,5.05,13.25,1.50,4.50
+2019,4.80,5.10,3.95,6.05,4.70,13.25,1.17,4.17
+2020,4.25,4.55,3.40,5.50,4.15,13.25,0.29,3.29
+2021,3.45,3.75,2.50,4.70,3.40,13.25,0.10,3.10
+2022,4.50,4.85,5.10,6.15,4.85,13.25,1.85,4.85
+2023,6.50,6.85,6.45,8.05,6.60,13.25,4.09,7.09
+2024,6.50,6.85,6.20,8.00,6.55,13.25,4.35,7.35
