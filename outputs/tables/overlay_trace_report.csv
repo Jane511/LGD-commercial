@@ -1,0 +1,5 @@
+product,loan_count,total_ead,avg_macro_downturn_scalar,avg_industry_downturn_adjustment,avg_combined_downturn_scalar,overlay_source_mode,parameter_version,scenario_id
+cashflow_lending,400,1580458102.22,1.146269048179487,1.029499375,1.1802352737679873,macro_plus_industry,v1.0,baseline
+commercial,300,2290984728.06,1.2786068094444445,1.0251949999999999,1.3106616181152777,macro_plus_industry,v1.0,baseline
+development,200,4154640674.45,1.5303287505159033,1.0135975000000002,1.5509748451730316,macro_plus_industry,v1.0,baseline
+mortgage,500,444486089.71,1.1535501600000002,1.0,1.1535501600000002,macro_only,v1.0,baseline

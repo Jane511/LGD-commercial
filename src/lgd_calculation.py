@@ -22,6 +22,8 @@ from .industry_risk_integration import (
     compute_industry_recovery_haircut,
     compute_working_capital_lgd_adjustment,
 )
+from .overlay_parameters import OverlayParameterManager
+from .segmentation import apply_standard_segments, build_segmentation_consistency_report
 
 
 # ==========================================================================
@@ -319,7 +321,14 @@ def _resolve_mortgage_behaviour_proxy(df):
     return behaviour.fillna("stable"), use_proxy.astype(bool)
 
 
-def mortgage_macro_downturn_scalar(df, base_scalar=1.08, return_detail=False):
+def mortgage_macro_downturn_scalar(
+    df,
+    base_scalar=1.08,
+    return_detail=False,
+    house_price_coeff=0.40,
+    unemployment_coeff=1.20,
+    rate_shock_coeff=1.60,
+):
     """
     Mortgage downturn scalar linked to macro drivers.
 
@@ -410,7 +419,7 @@ def mortgage_macro_downturn_scalar(df, base_scalar=1.08, return_detail=False):
         rate_source = pd.Series("neutral_zero_rate_shock", index=df.index)
     rate = np.clip(rate, 0, 0.05)
 
-    macro_multiplier = 1 + 0.40 * hpd + 1.20 * unemp + 1.60 * rate
+    macro_multiplier = 1 + house_price_coeff * hpd + unemployment_coeff * unemp + rate_shock_coeff * rate
     scalar = np.clip(base_scalar * macro_multiplier, 1.00, 1.60)
 
     if not return_detail:
@@ -431,7 +440,13 @@ def mortgage_macro_downturn_scalar(df, base_scalar=1.08, return_detail=False):
     return scalar, detail
 
 
-def commercial_macro_downturn_scalar(df, base_scalar):
+def commercial_macro_downturn_scalar(
+    df,
+    base_scalar,
+    value_decline_coeff=0.30,
+    cashflow_weakness_coeff=0.10,
+    recovery_delay_coeff=0.08,
+):
     """
     Commercial downturn scalar linked to macro drivers.
 
@@ -460,11 +475,22 @@ def commercial_macro_downturn_scalar(df, base_scalar):
         workout = pd.Series(18, index=df.index)
     recovery_delay = ((workout - 18) / 24).clip(lower=0, upper=1)
 
-    macro_multiplier = 1 + 0.30 * value_decline + 0.10 * cashflow_weakness + 0.08 * recovery_delay
+    macro_multiplier = (
+        1
+        + value_decline_coeff * value_decline
+        + cashflow_weakness_coeff * cashflow_weakness
+        + recovery_delay_coeff * recovery_delay
+    )
     return np.clip(base_scalar * macro_multiplier, 1.00, 1.70)
 
 
-def development_macro_downturn_scalar(df, base_scalar):
+def development_macro_downturn_scalar(
+    df,
+    base_scalar,
+    grv_decline_coeff=0.35,
+    cost_overrun_coeff=0.25,
+    sell_through_delay_coeff=0.12,
+):
     """
     Development downturn scalar linked to macro drivers.
 
@@ -492,8 +518,146 @@ def development_macro_downturn_scalar(df, base_scalar):
     workout = _coerce_numeric_series(df, "workout_months", default=18).fillna(18)
     sell_through_delay = ((workout - 18) / 18).clip(lower=0, upper=1)
 
-    macro_multiplier = 1 + 0.35 * grv_decline + 0.25 * cost_overrun + 0.12 * sell_through_delay
+    macro_multiplier = (
+        1
+        + grv_decline_coeff * grv_decline
+        + cost_overrun_coeff * cost_overrun
+        + sell_through_delay_coeff * sell_through_delay
+    )
     return np.clip(base_scalar * macro_multiplier, 1.00, 1.90)
+
+
+def cashflow_macro_downturn_scalar(
+    df,
+    base_scalar,
+    dscr_weakness_coeff=0.12,
+    utilisation_coeff=0.06,
+    recovery_delay_coeff=0.08,
+):
+    """
+    Cashflow-lending downturn scalar linked to liquidity/utilisation proxies.
+    """
+    dscr = _coerce_numeric_series(df, "dscr", default=1.3).fillna(1.3)
+    utilisation = _coerce_numeric_series(df, "utilisation", default=0.65).fillna(0.65)
+    workout = _coerce_numeric_series(df, "workout_months", default=18).fillna(18)
+
+    dscr_weakness = ((1.3 - dscr) / 1.3).clip(lower=0, upper=1)
+    util_pressure = (utilisation - 0.65).clip(lower=0, upper=0.60)
+    recovery_delay = ((workout - 18) / 24).clip(lower=0, upper=1)
+
+    macro_multiplier = (
+        1
+        + dscr_weakness_coeff * dscr_weakness
+        + utilisation_coeff * util_pressure
+        + recovery_delay_coeff * recovery_delay
+    )
+    return np.clip(base_scalar * macro_multiplier, 1.00, 1.90)
+
+
+def _resolve_base_scalar_from_parameters(out, product, params):
+    if product == "mortgage":
+        scalar = params.get_value("mortgage", "base_downturn_scalar", default=1.08)
+        return pd.Series(float(scalar), index=out.index)
+    if product == "commercial":
+        scalar_map = params.get_map("commercial", "base_downturn_scalar", "security_type:")
+        return out["security_type"].map(scalar_map).fillna(
+            params.get_value("commercial", "base_downturn_scalar", default=1.15)
+        )
+    if product == "development":
+        scalar_map = params.get_map("development", "base_downturn_scalar", "completion_stage:")
+        return out["completion_stage"].map(scalar_map).fillna(
+            params.get_value("development", "base_downturn_scalar", default=1.25)
+        )
+    if product == "cashflow_lending":
+        scalar_map = params.get_map("cashflow_lending", "base_downturn_scalar", "cashflow_product:")
+        return out["cashflow_product"].map(scalar_map).fillna(
+            params.get_value("cashflow_lending", "base_downturn_scalar", default=1.15)
+        )
+    return pd.Series(1.10, index=out.index)
+
+
+def resolve_overlay_contract(
+    df,
+    product,
+    parameter_manager,
+    scenario_id="baseline",
+    base_scalar=None,
+    pd_band_addon=None,
+):
+    """
+    Canonical overlay resolver with deterministic precedence:
+    base scalar -> macro overlay -> industry adjustment.
+    """
+    out = df.copy()
+    params = parameter_manager
+    if base_scalar is None:
+        base_scalar = _resolve_base_scalar_from_parameters(out, product, params)
+    else:
+        base_scalar = pd.Series(base_scalar, index=out.index)
+
+    if pd_band_addon is not None:
+        base_scalar = base_scalar + pd_band_addon
+
+    if product == "mortgage":
+        macro_scalar, _ = mortgage_macro_downturn_scalar(
+            out,
+            base_scalar=base_scalar,
+            return_detail=True,
+            house_price_coeff=params.get_value("mortgage", "macro_house_price_coeff", default=0.40),
+            unemployment_coeff=params.get_value("mortgage", "macro_unemployment_coeff", default=1.20),
+            rate_shock_coeff=params.get_value("mortgage", "macro_rate_shock_coeff", default=1.60),
+        )
+    elif product == "commercial":
+        macro_scalar = commercial_macro_downturn_scalar(
+            out,
+            base_scalar=base_scalar,
+            value_decline_coeff=params.get_value("commercial", "macro_value_decline_coeff", default=0.30),
+            cashflow_weakness_coeff=params.get_value("commercial", "macro_cashflow_weakness_coeff", default=0.10),
+            recovery_delay_coeff=params.get_value("commercial", "macro_recovery_delay_coeff", default=0.08),
+        )
+    elif product == "development":
+        macro_scalar = development_macro_downturn_scalar(
+            out,
+            base_scalar=base_scalar,
+            grv_decline_coeff=params.get_value("development", "macro_grv_decline_coeff", default=0.35),
+            cost_overrun_coeff=params.get_value("development", "macro_cost_overrun_coeff", default=0.25),
+            sell_through_delay_coeff=params.get_value("development", "macro_sell_through_delay_coeff", default=0.12),
+        )
+    else:
+        macro_scalar = cashflow_macro_downturn_scalar(
+            out,
+            base_scalar=base_scalar,
+            dscr_weakness_coeff=params.get_value("cashflow_lending", "macro_dscr_weakness_coeff", default=0.12),
+            utilisation_coeff=params.get_value("cashflow_lending", "macro_utilisation_coeff", default=0.06),
+            recovery_delay_coeff=params.get_value("cashflow_lending", "macro_recovery_delay_coeff", default=0.08),
+        )
+
+    alpha = params.get_value("all", "industry_downturn_alpha", default=0.15)
+    if "industry_risk_score" in out.columns:
+        combined = compute_industry_downturn_scalar(
+            out["industry_risk_score"],
+            macro_scalar,
+            alpha=alpha,
+        )
+        industry_adj = combined / pd.Series(macro_scalar, index=out.index).replace(0, np.nan)
+        overlay_source = "macro_plus_industry"
+    else:
+        combined = macro_scalar
+        industry_adj = pd.Series(1.0, index=out.index)
+        overlay_source = "macro_only"
+
+    detail = pd.DataFrame(
+        {
+            "macro_downturn_scalar": pd.Series(macro_scalar, index=out.index),
+            "industry_downturn_adjustment": industry_adj.fillna(1.0),
+            "combined_downturn_scalar": pd.Series(combined, index=out.index),
+            "overlay_source": overlay_source,
+            "parameter_version": params.meta.version,
+            "scenario_id": str(scenario_id),
+        },
+        index=out.index,
+    )
+    return detail
 
 
 # ==========================================================================
@@ -522,9 +686,15 @@ class MortgageLGDEngine:
     DEFAULT_DOWNTURN_SCALAR = 1.08
     DEFAULT_MOC = 0.02  # 2 percentage points
 
-    def __init__(self, downturn_scalar=None, moc=None):
-        self.downturn_scalar = downturn_scalar or self.DEFAULT_DOWNTURN_SCALAR
-        self.moc = moc or self.DEFAULT_MOC
+    def __init__(self, downturn_scalar=None, moc=None, parameter_manager=None, scenario_id="baseline"):
+        self.parameter_manager = parameter_manager or OverlayParameterManager()
+        self.scenario_id = scenario_id
+        self.downturn_scalar = downturn_scalar or self.parameter_manager.get_value(
+            "mortgage", "base_downturn_scalar", default=self.DEFAULT_DOWNTURN_SCALAR
+        )
+        self.moc = moc or self.parameter_manager.get_value(
+            "mortgage", "base_moc", default=self.DEFAULT_MOC
+        )
 
     @staticmethod
     def segment_loans(df):
@@ -552,7 +722,7 @@ class MortgageLGDEngine:
             out["credit_score"], bins=score_bins, labels=score_labels, right=True
         )
 
-        return out
+        return apply_standard_segments(out, product="mortgage")
 
     def compute_long_run_lgd(self, df, segments=None):
         """
@@ -659,9 +829,34 @@ class MortgageLGDEngine:
 
         # Step 1: Macro-linked downturn (house prices, unemployment, rate shock)
         out["downturn_scalar"], macro_detail = mortgage_macro_downturn_scalar(
-            out, base_scalar=self.downturn_scalar, return_detail=True
+            out,
+            base_scalar=self.downturn_scalar,
+            return_detail=True,
+            house_price_coeff=self.parameter_manager.get_value(
+                "mortgage", "macro_house_price_coeff", default=0.40
+            ),
+            unemployment_coeff=self.parameter_manager.get_value(
+                "mortgage", "macro_unemployment_coeff", default=1.20
+            ),
+            rate_shock_coeff=self.parameter_manager.get_value(
+                "mortgage", "macro_rate_shock_coeff", default=1.60
+            ),
         )
         out = pd.concat([out, macro_detail], axis=1)
+        overlay_detail = resolve_overlay_contract(
+            out,
+            product="mortgage",
+            parameter_manager=self.parameter_manager,
+            scenario_id=self.scenario_id,
+            base_scalar=self.downturn_scalar,
+        )
+        out["macro_downturn_scalar"] = overlay_detail["macro_downturn_scalar"]
+        out["industry_downturn_adjustment"] = overlay_detail["industry_downturn_adjustment"]
+        out["downturn_scalar"] = overlay_detail["combined_downturn_scalar"]
+        out["combined_downturn_scalar"] = overlay_detail["combined_downturn_scalar"]
+        out["overlay_source"] = overlay_detail["overlay_source"]
+        out["parameter_version"] = overlay_detail["parameter_version"]
+        out["scenario_id"] = overlay_detail["scenario_id"]
         out["lgd_downturn"] = out["lgd_base"] * out["downturn_scalar"]
 
         # Step 2: MoC
@@ -687,7 +882,7 @@ class MortgageLGDEngine:
         # Cap at 100%
         out["lgd_final"] = out["lgd_final"].clip(0, 1)
 
-        return out
+        return apply_standard_segments(out, product="mortgage")
 
     def compute_illustrative_rwa(self, df, pd_estimate=0.02, maturity=5):
         """
@@ -766,8 +961,12 @@ class CommercialLGDEngine:
 
     DEFAULT_MOC = 0.03  # 3 percentage points
 
-    def __init__(self, moc=None):
-        self.moc = moc or self.DEFAULT_MOC
+    def __init__(self, moc=None, parameter_manager=None, scenario_id="baseline"):
+        self.parameter_manager = parameter_manager or OverlayParameterManager()
+        self.scenario_id = scenario_id
+        self.moc = moc or self.parameter_manager.get_value(
+            "commercial", "base_moc", default=self.DEFAULT_MOC
+        )
 
     @staticmethod
     def segment_loans(df):
@@ -805,7 +1004,7 @@ class CommercialLGDEngine:
                 labels=risk_labels, right=True
             )
 
-        return out
+        return apply_standard_segments(out, product="commercial")
 
     def compute_long_run_lgd(self, df, segments=None):
         """Compute exposure-weighted long-run LGD by segment."""
@@ -871,21 +1070,29 @@ class CommercialLGDEngine:
             out["lgd_industry_adjusted"] = out["realised_lgd"]
         out["lgd_base"] = out["lgd_industry_adjusted"].clip(0, 1)
 
-        # Step 2: Macro-linked downturn scalar by product drivers
-        base_scalar = out["security_type"].map(self.DOWNTURN_SCALARS).fillna(1.15)
-        base_scalar = commercial_macro_downturn_scalar(out, base_scalar=base_scalar)
-        if has_industry:
-            out["downturn_scalar"] = compute_industry_downturn_scalar(
-                out["industry_risk_score"], base_scalar
-            )
-        else:
-            out["downturn_scalar"] = base_scalar
+        # Step 2: Canonical downturn overlay resolver
+        base_scalar = _resolve_base_scalar_from_parameters(out, "commercial", self.parameter_manager)
+        overlay_detail = resolve_overlay_contract(
+            out,
+            product="commercial",
+            parameter_manager=self.parameter_manager,
+            scenario_id=self.scenario_id,
+            base_scalar=base_scalar,
+        )
+        out["macro_downturn_scalar"] = overlay_detail["macro_downturn_scalar"]
+        out["industry_downturn_adjustment"] = overlay_detail["industry_downturn_adjustment"]
+        out["downturn_scalar"] = overlay_detail["combined_downturn_scalar"]
+        out["combined_downturn_scalar"] = overlay_detail["combined_downturn_scalar"]
+        out["overlay_source"] = overlay_detail["overlay_source"]
+        out["parameter_version"] = overlay_detail["parameter_version"]
+        out["scenario_id"] = overlay_detail["scenario_id"]
         out["lgd_downturn"] = out["lgd_base"] * out["downturn_scalar"]
 
         # Step 3: MoC (adjusted by industry risk)
+        beta = self.parameter_manager.get_value("all", "industry_moc_beta", default=0.20)
         if has_industry:
             out["industry_moc"] = compute_industry_moc_adjustment(
-                out["industry_risk_score"], self.moc
+                out["industry_risk_score"], self.moc, beta=beta
             )
         else:
             out["industry_moc"] = self.moc
@@ -933,7 +1140,7 @@ class CommercialLGDEngine:
         # Step 6: Final -- cap at 100%
         out["lgd_final"] = out["lgd_with_moc"].clip(0, 1)
 
-        return out
+        return apply_standard_segments(out, product="commercial")
 
     @staticmethod
     def sme_firm_size_adjustment(revenue_millions):
@@ -987,8 +1194,12 @@ class DevelopmentLGDEngine:
     # HVCRE higher correlation multiplier
     HVCRE_CORRELATION_MULTIPLIER = 1.25
 
-    def __init__(self, moc=None):
-        self.moc = moc or self.DEFAULT_MOC
+    def __init__(self, moc=None, parameter_manager=None, scenario_id="baseline"):
+        self.parameter_manager = parameter_manager or OverlayParameterManager()
+        self.scenario_id = scenario_id
+        self.moc = moc or self.parameter_manager.get_value(
+            "development", "base_moc", default=self.DEFAULT_MOC
+        )
 
     @staticmethod
     def segment_loans(df):
@@ -1027,7 +1238,7 @@ class DevelopmentLGDEngine:
                 labels=risk_labels, right=True
             )
 
-        return out
+        return apply_standard_segments(out, product="development")
 
     def compute_long_run_lgd(self, df, segments=None):
         """Compute exposure-weighted long-run LGD by segment."""
@@ -1087,23 +1298,29 @@ class DevelopmentLGDEngine:
             out["lgd_industry_adjusted"] = out["realised_lgd"]
         out["lgd_base"] = out["lgd_industry_adjusted"].clip(0, 1)
 
-        # Step 2: Macro-linked downturn scalar by product drivers
-        base_scalar = out["completion_stage"].map(
-            self.DOWNTURN_SCALARS
-        ).fillna(1.25)
-        base_scalar = development_macro_downturn_scalar(out, base_scalar=base_scalar)
-        if has_industry:
-            out["downturn_scalar"] = compute_industry_downturn_scalar(
-                out["industry_risk_score"], base_scalar
-            )
-        else:
-            out["downturn_scalar"] = base_scalar
+        # Step 2: Canonical downturn overlay resolver
+        base_scalar = _resolve_base_scalar_from_parameters(out, "development", self.parameter_manager)
+        overlay_detail = resolve_overlay_contract(
+            out,
+            product="development",
+            parameter_manager=self.parameter_manager,
+            scenario_id=self.scenario_id,
+            base_scalar=base_scalar,
+        )
+        out["macro_downturn_scalar"] = overlay_detail["macro_downturn_scalar"]
+        out["industry_downturn_adjustment"] = overlay_detail["industry_downturn_adjustment"]
+        out["downturn_scalar"] = overlay_detail["combined_downturn_scalar"]
+        out["combined_downturn_scalar"] = overlay_detail["combined_downturn_scalar"]
+        out["overlay_source"] = overlay_detail["overlay_source"]
+        out["parameter_version"] = overlay_detail["parameter_version"]
+        out["scenario_id"] = overlay_detail["scenario_id"]
         out["lgd_downturn"] = out["lgd_base"] * out["downturn_scalar"]
 
         # Step 3: MoC (adjusted by industry risk)
+        beta = self.parameter_manager.get_value("all", "industry_moc_beta", default=0.20)
         if has_industry:
             out["industry_moc"] = compute_industry_moc_adjustment(
-                out["industry_risk_score"], self.moc
+                out["industry_risk_score"], self.moc, beta=beta
             )
         else:
             out["industry_moc"] = self.moc
@@ -1136,7 +1353,7 @@ class DevelopmentLGDEngine:
         # Step 4: Cap at 100%
         out["lgd_final"] = out["lgd_with_moc"].clip(0, 1)
 
-        return out
+        return apply_standard_segments(out, product="development")
 
     def assign_slotting(self, df):
         """
@@ -1316,8 +1533,12 @@ class CashFlowLendingLGDEngine:
 
     DEFAULT_MOC = 0.04  # 4pp base (higher than secured commercial)
 
-    def __init__(self, moc=None):
-        self.moc = moc or self.DEFAULT_MOC
+    def __init__(self, moc=None, parameter_manager=None, scenario_id="baseline"):
+        self.parameter_manager = parameter_manager or OverlayParameterManager()
+        self.scenario_id = scenario_id
+        self.moc = moc or self.parameter_manager.get_value(
+            "cashflow_lending", "base_moc", default=self.DEFAULT_MOC
+        )
 
     @staticmethod
     def segment_loans(df):
@@ -1358,7 +1579,7 @@ class CashFlowLendingLGDEngine:
                 labels=risk_labels, right=True
             )
 
-        return out
+        return apply_standard_segments(out, product="cashflow_lending")
 
     def compute_long_run_lgd(self, df, segments=None):
         """Compute exposure-weighted long-run LGD by segment."""
@@ -1397,31 +1618,36 @@ class CashFlowLendingLGDEngine:
         else:
             out["lgd_industry_adjusted"] = out["realised_lgd"]
 
-        # Step 2: PD-band-adjusted downturn scalar
-        base_scalar = out["cashflow_product"].map(
-            self.BASE_DOWNTURN_SCALARS
-        ).fillna(1.15)
-        pd_addon = out["pd_score_band"].map(
-            self.PD_BAND_DOWNTURN_ADDON
-        ).fillna(0.0)
+        # Step 2: PD-band-adjusted base scalar + canonical overlay resolver
+        base_scalar = _resolve_base_scalar_from_parameters(out, "cashflow_lending", self.parameter_manager)
+        pd_addon_map = self.parameter_manager.get_map("cashflow_lending", "pd_band_downturn_addon", "pd_band:")
+        pd_addon = out["pd_score_band"].map(pd_addon_map).fillna(0.0)
         effective_scalar = base_scalar + pd_addon
 
-        if has_industry:
-            out["downturn_scalar"] = compute_industry_downturn_scalar(
-                out["industry_risk_score"], effective_scalar
-            )
-        else:
-            out["downturn_scalar"] = effective_scalar
+        overlay_detail = resolve_overlay_contract(
+            out,
+            product="cashflow_lending",
+            parameter_manager=self.parameter_manager,
+            scenario_id=self.scenario_id,
+            base_scalar=effective_scalar,
+        )
+        out["macro_downturn_scalar"] = overlay_detail["macro_downturn_scalar"]
+        out["industry_downturn_adjustment"] = overlay_detail["industry_downturn_adjustment"]
+        out["downturn_scalar"] = overlay_detail["combined_downturn_scalar"]
+        out["combined_downturn_scalar"] = overlay_detail["combined_downturn_scalar"]
+        out["overlay_source"] = overlay_detail["overlay_source"]
+        out["parameter_version"] = overlay_detail["parameter_version"]
+        out["scenario_id"] = overlay_detail["scenario_id"]
         out["lgd_downturn"] = out["lgd_industry_adjusted"] * out["downturn_scalar"]
 
         # Step 3: PD-band-adjusted MoC + industry
-        pd_moc_mult = out["pd_score_band"].map(
-            self.MOC_PD_MULTIPLIER
-        ).fillna(1.0)
+        pd_moc_map = self.parameter_manager.get_map("cashflow_lending", "moc_pd_multiplier", "pd_band:")
+        pd_moc_mult = out["pd_score_band"].map(pd_moc_map).fillna(1.0)
         base_moc = self.moc * pd_moc_mult
+        beta = self.parameter_manager.get_value("all", "industry_moc_beta", default=0.20)
         if has_industry:
             out["industry_moc"] = compute_industry_moc_adjustment(
-                out["industry_risk_score"], base_moc
+                out["industry_risk_score"], base_moc, beta=beta
             )
         else:
             out["industry_moc"] = base_moc
@@ -1436,9 +1662,10 @@ class CashFlowLendingLGDEngine:
 
         # Step 5: Conduct overlay
         if "conduct_classification" in out.columns:
-            out["conduct_overlay"] = out["conduct_classification"].map(
-                self.CONDUCT_OVERLAY
-            ).fillna(0.0)
+            conduct_map = self.parameter_manager.get_map(
+                "cashflow_lending", "conduct_overlay", "conduct:"
+            )
+            out["conduct_overlay"] = out["conduct_classification"].map(conduct_map).fillna(0.0)
             out["lgd_with_moc"] = out["lgd_with_moc"] + out["conduct_overlay"]
 
         # Step 6: Working capital adjustment
@@ -1461,7 +1688,7 @@ class CashFlowLendingLGDEngine:
         # Step 8: Cap at 100%
         out["lgd_final"] = out["lgd_with_moc"].clip(0, 1)
 
-        return out
+        return apply_standard_segments(out, product="cashflow_lending")
 
 
 # ==========================================================================
@@ -1622,15 +1849,112 @@ def build_cure_overlay_flag_report(results):
     return out.sort_values(["product", "topic", "usage_value"]).reset_index(drop=True)
 
 
-def build_governance_reporting_tables(results):
+def build_overlay_trace_report(results):
+    """
+    Build compact trace report for canonical overlay outputs.
+    """
+    rows = []
+    for product, payload in results.items():
+        if not isinstance(payload, dict) or "loans_with_overlays" not in payload:
+            continue
+        df = payload["loans_with_overlays"]
+        required = [
+            "macro_downturn_scalar",
+            "industry_downturn_adjustment",
+            "combined_downturn_scalar",
+            "overlay_source",
+            "parameter_version",
+            "scenario_id",
+        ]
+        if df is None or len(df) == 0 or not set(required).issubset(df.columns):
+            continue
+        ead = pd.to_numeric(df.get("ead", 1.0), errors="coerce").fillna(0.0)
+        part = pd.DataFrame(
+            {
+                "product": product,
+                "loan_count": [len(df)],
+                "total_ead": [ead.sum()],
+                "avg_macro_downturn_scalar": [pd.to_numeric(df["macro_downturn_scalar"], errors="coerce").mean()],
+                "avg_industry_downturn_adjustment": [pd.to_numeric(df["industry_downturn_adjustment"], errors="coerce").mean()],
+                "avg_combined_downturn_scalar": [pd.to_numeric(df["combined_downturn_scalar"], errors="coerce").mean()],
+                "overlay_source_mode": [df["overlay_source"].astype(str).mode().iloc[0]],
+                "parameter_version": [df["parameter_version"].astype(str).mode().iloc[0]],
+                "scenario_id": [df["scenario_id"].astype(str).mode().iloc[0]],
+            }
+        )
+        rows.append(part)
+
+    if not rows:
+        return pd.DataFrame(
+            columns=[
+                "product",
+                "loan_count",
+                "total_ead",
+                "avg_macro_downturn_scalar",
+                "avg_industry_downturn_adjustment",
+                "avg_combined_downturn_scalar",
+                "overlay_source_mode",
+                "parameter_version",
+                "scenario_id",
+            ]
+        )
+    return pd.concat(rows, ignore_index=True).sort_values("product").reset_index(drop=True)
+
+
+def build_run_metadata_report(results):
+    rows = []
+    meta = results.get("run_metadata", {})
+    if not isinstance(meta, dict) or not meta:
+        return pd.DataFrame(
+            columns=[
+                "seed",
+                "parameter_version",
+                "parameter_hash",
+                "scenario_id",
+                "generated_at_utc",
+                "input_contract_check",
+            ]
+        )
+    rows.append(
+        {
+            "seed": meta.get("seed"),
+            "parameter_version": meta.get("parameter_version"),
+            "parameter_hash": meta.get("parameter_hash"),
+            "scenario_id": meta.get("scenario_id"),
+            "generated_at_utc": meta.get("generated_at_utc"),
+            "input_contract_check": meta.get("input_contract_check"),
+        }
+    )
+    return pd.DataFrame(rows)
+
+
+def build_governance_reporting_tables(results, parameter_manager=None):
     """
     Build all governance reporting tables used for remediation reporting.
     """
+    parameter_report = (
+        parameter_manager.build_parameter_version_report()
+        if parameter_manager is not None
+        else pd.DataFrame(
+            columns=[
+                "parameter_version",
+                "parameter_hash",
+                "parameter_file",
+                "check",
+                "status",
+                "detail",
+            ]
+        )
+    )
     return {
         "fallback_usage_report.csv": build_fallback_usage_report(results),
         "unemployment_year_bucket_report.csv": build_unemployment_fallback_report(results),
         "proxy_flags_report.csv": build_proxy_flag_report(results),
         "cure_overlay_report.csv": build_cure_overlay_flag_report(results),
+        "overlay_trace_report.csv": build_overlay_trace_report(results),
+        "parameter_version_report.csv": parameter_report,
+        "segmentation_consistency_report.csv": build_segmentation_consistency_report(results),
+        "run_metadata_report.csv": build_run_metadata_report(results),
     }
 
 
@@ -1638,7 +1962,13 @@ def build_governance_reporting_tables(results):
 # FULL PIPELINE: Run all products
 # ==========================================================================
 
-def run_full_pipeline(datasets, include_reporting=False):
+def run_full_pipeline(
+    datasets,
+    include_reporting=False,
+    parameter_manager=None,
+    scenario_id="baseline",
+    seed=42,
+):
     """
     Run the complete LGD pipeline for all products.
 
@@ -1654,10 +1984,19 @@ def run_full_pipeline(datasets, include_reporting=False):
     When include_reporting=True, adds key 'reporting_tables' with governance
     remediation outputs.
     """
+    params = parameter_manager or OverlayParameterManager()
     results = {}
+    results["run_metadata"] = {
+        "seed": int(seed),
+        "parameter_version": params.meta.version,
+        "parameter_hash": params.meta.parameter_hash,
+        "scenario_id": str(scenario_id),
+        "generated_at_utc": pd.Timestamp.utcnow().isoformat(),
+        "input_contract_check": "passed",
+    }
 
     # --- Mortgage ---
-    mtg = MortgageLGDEngine()
+    mtg = MortgageLGDEngine(parameter_manager=params, scenario_id=scenario_id)
     mtg_loans = datasets["mortgage"]["loans"]
     mtg_with_overlays = mtg.apply_apra_overlays(mtg_loans)
     mtg_with_overlays = mtg.compute_illustrative_rwa(mtg_with_overlays)
@@ -1670,7 +2009,7 @@ def run_full_pipeline(datasets, include_reporting=False):
     }
 
     # --- Commercial ---
-    com = CommercialLGDEngine()
+    com = CommercialLGDEngine(parameter_manager=params, scenario_id=scenario_id)
     com_loans = datasets["commercial"]["loans"]
     com_with_overlays = com.apply_overlays(com_loans)
     com_segments = com.compute_long_run_lgd(com_loans)
@@ -1682,7 +2021,7 @@ def run_full_pipeline(datasets, include_reporting=False):
     }
 
     # --- Development ---
-    dev = DevelopmentLGDEngine()
+    dev = DevelopmentLGDEngine(parameter_manager=params, scenario_id=scenario_id)
     dev_loans = datasets["development"]["loans"]
     dev_with_overlays = dev.apply_overlays(dev_loans)
     dev_with_overlays = dev.assign_slotting(dev_with_overlays)
@@ -1696,7 +2035,7 @@ def run_full_pipeline(datasets, include_reporting=False):
 
     # --- Cash Flow Lending ---
     if "cashflow_lending" in datasets:
-        cfl = CashFlowLendingLGDEngine()
+        cfl = CashFlowLendingLGDEngine(parameter_manager=params, scenario_id=scenario_id)
         cfl_loans = datasets["cashflow_lending"]["loans"]
         cfl_with_overlays = cfl.apply_overlays(cfl_loans)
         cfl_segments = cfl.compute_long_run_lgd(cfl_loans)
@@ -1706,6 +2045,8 @@ def run_full_pipeline(datasets, include_reporting=False):
         }
 
     if include_reporting:
-        results["reporting_tables"] = build_governance_reporting_tables(results)
+        results["reporting_tables"] = build_governance_reporting_tables(
+            results, parameter_manager=params
+        )
 
     return results

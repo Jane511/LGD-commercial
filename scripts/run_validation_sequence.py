@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 import traceback
@@ -14,6 +15,9 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 TABLE_DIR = PROJECT_ROOT / "outputs" / "tables"
 REPORT_DIR = PROJECT_ROOT / "outputs" / "reports"
+RUNTIME_SOURCE = "generated"
+RUNTIME_CONTROLLED_ROOT = PROJECT_ROOT / "data" / "controlled"
+RUNTIME_REQUIRE_ALL_PRODUCTS = True
 
 
 def _format_detail(detail: str) -> str:
@@ -36,34 +40,49 @@ def _run_step(step_name: str, fn):
         }
 
 
-def _step_demo_pipeline():
-    from src.demo_run_pipeline import run_pipeline
+def _load_runtime_datasets():
+    from src.data_source_adapter import load_datasets
 
-    result = run_pipeline(project_root=PROJECT_ROOT, persist=True)
-    outputs = result["outputs"]
-    required = {
-        "lgd_segment_summary.csv",
-        "recovery_waterfall.csv",
-        "downturn_lgd_output.csv",
-        "lgd_validation_report.csv",
-        "policy_parameter_register.csv",
-        "pipeline_validation_report.csv",
-    }
-    missing = sorted(required - set(outputs.keys()))
-    all_valid = bool(result["validation"]["status"].all())
-    passed = (len(missing) == 0) and all_valid
+    return load_datasets(
+        source=RUNTIME_SOURCE,
+        controlled_root=RUNTIME_CONTROLLED_ROOT,
+        require_all_products=RUNTIME_REQUIRE_ALL_PRODUCTS,
+    )
+
+
+def _step_demo_pipeline():
+    from src.lgd_calculation import run_full_pipeline
+
+    datasets = _load_runtime_datasets()
+    results = run_full_pipeline(datasets, include_reporting=False)
+    required_products = {"mortgage", "commercial", "development", "cashflow_lending"}
+    missing_products = sorted(required_products - set(results.keys()))
+
+    has_core_payload = True
+    for product in required_products:
+        payload = results.get(product, {})
+        if product == "cashflow_lending":
+            ok = ("loans_with_overlays" in payload) and ("segment_summary" in payload)
+        else:
+            ok = (
+                ("loans_with_overlays" in payload)
+                and ("segment_summary" in payload)
+                and ("weighted_output" in payload)
+            )
+        has_core_payload = has_core_payload and ok
+
+    passed = (len(missing_products) == 0) and has_core_payload
     detail = (
-        f"outputs={len(outputs)}; validation_pass={all_valid}; "
-        f"missing={missing if missing else 'none'}"
+        f"source={RUNTIME_SOURCE}; products={sorted(results.keys())}; "
+        f"missing_products={missing_products or 'none'}; core_payload={has_core_payload}"
     )
     return {"passed": passed, "detail": detail}
 
 
 def _step_core_governance_reports():
-    from src.data_generation import generate_all_datasets
     from src.lgd_calculation import run_full_pipeline
 
-    datasets = generate_all_datasets()
+    datasets = _load_runtime_datasets()
     results = run_full_pipeline(datasets, include_reporting=True)
     reporting = results.get("reporting_tables", {})
 
@@ -74,6 +93,10 @@ def _step_core_governance_reports():
         "unemployment_year_bucket_report.csv",
         "proxy_flags_report.csv",
         "cure_overlay_report.csv",
+        "overlay_trace_report.csv",
+        "parameter_version_report.csv",
+        "segmentation_consistency_report.csv",
+        "run_metadata_report.csv",
     }
     for name, df in reporting.items():
         df.to_csv(TABLE_DIR / name, index=False)
@@ -86,12 +109,63 @@ def _step_core_governance_reports():
     return {"passed": passed, "detail": detail}
 
 
+def _step_reproducibility_determinism():
+    from src.lgd_calculation import run_full_pipeline
+    from src.reproducibility import set_global_seed
+
+    def _norm(df: pd.DataFrame) -> pd.DataFrame:
+        out = df.copy()
+        out = out.sort_index(axis=1)
+        for col in out.columns:
+            if pd.api.types.is_numeric_dtype(out[col]):
+                out[col] = pd.to_numeric(out[col], errors="coerce").round(10)
+            else:
+                out[col] = out[col].astype(str)
+        return out
+
+    set_global_seed(42)
+    d1 = _load_runtime_datasets()
+    r1 = run_full_pipeline(d1, include_reporting=True, seed=42, scenario_id="baseline")
+    set_global_seed(42)
+    d2 = _load_runtime_datasets()
+    r2 = run_full_pipeline(d2, include_reporting=True, seed=42, scenario_id="baseline")
+
+    checks = []
+    for product in ["mortgage", "commercial", "development", "cashflow_lending"]:
+        if product in r1 and product in r2:
+            if "weighted_output" in r1[product] and "weighted_output" in r2[product]:
+                left = _norm(r1[product]["weighted_output"])
+                right = _norm(r2[product]["weighted_output"])
+                checks.append(
+                    {
+                        "target": f"{product}.weighted_output",
+                        "is_equal": bool(left.equals(right)),
+                    }
+                )
+
+    for table in ["overlay_trace_report.csv", "parameter_version_report.csv", "segmentation_consistency_report.csv"]:
+        left = _norm(r1["reporting_tables"][table])
+        right = _norm(r2["reporting_tables"][table])
+        checks.append(
+            {
+                "target": f"reporting.{table}",
+                "is_equal": bool(left.equals(right)),
+            }
+        )
+
+    df = pd.DataFrame(checks)
+    TABLE_DIR.mkdir(parents=True, exist_ok=True)
+    df.to_csv(TABLE_DIR / "reproducibility_determinism_report.csv", index=False)
+    passed = bool(df["is_equal"].all()) if len(df) else False
+    detail = f"checks={len(df)}; all_equal={passed}"
+    return {"passed": passed, "detail": detail}
+
+
 def _step_validation_report_hooks():
-    from src.data_generation import generate_all_datasets
     from src.lgd_calculation import run_full_pipeline
     from src.validation import generate_validation_report
 
-    datasets = generate_all_datasets()
+    datasets = _load_runtime_datasets()
     results = run_full_pipeline(datasets, include_reporting=False)
 
     product_configs = {
@@ -260,8 +334,12 @@ def _step_validation_report_hooks():
 def _step_final_lgd_layer():
     from src.lgd_final import build_and_save_repo_final_lgd
 
+    raw_dir = PROJECT_ROOT / "data" / "raw"
+    if RUNTIME_SOURCE == "controlled":
+        raw_dir = Path(RUNTIME_CONTROLLED_ROOT)
+
     _, summary, checks = build_and_save_repo_final_lgd(
-        raw_dir=PROJECT_ROOT / "data" / "raw",
+        raw_dir=raw_dir,
         output_dir=TABLE_DIR,
     )
     pass_rate = float(checks["passed"].mean()) if len(checks) else 0.0
@@ -310,13 +388,33 @@ def _step_notebook_reproducibility_scan():
     df.to_csv(TABLE_DIR / "notebook_reproducibility_scan.csv", index=False)
 
     compliance_rate = float(df["is_reproducible_proxy"].mean()) if len(df) else 0.0
-    passed = compliance_rate >= 0.75
+    passed = compliance_rate >= 0.90
     detail = f"notebooks={len(df)}; reproducibility_proxy_rate={compliance_rate:.2%}"
     return {"passed": passed, "detail": detail}
 
 
 def main():
     from src.reproducibility import set_global_seed
+
+    global RUNTIME_SOURCE
+    global RUNTIME_CONTROLLED_ROOT
+    global RUNTIME_REQUIRE_ALL_PRODUCTS
+
+    parser = argparse.ArgumentParser(
+        description="Run repo-safe validation sequence against generated or controlled input source."
+    )
+    parser.add_argument("--source", choices=["generated", "controlled"], default="generated")
+    parser.add_argument("--controlled-root", default=str(PROJECT_ROOT / "data" / "controlled"))
+    parser.add_argument(
+        "--allow-missing-products",
+        action="store_true",
+        help="Allow adapter loading when some product files are intentionally missing.",
+    )
+    args = parser.parse_args()
+
+    RUNTIME_SOURCE = args.source
+    RUNTIME_CONTROLLED_ROOT = Path(args.controlled_root)
+    RUNTIME_REQUIRE_ALL_PRODUCTS = not bool(args.allow_missing_products)
 
     set_global_seed(42)
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
@@ -327,6 +425,7 @@ def main():
         ("core_governance_reports", _step_core_governance_reports),
         ("validation_report_hooks", _step_validation_report_hooks),
         ("final_lgd_layer", _step_final_lgd_layer),
+        ("reproducibility_determinism", _step_reproducibility_determinism),
         ("notebook_reproducibility_scan", _step_notebook_reproducibility_scan),
     ]
 
@@ -352,6 +451,9 @@ def main():
     )
 
     print(f"Validation sequence completed: {passed}/{total} steps passed.")
+    print(f"Source: {RUNTIME_SOURCE}")
+    if RUNTIME_SOURCE == "controlled":
+        print(f"Controlled root: {RUNTIME_CONTROLLED_ROOT}")
     print(f"CSV: {TABLE_DIR / 'validation_sequence_report.csv'}")
     print(f"MD:  {REPORT_DIR / 'validation_sequence_report.md'}")
 

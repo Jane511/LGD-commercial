@@ -99,7 +99,11 @@ Reviewer notebooks live under `notebooks/` and export canonical tables under `ou
 Upstream inputs (context providers):
 
 - `PD-and-scorecard-commercial`
-- `industry-analysis`
+- `industry-analysis` compact contract via `data/exports/` parquet files:
+  - `industry_risk_scores.parquet`
+  - `macro_regime_flags.parquet`
+  - `downturn_overlay_table.parquet`
+  - `property_market_overlays.parquet` (optional; property-backed overlay only)
 
 Downstream consumers (typical users of LGD outputs):
 

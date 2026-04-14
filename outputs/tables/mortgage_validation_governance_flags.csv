@@ -11,6 +11,7 @@ mortgage,house_price_source,observed_house_price_decline,500,444486089.71,1.0
 mortgage,lmi_flag,0,320,259906388.94,0.5847345844041442
 mortgage,lmi_flag,1,180,184579700.77,0.4152654155958558
 mortgage,origination_year_source,derived_from_seasoning_months,500,444486089.71,1.0
+mortgage,overlay_source,macro_only,500,444486089.71,1.0
 mortgage,proxy_arrears_flag,True,500,444486089.71,1.0
 mortgage,proxy_behaviour_flag,True,500,444486089.71,1.0
 mortgage,rate_shock_source,observed_rate_shock,500,444486089.71,1.0

@@ -1,0 +1,4 @@
+parameter_version,parameter_hash,parameter_file,check,status,detail
+v1.0,a9dbb0bb1b6643e6902c63ba7a9ff950acd2110014c9f9fc7f4c5458468c8f82,D:\Jane\Job Search\Github\credit-risk-portfolio_bank\credit risk models commercial\LGD-commercial\data\config\overlay_parameters.csv,schema_valid,True,required columns present and validated
+v1.0,a9dbb0bb1b6643e6902c63ba7a9ff950acd2110014c9f9fc7f4c5458468c8f82,D:\Jane\Job Search\Github\credit-risk-portfolio_bank\credit risk models commercial\LGD-commercial\data\config\overlay_parameters.csv,single_active_version,True,version=v1.0
+v1.0,a9dbb0bb1b6643e6902c63ba7a9ff950acd2110014c9f9fc7f4c5458468c8f82,D:\Jane\Job Search\Github\credit-risk-portfolio_bank\credit risk models commercial\LGD-commercial\data\config\overlay_parameters.csv,manifest_file_present,True,D:\Jane\Job Search\Github\credit-risk-portfolio_bank\credit risk models commercial\LGD-commercial\data\config\overlay_parameters_manifest.json

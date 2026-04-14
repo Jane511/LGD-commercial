@@ -1,0 +1,51 @@
+parameter_group,product_scope,segment_scope,parameter_name,value,effective_date,version,owner,rationale
+overlay,mortgage,all,base_downturn_scalar,1.08,2026-04-14,v1.0,LGD-Model-Risk,Baseline mortgage downturn scalar
+overlay,commercial,security_type:Property,base_downturn_scalar,1.15,2026-04-14,v1.0,LGD-Model-Risk,Security-type base downturn scalar
+overlay,commercial,security_type:PPSR - P&E,base_downturn_scalar,1.20,2026-04-14,v1.0,LGD-Model-Risk,Security-type base downturn scalar
+overlay,commercial,security_type:PPSR - Receivables,base_downturn_scalar,1.20,2026-04-14,v1.0,LGD-Model-Risk,Security-type base downturn scalar
+overlay,commercial,security_type:PPSR - Mixed,base_downturn_scalar,1.20,2026-04-14,v1.0,LGD-Model-Risk,Security-type base downturn scalar
+overlay,commercial,security_type:GSR Only,base_downturn_scalar,1.15,2026-04-14,v1.0,LGD-Model-Risk,Security-type base downturn scalar
+overlay,development,completion_stage:Pre-Construction,base_downturn_scalar,1.20,2026-04-14,v1.0,LGD-Model-Risk,Completion-stage base downturn scalar
+overlay,development,completion_stage:Early Construction,base_downturn_scalar,1.25,2026-04-14,v1.0,LGD-Model-Risk,Completion-stage base downturn scalar
+overlay,development,completion_stage:Mid-Construction,base_downturn_scalar,1.30,2026-04-14,v1.0,LGD-Model-Risk,Completion-stage base downturn scalar
+overlay,development,completion_stage:Near-Complete,base_downturn_scalar,1.15,2026-04-14,v1.0,LGD-Model-Risk,Completion-stage base downturn scalar
+overlay,development,completion_stage:Complete Unsold,base_downturn_scalar,1.20,2026-04-14,v1.0,LGD-Model-Risk,Completion-stage base downturn scalar
+overlay,cashflow_lending,cashflow_product:Business Term Loan,base_downturn_scalar,1.15,2026-04-14,v1.0,LGD-Model-Risk,Cashflow product base downturn scalar
+overlay,cashflow_lending,cashflow_product:Working Capital Facility,base_downturn_scalar,1.20,2026-04-14,v1.0,LGD-Model-Risk,Cashflow product base downturn scalar
+overlay,cashflow_lending,cashflow_product:Trade Finance,base_downturn_scalar,1.10,2026-04-14,v1.0,LGD-Model-Risk,Cashflow product base downturn scalar
+overlay,cashflow_lending,cashflow_product:Equipment Finance,base_downturn_scalar,1.10,2026-04-14,v1.0,LGD-Model-Risk,Cashflow product base downturn scalar
+overlay,cashflow_lending,cashflow_product:Invoice Finance,base_downturn_scalar,1.10,2026-04-14,v1.0,LGD-Model-Risk,Cashflow product base downturn scalar
+overlay,cashflow_lending,cashflow_product:Merchant Cash Advance,base_downturn_scalar,1.25,2026-04-14,v1.0,LGD-Model-Risk,Cashflow product base downturn scalar
+overlay,cashflow_lending,cashflow_product:Business Line of Credit,base_downturn_scalar,1.20,2026-04-14,v1.0,LGD-Model-Risk,Cashflow product base downturn scalar
+overlay,cashflow_lending,cashflow_product:Professional Practice Loan,base_downturn_scalar,1.10,2026-04-14,v1.0,LGD-Model-Risk,Cashflow product base downturn scalar
+overlay,cashflow_lending,pd_band:A,pd_band_downturn_addon,-0.03,2026-04-14,v1.0,LGD-Model-Risk,PD-band downturn addon
+overlay,cashflow_lending,pd_band:B,pd_band_downturn_addon,-0.01,2026-04-14,v1.0,LGD-Model-Risk,PD-band downturn addon
+overlay,cashflow_lending,pd_band:C,pd_band_downturn_addon,0.00,2026-04-14,v1.0,LGD-Model-Risk,PD-band downturn addon
+overlay,cashflow_lending,pd_band:D,pd_band_downturn_addon,0.03,2026-04-14,v1.0,LGD-Model-Risk,PD-band downturn addon
+overlay,cashflow_lending,pd_band:E,pd_band_downturn_addon,0.05,2026-04-14,v1.0,LGD-Model-Risk,PD-band downturn addon
+moc,mortgage,all,base_moc,0.02,2026-04-14,v1.0,LGD-Model-Risk,Base MoC for mortgage
+moc,commercial,all,base_moc,0.03,2026-04-14,v1.0,LGD-Model-Risk,Base MoC for commercial
+moc,development,all,base_moc,0.05,2026-04-14,v1.0,LGD-Model-Risk,Base MoC for development
+moc,cashflow_lending,all,base_moc,0.04,2026-04-14,v1.0,LGD-Model-Risk,Base MoC for cashflow lending
+moc,cashflow_lending,pd_band:A,moc_pd_multiplier,0.85,2026-04-14,v1.0,LGD-Model-Risk,PD-band MoC multiplier
+moc,cashflow_lending,pd_band:B,moc_pd_multiplier,0.95,2026-04-14,v1.0,LGD-Model-Risk,PD-band MoC multiplier
+moc,cashflow_lending,pd_band:C,moc_pd_multiplier,1.00,2026-04-14,v1.0,LGD-Model-Risk,PD-band MoC multiplier
+moc,cashflow_lending,pd_band:D,moc_pd_multiplier,1.10,2026-04-14,v1.0,LGD-Model-Risk,PD-band MoC multiplier
+moc,cashflow_lending,pd_band:E,moc_pd_multiplier,1.25,2026-04-14,v1.0,LGD-Model-Risk,PD-band MoC multiplier
+overlay,cashflow_lending,conduct:Green,conduct_overlay,0.000,2026-04-14,v1.0,LGD-Model-Risk,Conduct overlay
+overlay,cashflow_lending,conduct:Amber,conduct_overlay,0.005,2026-04-14,v1.0,LGD-Model-Risk,Conduct overlay
+overlay,cashflow_lending,conduct:Red,conduct_overlay,0.015,2026-04-14,v1.0,LGD-Model-Risk,Conduct overlay
+overlay_coeff,all,all,industry_downturn_alpha,0.15,2026-04-14,v1.0,LGD-Model-Risk,Industry downturn scalar sensitivity
+overlay_coeff,all,all,industry_moc_beta,0.20,2026-04-14,v1.0,LGD-Model-Risk,Industry MoC sensitivity
+overlay_coeff,mortgage,all,macro_house_price_coeff,0.40,2026-04-14,v1.0,LGD-Model-Risk,Mortgage macro house-price coefficient
+overlay_coeff,mortgage,all,macro_unemployment_coeff,1.20,2026-04-14,v1.0,LGD-Model-Risk,Mortgage macro unemployment coefficient
+overlay_coeff,mortgage,all,macro_rate_shock_coeff,1.60,2026-04-14,v1.0,LGD-Model-Risk,Mortgage macro rate-shock coefficient
+overlay_coeff,commercial,all,macro_value_decline_coeff,0.30,2026-04-14,v1.0,LGD-Model-Risk,Commercial macro value-decline coefficient
+overlay_coeff,commercial,all,macro_cashflow_weakness_coeff,0.10,2026-04-14,v1.0,LGD-Model-Risk,Commercial macro cashflow-weakness coefficient
+overlay_coeff,commercial,all,macro_recovery_delay_coeff,0.08,2026-04-14,v1.0,LGD-Model-Risk,Commercial macro recovery-delay coefficient
+overlay_coeff,development,all,macro_grv_decline_coeff,0.35,2026-04-14,v1.0,LGD-Model-Risk,Development macro GRV-decline coefficient
+overlay_coeff,development,all,macro_cost_overrun_coeff,0.25,2026-04-14,v1.0,LGD-Model-Risk,Development macro cost-overrun coefficient
+overlay_coeff,development,all,macro_sell_through_delay_coeff,0.12,2026-04-14,v1.0,LGD-Model-Risk,Development macro sell-through-delay coefficient
+overlay_coeff,cashflow_lending,all,macro_dscr_weakness_coeff,0.12,2026-04-14,v1.0,LGD-Model-Risk,Cashflow macro DSCR-weakness coefficient
+overlay_coeff,cashflow_lending,all,macro_utilisation_coeff,0.06,2026-04-14,v1.0,LGD-Model-Risk,Cashflow macro utilisation coefficient
+overlay_coeff,cashflow_lending,all,macro_recovery_delay_coeff,0.08,2026-04-14,v1.0,LGD-Model-Risk,Cashflow macro recovery-delay coefficient

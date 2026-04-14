@@ -1,8 +1,14 @@
 ﻿# Cash-Flow Lending Methodology Manual
 
-Audience: HR, new team members, analysts, and interview reviewers.
-
 This document explains the cash-flow lending LGD framework in plain language and links each method step to practical banking logic.
+
+## Section 6-8 Delta Summary (Current Version)
+
+| Section | Delta added | Where to read |
+| --- | --- | --- |
+| 6 | Current component-to-model implementation map (5.1-5.8), plus upstream industry contract and derived fields used | Section `5.9` |
+| 7 | Additional generated governance and traceability datasets for overlays, parameters, segmentation, metadata, reproducibility, and strict gap audit | Section `7.1` |
+| 8 | Explicit strict-all-options status linkage for Section-5 components with remediation source reference | Section `8.5` |
 
 ## 1. What is cash-flow lending LGD
 
@@ -40,6 +46,7 @@ Why these are separated:
 ## 3. Policy baseline used in this repo
 
 1. Exposure-weighted LGD aggregation: `Sum(LGD*EAD)/Sum(EAD)`
+
 2. Discount-rate rule: `discount_rate = max(contract_rate_proxy, cost_of_funds_proxy)`
 
 3. Downturn LGD linked to stress drivers (not flat unexplained overlays)
@@ -47,6 +54,7 @@ Why these are separated:
 4. Transparent proxy assumptions where real workout data is unavailable
 
 ## 4. Data needed by component
+
 ### 4.1 Facility and product data
 
 Needed for product segmentation and EAD behaviour.
@@ -151,6 +159,7 @@ This section expands the component design in your provided cash-flow PDFs and ma
 ### 5.1 Component 1: EAD at default and conversion
 
 Business question:
+
 How much exposure is actually at risk when default occurs?
 
 Historical datasets/drivers:
@@ -179,6 +188,7 @@ Outputs:
 ### 5.2 Component 2: Cure probability
 
 Business question:
+
 What is the probability the exposure returns to performing and avoids full liquidation workout?
 
 Historical datasets/drivers:
@@ -229,6 +239,7 @@ Outputs:
 ### 5.4 Component 4: Recovery timing
 
 Business question:
+
 How long does it take to recover cash and close the case?
 
 Historical datasets/drivers:
@@ -254,8 +265,8 @@ Outputs:
 ### 5.5 Component 5: Recovery cost rate
 
 Business question:
-What costs reduce gross recoveries and increase LGD?
 
+What costs reduce gross recoveries and increase LGD?
 Historical datasets/drivers:
 
 - legal costs
@@ -349,6 +360,7 @@ Step 4: Calculate economic LGD
 - Use Component 6 to convert recoveries/costs into discounted realised/economic LGD.
 - Practical formulation:
   - `LGD_economic = P(cure) * LGD_if_cure + (1 - P(cure)) * LGD_if_non_cure`
+  
   - In simplified implementations where cure loss is near zero:
     - `LGD_economic ~= (1 - P(cure)) * LGD_if_non_cure`
 
@@ -431,6 +443,149 @@ How this maps by cash-flow product:
 
 This component chain is what turns product-level behaviour into consistent, auditable cash-flow lending LGD outputs.
 
+### 5.9 Component Construction Logic
+
+This section explains the practical construction path for each component using:
+1. upstream `industry-analysis` outputs
+2. repo-generated/internal datasets
+3. model or rule method
+4. base-to-downturn calculation flow
+
+Common upstream industry inputs (current contract):
+- `industry_risk_scores.parquet`
+- `macro_regime_flags.parquet`
+- `downturn_overlay_table.parquet`
+- `property_market_overlays.parquet` (optional in cash-flow; mainly property use)
+
+Common generated/internal datasets used by cash-flow modules:
+- product loan panels from `src/data_generation.py` (`commercial`, `cashflow_lending`)
+- cashflow/recovery assumptions (`*_cashflows`, `workout_months`, proxy cost and timing drivers)
+- intermediate segment tags and scenario flags in `src/lgd_calculation.py`
+
+#### 5.9.1 Component 5.1 EAD at default and conversion
+- Upstream used: `industry_risk_scores` (industry risk level used as risk context), `downturn_overlay_table` (stress add-on/scalar context)
+- Generated/internal used: limits, drawn/undrawn, contingent exposures, utilisation proxies, product flags
+- Implemented in:
+  - `notebooks/03_commercial_cashflow_lgd.ipynb`
+  - `notebooks/04_receivables_invoice_finance_lgd.ipynb`
+  - `notebooks/05_trade_contingent_facilities_lgd.ipynb`
+  - `notebooks/06_asset_equipment_finance_lgd.ipynb`
+  - `src/lgd_calculation.py` (`CommercialLGDEngine`, `CashFlowLendingLGDEngine`)
+- Method: rule-based EAD + proxy CCF mapping by product/segment; weighted segment averages where required
+- Calculation flow:
+  1. Base EAD from observed drawn amount (or funded equivalent for contingent products)
+  2. Conversion on undrawn/contingent via CCF proxy
+  3. `EAD_total = Drawn + (Undrawn * CCF)`
+  4. Downturn conversion uplift applied by stress scalar/add-on where configured
+
+#### 5.9.2 Component 5.2 Cure probability
+- Upstream used: `industry_risk_scores` and `macro_regime_flags` as stress context inputs to cure overlays
+- Generated/internal used: arrears/behaviour proxy flags, DSCR/ICR proxies, segment-level cure assumptions
+- Implemented in:
+  - `src/lgd_calculation.py` (`CashFlowLendingLGDEngine.apply_overlays`, shared cure/overlay path)
+  - `notebooks/03_commercial_cashflow_lgd.ipynb` (commercial proxy cure assumptions)
+- Method: segmented cure mapping with proxy overlay (logistic-style option documented but not fully portfolio-wide)
+- Calculation flow:
+  1. Assign base cure rate by segment
+  2. Apply risk adjustments (industry, behaviour, stress regime)
+  3. Bound to `[0,1]`
+  4. `P(non_cure) = 1 - P(cure)`
+
+#### 5.9.3 Component 5.3 Non-cure severity
+- Upstream used: `industry_risk_scores` (risk-score linked haircut influence)
+- Generated/internal used: collateral proxy strength, guarantee support, recovery channel assumptions
+- Implemented in:
+  - `notebooks/03_commercial_cashflow_lgd.ipynb`
+  - `notebooks/04_receivables_invoice_finance_lgd.ipynb`
+  - `notebooks/05_trade_contingent_facilities_lgd.ipynb`
+  - `notebooks/06_asset_equipment_finance_lgd.ipynb`
+  - `src/lgd_calculation.py` (commercial and cashflow severity assembly)
+- Method: deterministic proxy severity + segment weighted averaging
+- Calculation flow:
+  1. Estimate gross recovery rate by segment/security
+  2. Apply industry-linked recovery haircut proxy
+  3. Convert to severity: `LGD_non_cure = 1 - Recovery_rate_net`
+
+#### 5.9.4 Component 5.4 Recovery timing
+- Upstream used: `macro_regime_flags` and `downturn_overlay_table` for stress-delay context
+- Generated/internal used: workout month proxies, product timing bands, recovery lag assumptions
+- Implemented in:
+  - `notebooks/03_commercial_cashflow_lgd.ipynb`
+  - `notebooks/04_receivables_invoice_finance_lgd.ipynb`
+  - `notebooks/05_trade_contingent_facilities_lgd.ipynb`
+  - `notebooks/06_asset_equipment_finance_lgd.ipynb`
+  - `src/lgd_calculation.py` (timing-adjusted overlay chain)
+- Method: rule-based timing bands (no survival model in current productionized path)
+- Calculation flow:
+  1. Assign base months-to-recovery by segment
+  2. Apply downturn delay scalar/add-on
+  3. Use timing factor in economic discounting
+
+#### 5.9.5 Component 5.5 Recovery cost rate
+- Upstream used: stress context from `downturn_overlay_table` where cost pressure is reflected in stress settings
+- Generated/internal used: legal/enforcement/administration cost proxies by workout path
+- Implemented in:
+  - `notebooks/03_commercial_cashflow_lgd.ipynb`
+  - `notebooks/04_receivables_invoice_finance_lgd.ipynb`
+  - `notebooks/05_trade_contingent_facilities_lgd.ipynb`
+  - `notebooks/06_asset_equipment_finance_lgd.ipynb`
+  - `src/lgd_calculation.py` (net-recovery severity assembly)
+- Method: segment-level cost-rate mapping with conservative add-ons
+- Calculation flow:
+  1. Assign base cost rate per segment/path
+  2. Apply stress uplift where required
+  3. `Net_recovery = Gross_recovery - Recovery_costs`
+
+#### 5.9.6 Component 5.6 Final realised economic LGD
+- Upstream used: indirect via component-level stress context and industry effects
+- Generated/internal used: EAD, recovery and cost assumptions, timing and discount rate proxies
+- Implemented in:
+  - `src/lgd_calculation.py` (`run_full_pipeline`, product `apply_overlays` outputs)
+  - `src/lgd_final.py` (portfolio final-layer LGD assembly)
+  - `notebooks/03_commercial_cashflow_lgd.ipynb` (commercial framework economic LGD views)
+- Method: deterministic discounted-loss assembly
+- Calculation flow:
+  1. `Recovery_PV = Recovery / (1 + discount_rate)^t`
+  2. `Cost_PV = Cost / (1 + discount_rate)^t`
+  3. `LGD_base = (EAD - (Recovery_PV - Cost_PV)) / EAD`
+  4. Bound output to `[0,1]`
+
+#### 5.9.7 Component 5.7 Downturn LGD and conservatism
+- Upstream used: all three core upstream files
+  - `macro_regime_flags` -> downturn regime switch
+  - `downturn_overlay_table` -> stress scalar/add-on
+  - `industry_risk_scores` -> industry downturn adjustment
+- Generated/internal used: versioned parameters (`overlay_parameters.csv`), segmentation outputs
+- Implemented in:
+  - `src/lgd_calculation.py` (`resolve_overlay_contract`, product overlay application)
+  - `src/overlay_parameters.py` (parameter loading/validation)
+  - `data/config/overlay_parameters.csv` (parameter values)
+- Method: shared overlay resolver with deterministic order
+- Calculation flow:
+  1. Start `LGD_base` (economic)
+  2. Apply macro overlay -> `macro_downturn_scalar`
+  3. Apply industry adjustment -> `industry_downturn_adjustment`
+  4. Combine -> `combined_downturn_scalar`
+  5. Apply MoC and floor
+  6. `LGD_downturn = clip(LGD_base * combined_downturn_scalar, 0, 1)`
+  7. `LGD_final = max(clip(LGD_downturn + MoC, 0, 1), LGD_floor)`
+
+#### 5.9.8 Component 5.8 End-to-end assembly and reporting
+- Upstream used: compact industry contract files above
+- Generated/internal used: product loan/cashflow panels, segment tags, governance reporting tables
+- Implemented in:
+  - `src/lgd_calculation.py` (`run_full_pipeline`, `build_governance_reporting_tables`)
+  - `scripts/run_validation_sequence.py` (validation and reproducibility reporting)
+  - `scripts/build_strict_component_gap_matrix.py` (strict component evidence matrix)
+- Method: pipeline orchestration with additive governance outputs
+- Calculation flow:
+  1. Build base component outputs (EAD, cure, severity, timing, costs)
+  2. Construct `LGD_base`
+  3. Apply downturn/MoC/floor to get `LGD_downturn` and `LGD_final`
+  4. Aggregate exposure-weighted metrics:
+     - `Weighted LGD = Sum(LGD_i * EAD_i) / Sum(EAD_i)`
+  5. Publish governance trace tables (`overlay_trace_report.csv`, `parameter_version_report.csv`, etc.)
+
 ## 6. How this repo implements cash-flow lending
 
 Primary notebooks:
@@ -453,6 +608,14 @@ What each notebook’s code does:
 - creates monitoring, vintage, concentration, estimate-vs-realised, and validation tables
 - exports parent framework outputs under `outputs/tables/commercial_framework_*.csv`
 
+How this is achieved:
+- Logic: engineered borrower/collateral features are mapped into segment rules, then base, downturn, and final LGD are calculated in sequence.
+- Methods: ratio features (for example leverage, DSCR/ICR proxies), threshold banding (security/risk classes), and weighted aggregation.
+- Formula examples:
+  - `LGD_base = (EAD - NetRecoveryPV) / EAD`
+  - `Weighted LGD = Sum(LGD_i * EAD_i) / Sum(EAD_i)`
+  - `LGD_downturn = clip(LGD_base * DownturnScalar, 0, 1)`
+
 ### 6.2 `04_receivables_invoice_finance_lgd.ipynb`
 
 - isolates receivables-led facilities from the base commercial dataset
@@ -462,6 +625,14 @@ What each notebook’s code does:
 - applies downturn stresses (slower collections, weaker eligibility, higher disputes/dilution proxies)
 - runs segment-level weighted LGD views (concentration/ageing/advance-rate bands) plus sensitivity
 - exports receivables-specific outputs under `outputs/tables/receivables_invoice_finance_*.csv`
+
+How this is achieved:
+- Logic: receivables quality is converted into EAD conversion and recovery strength through eligibility, ageing, and dilution proxies.
+- Methods: ratio construction (`eligible_balance / total_balance`), risk banding (ageing and concentration buckets), stress multipliers for downturn.
+- Formula examples:
+  - `Recovery_rate_proxy = Eligible_pool_ratio * (1 - Dilution_rate) * Collection_factor`
+  - `LGD_base = 1 - Recovery_rate_proxy`
+  - `LGD_downturn = clip(LGD_base * stress_multiplier, 0, 1)`
 
 ### 6.3 `05_trade_contingent_facilities_lgd.ipynb`
 
@@ -473,6 +644,14 @@ What each notebook’s code does:
 - generates weighted LGD by product/security level and conversion sensitivity scenarios
 - exports trade/contingent outputs under `outputs/tables/trade_contingent_*.csv`
 
+How this is achieved:
+- Logic: contingent obligations are first converted to funded exposure, then adjusted for support quality and expected recovery timing.
+- Methods: conversion-factor mapping, rule-based haircut overlays, and scenario scaling.
+- Formula examples:
+  - `EAD_funded = Contingent_amount * Claim_conversion_factor`
+  - `Recovery_rate = Support_strength * (1 - Haircut) * Timing_factor`
+  - `LGD = (EAD_funded - Recovery_value) / EAD_funded`
+
 ### 6.4 `06_asset_equipment_finance_lgd.ipynb`
 
 - isolates asset/equipment segment from base commercial loans
@@ -483,6 +662,14 @@ What each notebook’s code does:
 - generates weighted LGD by asset type/liquidity and sensitivity scenarios
 - exports asset/equipment outputs under `outputs/tables/asset_equipment_finance_*.csv`
 
+How this is achieved:
+- Logic: each asset is scored on liquidity, age, and disposal friction; this drives haircut, timing, and cost assumptions.
+- Methods: rule-based segmentation, haircut mapping tables, and discounted recovery calculation.
+- Formula examples:
+  - `Sale_proceeds_proxy = Market_value * (1 - Haircut)`
+  - `Recovery_PV = Sale_proceeds_proxy / (1 + discount_rate)^t`
+  - `LGD = (EAD - (Recovery_PV - Cost_PV)) / EAD`
+
 Parent segment mapping standard:
 
 1. `PPSR - Receivables` -> Receivables / Invoice Finance
@@ -490,6 +677,10 @@ Parent segment mapping standard:
 3. Overdraft/Revolver + `GSR Only` -> Trade / Contingent Facilities (Proxy)
 4. Other Overdraft/Revolver -> Overdraft / Revolver
 5. Else -> SME / Middle-Market Term Lending
+
+### 6.5 Relocated Note
+
+The former Section 6.5 component addendum has been moved and expanded to Section `5.9 Component Construction Logic` so component design and component implementation logic are kept together in one place.
 
 ## 7. Key outputs
 
@@ -507,6 +698,18 @@ Segment-level outputs:
 - `outputs/tables/trade_contingent_*.csv`
 - `outputs/tables/asset_equipment_finance_*.csv`
 
+### 7.1 Additional current-version generated datasets (governance and traceability)
+
+The current version additionally generates:
+
+1. `outputs/tables/overlay_trace_report.csv`
+2. `outputs/tables/parameter_version_report.csv`
+3. `outputs/tables/segmentation_consistency_report.csv`
+4. `outputs/tables/run_metadata_report.csv`
+5. `outputs/tables/reproducibility_determinism_report.csv`
+6. `outputs/tables/strict_component_gap_matrix.csv`
+7. `outputs/reports/strict_component_gap_matrix.md`
+
 ## 8. Gaps for this portfolio (explicit)
 ### 8.1 Data gaps
 
@@ -518,25 +721,42 @@ Segment-level outputs:
 
 ### 8.2 Model calibration gaps
 
-1. Segment models are proxy-based and not calibrated to real internal history.
-2. Product segmentation for trade/contingent remains partly proxy-mapped in parent framework.
-3. Downturn overlays are driver-linked but still demonstration calibration.
-4. Validation compares proxy-estimated vs proxy-realised values from synthetic datasets.
+Closed in this repo (proxy-level):
+1. Structured macro/industry overlay logic is now standardised through a shared overlay resolver and versioned parameter tables.
+2. Cross-module parameterisation is now consistent and reproducible (single parameter version/hash across products).
+3. Proxy segmentation consistency is now centrally enforced across modules via shared standardized segment tags.
+
+Still open (production):
+4. Segment models remain proxy-based and are not calibrated to internal realised default/recovery history.
+5. Validation still relies on synthetic proxy outcomes rather than governed production OOT cohorts.
 
 ### 8.3 Governance and validation maturity gaps
 
-1. Independent model validation pack is not included.
-2. Model risk approval workflow and challenger model evidence are not included.
-3. Data lineage reconciliation to GL and source systems is not included.
-4. Recalibration policy thresholds and periodic governance cycles are not included.
+Closed in this repo (proxy-level):
+1. Governance outputs now include `overlay_trace_report.csv`, `parameter_version_report.csv`, `segmentation_consistency_report.csv`, and `reproducibility_determinism_report.csv`.
+
+Still open (production):
+2. Independent model validation pack is not included.
+3. Model risk approval workflow and challenger model evidence are not included.
+4. Data lineage reconciliation to GL and source systems is not included.
+5. Recalibration policy thresholds and periodic governance cycles are not included.
 
 ### 8.4 Documentation structure gap addressed
 
 central limitations and use considerations should live in one primary methodology location with concise references elsewhere. This split (cash-flow vs property-backed) addresses that structure requirement.
 
-## 9. How inputs are obtained in real banks (reference view)
+### 8.5 Current strict component status for Section 5
 
-As highlighted in `gaps_1_cashflow.pdf`, production banks source these inputs from controlled systems, not proxies:
+Under strict-all-options assessment (every documented option required for full implementation), components `5.1` to `5.8` in this cash-flow manual are currently `Proxy-only` in `outputs/tables/strict_component_gap_matrix.csv`.
+
+Meaning in current version:
+1. The component stages are implemented and feed final LGD outputs.
+2. At least one documented option per component remains absent or approximated.
+3. Exact remediation tasks and acceptance criteria are maintained in the strict matrix output.
+
+## 9. How inputs are obtained in realities
+
+source these inputs from controlled systems, not proxies:
 
 - loan servicing systems
 - collections/workout systems
