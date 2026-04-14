@@ -585,15 +585,6 @@ def build_and_save_repo_final_lgd(
     return final_lgd, summary, checks
 
 
-if __name__ == "__main__":  # pragma: no cover
-    # Run via: python -m src.lgd_final
-    import sys
-    _final, _summary, _checks = build_and_save_repo_final_lgd()
-    print(f"Final LGD built: {len(_final)} rows")
-    print(_summary.to_string(index=False))
-    sys.exit(0)
-
-
 def main() -> None:
     """CLI entry point for building the final LGD layer outputs."""
     final_lgd, summary, checks = build_and_save_repo_final_lgd()

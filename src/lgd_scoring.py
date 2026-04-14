@@ -147,24 +147,29 @@ def _validate_bounds(df: pd.DataFrame, product: str, schema: ProductSchema) -> N
         if col not in df.columns:
             continue
         series = pd.to_numeric(df[col], errors="coerce")
-        if series.isna().any():
-            bad_idx = df.index[series.isna()].tolist()[:10]
+        na_mask = series.isna()
+        if na_mask.any():
+            bad_idx = df.index[na_mask].tolist()[:10]
             raise ValueError(
                 f"{product}: column '{col}' has non-numeric/null values. "
-                f"Count: {series.isna().sum()}. First offending indices: {bad_idx}"
+                f"Count: {na_mask.sum()}. First offending indices: {bad_idx}"
             )
-        if lo is not None and (series < lo).any():
-            bad_idx = df.index[series < lo].tolist()[:10]
-            raise ValueError(
-                f"{product}: column '{col}' has {(series < lo).sum()} value(s) below {lo}. "
-                f"First offending indices: {bad_idx}"
-            )
-        if hi is not None and (series > hi).any():
-            bad_idx = df.index[series > hi].tolist()[:10]
-            raise ValueError(
-                f"{product}: column '{col}' has {(series > hi).sum()} value(s) above {hi}. "
-                f"First offending indices: {bad_idx}"
-            )
+        if lo is not None:
+            lo_mask = series < lo
+            if lo_mask.any():
+                bad_idx = df.index[lo_mask].tolist()[:10]
+                raise ValueError(
+                    f"{product}: column '{col}' has {lo_mask.sum()} value(s) below {lo}. "
+                    f"First offending indices: {bad_idx}"
+                )
+        if hi is not None:
+            hi_mask = series > hi
+            if hi_mask.any():
+                bad_idx = df.index[hi_mask].tolist()[:10]
+                raise ValueError(
+                    f"{product}: column '{col}' has {hi_mask.sum()} value(s) above {hi}. "
+                    f"First offending indices: {bad_idx}"
+                )
 
 
 def _validate_categories(df: pd.DataFrame, product: str, schema: ProductSchema) -> None:
@@ -188,15 +193,15 @@ def _apply_explicit_defaults(df: pd.DataFrame, schema: ProductSchema) -> pd.Data
             )
             out[col] = default
         else:
-            na_count = out[col].isna().sum()
-            if na_count > 0:
+            na_mask = out[col].isna()
+            if na_mask.any():
                 logger.warning(
                     "Column '%s': %d null value(s) filled with default %r",
                     col,
-                    na_count,
+                    na_mask.sum(),
                     default,
                 )
-            out[col] = out[col].fillna(default)
+                out[col] = out[col].where(~na_mask, default)
     return out
 
 

@@ -17,14 +17,15 @@ def _industry_risk_band(series: pd.Series) -> pd.Series:
 def _series_or_default(df: pd.DataFrame, col: str, default: str, seg_col: str = "") -> pd.Series:
     if col in df.columns:
         result = df[col].astype(str)
-        unknown_count = (result == default).sum() if default == "Unknown" else 0
-        if unknown_count > 0 and seg_col:
-            logger.warning(
-                "Segment '%s': %d row(s) have unrecognised/null source values in '%s' — defaulting to 'Unknown'",
-                seg_col,
-                unknown_count,
-                col,
-            )
+        if seg_col and logger.isEnabledFor(logging.WARNING):
+            unknown_count = (result == default).sum()
+            if unknown_count > 0:
+                logger.warning(
+                    "Segment '%s': %d row(s) have unrecognised/null source values in '%s' — defaulting to 'Unknown'",
+                    seg_col,
+                    unknown_count,
+                    col,
+                )
         return result
     if seg_col:
         logger.warning(

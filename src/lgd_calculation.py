@@ -172,6 +172,19 @@ def add_margin_of_conservatism(lgd_series, margin):
     return lgd_series + margin
 
 
+def _apply_downturn_scalar(
+    base_scalar,
+    macro_multiplier,
+    lower: float = 1.00,
+    upper: float = 1.90,
+):
+    """Compute clip(base_scalar * macro_multiplier, lower, upper).
+
+    Centralises clip-bounds logic shared across all product downturn scalar functions.
+    """
+    return np.clip(base_scalar * macro_multiplier, lower, upper)
+
+
 def _validate_final_lgd(df: pd.DataFrame, product: str) -> None:
     """
     Sanity-check lgd_final after all overlays are applied.
@@ -202,7 +215,7 @@ def _validate_final_lgd(df: pd.DataFrame, product: str) -> None:
         )
 
     if "lgd_base" in df.columns and "combined_downturn_scalar" in df.columns:
-        scalar = pd.to_numeric(df["combined_downturn_scalar"], errors="coerce").fillna(1.0)
+        scalar = _coerce_numeric_series(df, "combined_downturn_scalar", default=1.0).fillna(1.0)
         uplift_mask = scalar > 1.0
         if uplift_mask.any():
             violation = (df.loc[uplift_mask, "lgd_final"] < df.loc[uplift_mask, "lgd_base"]).sum()
@@ -219,9 +232,9 @@ def _coerce_numeric_series(df, column, default=np.nan):
     """Return a numeric Series for `column`, or a default-filled Series if missing."""
     if column not in df.columns:
         return pd.Series(default, index=df.index, dtype=float)
-    original_na_count = df[column].isna().sum()
+    original_na_mask = df[column].isna()
     numeric = pd.to_numeric(df[column], errors="coerce")
-    new_na_count = numeric.isna().sum() - original_na_count
+    new_na_count = int(numeric.isna().sum()) - int(original_na_mask.sum())
     if new_na_count > 0:
         logger.warning(
             "Column '%s': %d value(s) could not be converted to numeric and were set to NaN",
@@ -631,21 +644,6 @@ def cashflow_macro_downturn_scalar(
         + recovery_delay_coeff * recovery_delay
     )
     return _apply_downturn_scalar(base_scalar, macro_multiplier, lower=1.00, upper=1.90)
-
-
-def _apply_downturn_scalar(
-    base_scalar,
-    macro_multiplier,
-    lower: float = 1.00,
-    upper: float = 1.90,
-):
-    """
-    Compute the final downturn scalar: clip(base_scalar * macro_multiplier, lower, upper).
-
-    Centralises the clip bounds logic that is otherwise duplicated across the
-    mortgage, commercial, development, and cashflow product scalar functions.
-    """
-    return np.clip(base_scalar * macro_multiplier, lower, upper)
 
 
 def _resolve_base_scalar_from_parameters(out, product, params):

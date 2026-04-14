@@ -409,8 +409,11 @@ def add_vintage_columns(
     source.loc[default_dates.isna()] = "missing_default_date"
 
     # Log fallback tier summary for audit trail
-    tier_counts = source.value_counts().to_dict()
-    logger.info("add_vintage_columns origination_date fallback summary: %s", tier_counts)
+    if logger.isEnabledFor(logging.INFO):
+        logger.info(
+            "add_vintage_columns origination_date fallback summary: %s",
+            source.value_counts().to_dict(),
+        )
 
     out["origination_date_derived"] = orig_dates
     out["origination_year"] = orig_dates.dt.year.astype("Int64")
