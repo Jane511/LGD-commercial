@@ -1,159 +1,190 @@
-﻿# Project Overview - LGD-commercial
+# Project Overview — LGD Commercial Framework
 
-`LGD-commercial` is the LGD, recoveries, and validation layer in an integrated public credit-risk portfolio stack.
+## What this project demonstrates
 
-It is designed to be:
+This repo builds a **production-style LGD model** for 11 commercial and mortgage products,
+following the APRA APS 113 IRB methodology. It is part of a broader credit risk portfolio
+that covers the full capital and pricing chain — from PD scoring through LGD, EAD, RWA,
+expected loss, stress testing, and RAROC pricing.
 
-- practical and auditable (bank-style, not academic)
-- cross-product (consistent output contracts across products)
-- portfolio-ready (clear assumptions, clear limitations)
-- reproducible (script-first validation, non-interactive notebook handling)
+The goal is to show how a bank's model development team would approach LGD end-to-end:
+rigorous methodology, governed parameters, proper validation, and code a colleague can
+actually maintain and run.
 
-## 1. Portfolio role
+---
 
-This repo converts borrower risk context, facility structure, collateral assumptions, cure / workout logic, and stress drivers into:
+## Portfolio stack
 
-- loan-level and segment-level **base / downturn / final LGD** outputs
-- recovery timing metrics (product-appropriate)
-- governance and validation reporting (fallback usage, proxy flags, cure overlay reporting)
-- cross-product comparison outputs (LGD, sensitivity, recovery time, portfolio mix)
+This is repo **1.2** in the commercial credit risk series:
 
-## 2. LGD concepts used (from the concept notes)
+| # | Repo | Role |
+| - | ---- | ---- |
+| 1.1 | PD-and-Scorecard-Commercial-SME-Lending | PD models, scorecards |
+| **1.2** | **LGD-Framework-Commercial-SME-Lending** | **LGD, recoveries, MoC (this repo)** |
+| 1.3 | EAD-and-CCF-Commercial-SME-Lending | Exposure at default, CCF |
+| 1.4 | RWA-Capital-Modules | Risk-weighted assets |
+| 1.5 | Expected-Loss-Engine-Commercial-SME-Lending | EL = PD × LGD × EAD |
+| 1.6 | RAROC-Pricing-and-Return-Hurdle | Risk-adjusted pricing |
+| 1.7 | Stress-Testing-Commercial-SME-Lending | Macro stress scenarios |
+| 1.9 | industry_analysis | Industry risk scores, macro regime flags |
 
-This repo implements a simplified version of the standard LGD components, using transparent proxies where detailed workout cashflows are not available.
+LGD outputs from this repo feed directly into the Expected Loss Engine (1.5), RWA Capital (1.4),
+RAROC Pricing (1.6), and Stress Testing (1.7) modules.
 
-### 2.1 Core definition
+---
 
-LGD is defined as a loss fraction of exposure at default:
+## Two-layer architecture
 
-`LGD = (EAD - NetRecoveryPV) / EAD`
+The framework separates two concerns deliberately kept in parallel files:
 
-where:
+```text
+Layer 1 — Proxy Baseline (src/lgd_calculation.py)
+    Transparent, rule-based LGD using collateral haircuts, cure overlays,
+    recovery timing, and discounting. Fast to run, no historical data needed.
+    Used for: new originations, portfolios without workout history.
 
-- `EAD` is the exposure at default (including CCF effects where relevant)
-- `NetRecoveryPV` is the present value of recoveries net of costs
-
-### 2.2 Decomposing net recovery
-
-`NetRecoveryPV = PV(Recoveries) - PV(Costs)`
-
-This is why discounting (timing) and costs matter in bank LGD logic.
-
-### 2.3 Cure vs non-cure (two-stage view)
-
-For products where cure is meaningful (especially mortgages), recovery is split into cure and non-cure components:
-
-`PV(Recoveries) = P(cure)*PV(Recovery|cure) + (1-P(cure))*PV(Recovery|non-cure)`
-
-In this repo’s mortgage module, cure probability is modelled using proxy drivers (LVR, arrears stage, borrower type / behaviour proxies). Final LGD follows:
-
-`LGD_final = (1 - P(cure)) * LGD_liquidation`
-
-`LGD_liquidation` is estimated using a lightweight cashflow-style proxy when collateral value inputs are available (property value, sale haircut, costs, time-to-sell, discounting). If those fields are not available, the demo pipeline falls back to a back-solve from `realised_lgd` for continuity with synthetic datasets.
-
-### 2.4 Non-cure resolution paths
-
-If a loan does not cure, it can still resolve via multiple pathways (restructure, liquidation/forced sale, guarantor, etc.). Expected non-cure recovery is path-weighted:
-
-`PV(Recovery|non-cure) = Sum_over_paths P(path|non-cure) * PV(Recovery|path)`
-
-In the portfolio project, “paths” are implemented as simple scenario logic and overlays by product, with assumptions documented in the methodology manuals.
-
-### 2.5 Timing and discounting
-
-Recoveries received later are worth less. The repo uses product-appropriate discount-rate logic in line with the policy position:
-
-`discount_rate = max(contract_rate_proxy, cost_of_funds_proxy)`
-
-and applies discounting to recovery timing proxies (for example months-to-sale / months-to-recovery).
-
-### 2.6 Exposure-weighted aggregation
-
-All portfolio-level summaries are exposure-weighted:
-
-`WeightedLGD = Sum(LGD_i * EAD_i) / Sum(EAD_i)`
-
-This is the repo standard (simple average LGD is not used for portfolio reporting).
-
-## 3. What is included (product modules)
-
-Reviewer notebooks live under `notebooks/` and export canonical tables under `outputs/tables/`.
-
-- Residential mortgage: cure + liquidation if non-cure
-- Commercial cash-flow lending framework:
-  - term lending (secured/partially secured/unsecured)
-  - overdraft/revolver (explicit EAD/CCF uplift logic)
-  - receivables / invoice finance sub-segment
-  - trade / contingent facilities sub-segment
-  - asset / equipment finance sub-segment
-- Property-backed secured modules:
-  - development finance
-  - CRE investment
-  - residual stock
-  - land / subdivision
-  - bridging loans
-  - mezzanine / 2nd mortgage (recovery waterfall)
-- Cross-product framework:
-  - consistent comparison across products (weighted LGD, downturn sensitivity, recovery time, portfolio mix, risk ranking)
-
-## 4. Upstream inputs and downstream consumers
-
-Upstream inputs (context providers):
-
-- `PD-and-scorecard-commercial`
-- `industry-analysis` compact contract via `data/exports/` parquet files:
-  - `industry_risk_scores.parquet`
-  - `macro_regime_flags.parquet`
-  - `downturn_overlay_table.parquet`
-  - `property_market_overlays.parquet` (optional; property-backed overlay only)
-
-Downstream consumers (typical users of LGD outputs):
-
-- `expected-loss-engine-commercial`
-- `stress-testing-commercial`
-- `RAROC-pricing-and-return-hurdle`
-- `RWA-capital-commercial`
-
-## 5. Governance, validation, and reproducibility
-
-This repo avoids “run all notebook cells” as a validation standard. The baseline is script-first execution.
-
-Commands:
-
-```powershell
-python -m src.pipeline.demo_pipeline
-python -m src.pipeline.validation_pipeline
+Layer 2 — APS 113 Calibration (src/lgd_calculations.py)
+    Full IRB pipeline on 10-year workout histories (2014–2024).
+    Used for: regulatory capital, model validation, APRA submissions.
 ```
 
-Validation outputs include:
+Both layers produce the same output contract (`lgd_base`, `lgd_downturn`, `lgd_final`)
+so downstream consumers don't need to know which layer ran.
 
-- fallback usage and counts (so governance reviewers can see where proxies/fallbacks were applied)
-- proxy arrears / behavioural flags and cure overlay flags (where used)
-- year-bucket macro fallback reporting
-- structural checks (non-empty outputs, required columns present, plausible ranges)
+---
 
-### 5.1 Runtime diagnostics and hardening
+## APS 113 calibration pipeline
 
-The pipeline emits structured `logging` output for operational observability. Key events:
+```text
+Realised LGD (workout tape)
+    ↓  Vintage exposure-weighted average  (APS 113 s.43)
+Long-run LGD
+    ↓  Downturn overlay — macro regime × product scalar  (s.46–50)
+Downturn LGD
+    ↓  Frye-Jacobs LGD-PD correlation adjustment  (s.55–57)
+Correlation-adjusted LGD
+    ↓  Margin of Conservatism — 5 APS 113 s.65 sources  (s.63–65)
+MoC-loaded LGD
+    ↓  Regulatory floor by product  (s.58)
+Final calibrated LGD
+```
 
-- **File I/O errors** — all CSV/Parquet loads raise descriptive `FileNotFoundError` or `ValueError` with the file path; no silent failures
-- **Numeric coercion** — `WARNING` logged whenever `pd.to_numeric(..., errors=”coerce”)` silently converts values to NaN, with a count of affected rows
-- **Explicit defaults** — `WARNING` logged when a schema column is absent from input or NaN rows are filled with a default value, so QA can track imputation rates
-- **Segmentation** — `WARNING` logged when any segment column falls back to `”Unknown”` due to a missing or unrecognised source column
-- **Vintage / OOT fallback** — origination-date fallback tier usage is logged as an `INFO` summary on every run; a `WARNING` is raised if the constant years-on-book proxy is applied; `require_observed=True` can be passed to `add_vintage_columns()` to enforce observed dates in production
-- **Validation error messages** — bounds violations in `_validate_bounds()` now include offending row indices and violation counts, not just column names
-- **Post-overlay sanity checks** — `_validate_final_lgd()` is called after every product overlay chain: hard `ValueError` if `lgd_final` is outside [0, 1]; advisory `WARNING` if portfolio mean LGD is outside [5%, 70%] or downturn scalar direction is contradicted by floor interactions
-- **Discount-rate fallback** — `WARNING` logged when tier-4 or tier-5 fallbacks are used and when rates are clipped from negative values
-- **Overlay parameter load** — version, row count, and hash prefix logged on every load; missing parameter matches logged at `DEBUG`
+The MoC is applied to downturn LGD, not long-run LGD — a requirement of APS 113 s.63
+that is explicitly enforced and tested.
 
-## 6. Documentation set
+---
 
-- `docs/methodology_cashflow_lending.md` (training manual)
-- `docs/methodology_property_backed_lending.md` (manual)
-- `docs/data_dictionary.md` (fields and outputs)
+## Products covered
 
-## 7. Limitations and calibration status
+| Product | LGD drivers | Key risk factors |
+| ------- | ----------- | ---------------- |
+| Residential mortgage | LVR, LMI, cure probability, liquidation path | Arrears stage, borrower behaviour, property market |
+| Commercial cashflow | Collateral coverage, DSCR, seniority | Security type, workout duration |
+| Receivables / invoice finance | Eligible pool, advance rate, dilution | Ageing, concentration |
+| Trade / contingent | Claim conversion, cash backing | Tenor, settlement risk |
+| Asset & equipment finance | Asset type, residual value, repossession | Age, remarketing haircut |
+| Development finance | GRV, completion stage, cost-to-complete | Market absorption, exit scenario |
+| CRE investment | LVR, DSCR, WALE, vacancy | Refinance vs forced sale |
+| Residual stock | Absorption rate, discount-to-clear | Holding cost, time-to-sale |
+| Land subdivision | Liquidity, market depth | Haircut, longer recovery time |
+| Bridging | Exit type/certainty, valuation risk | Failed-exit stress |
+| Mezz / 2nd mortgage | Recovery waterfall position | Senior recovery residual |
 
-- This is a portfolio/demo repo with synthetic data and proxy assumptions.
-- Downturn logic is linked to simple stress drivers, but is not calibrated to internal macro models.
-- The repo is intended to demonstrate an integrated LGD framework, not to replicate a bank’s production calibration pack.
+---
+
+## Technical highlights
+
+**Parameter governance**
+All LGD floors, downturn scalars, and MoC inputs live in a single versioned CSV
+(`data/config/overlay_parameters.csv`) with a SHA-256 hash manifest. Any unauthorised
+edit causes the pipeline to refuse to run, giving the same protection as a database-controlled
+parameter table.
+
+**Economic regime integration**
+The downturn overlay is driven by economic regime classification (expansion / mild downturn /
+severe downturn) derived from RBA macro series. When real upstream data is available
+(`macro_regime_flags.parquet` from repo 1.9), it is used directly; otherwise the module
+degrades gracefully to synthetic regime flags.
+
+**Validation suite**
+Every model run produces a full validation report covering:
+
+- Accuracy: weighted MAE, RMSE, bias
+- Rank-ordering: Gini coefficient and AUROC
+- Calibration: Hosmer-Lemeshow goodness-of-fit
+- Stability: Population Stability Index (PSI)
+- Out-of-time backtest: vintage-based holdout performance
+- Conservatism: model ≥ actual at portfolio and segment level
+
+**Scoring API**
+A loan-level scoring interface (`src/lgd_scoring.py`) takes a single JSON payload or
+batch CSV and returns `lgd_base`, `lgd_downturn`, `lgd_final` with full overlay trace
+and parameter provenance, suitable for integration into a pricing or decisioning system.
+
+**Data source adapter**
+The pipeline can run against three data sources without any code change:
+
+- Built-in demo data (instant, no setup)
+- Synthetic generated workout histories (10-year, all products)
+- Controlled/real input tables (drop-in replacement via `--source controlled`)
+
+---
+
+## Key design decisions
+
+**Why two files named `lgd_calculation.py` and `lgd_calculations.py`?**
+Intentional. The proxy engine (`lgd_calculation.py`) is the stable Layer 1 baseline that
+the calibration layer imports from. The `s` signals Layer 2. Both can be imported in the
+same process without conflict.
+
+**Why is validation merged into one file?**
+`src/validation.py` contains both the proxy validation metrics and the IRB-grade extended
+metrics (Gini, Hosmer-Lemeshow). One import path for all validation, no wrapper indirection.
+
+**Why script-first, not notebook-first?**
+Model validation that only works by running notebook cells interactively is not auditable.
+All validation logic is importable Python. Notebooks are presentation layers over the same
+underlying functions.
+
+---
+
+## Repo structure (top level)
+
+```text
+src/
+├── lgd_calculation.py      Proxy engine — Layer 1
+├── lgd_calculations.py     Calibration engine — Layer 2
+├── lgd_scoring.py          Loan scoring API
+├── validation.py           Full validation suite
+├── moc_framework.py        MoC register (APS 113 s.65)
+├── overlay_parameters.py   SHA-256-governed parameter manager
+├── data/                   Data loaders (RBA rates, regime, source adapter)
+├── generators/             11 synthetic workout data generators
+├── pipeline/               CLI entry points
+├── scoring/                Scoring CLI wrapper
+└── governance/             APS 113 gap matrix
+
+data/
+├── raw/                    Demo input CSVs
+├── config/                 Overlay parameters + hash manifest
+├── external/               RBA B6 rates, APRA ADI statistics
+└── generated/historical/   Synthetic Parquet workout histories
+
+notebooks/02–13             Per-product notebooks + cross-product comparison
+docs/                       Methodology manuals, data dictionary
+```
+
+---
+
+## Limitations (honest assessment)
+
+This is a demonstration framework, not a signed-off production model.
+
+- Workout data is **synthetic** — calibrated outputs are illustrative only
+- MoC values require Model Risk Committee sign-off in production
+- APRA benchmarks use impairment ratios as a directional proxy, not institution-specific LGD
+- APS 113 compliance map reports `partial` for s.60 and s.66 because data is not from
+  a real internal workout tape
+
+A real bank deployment would replace `data/generated/historical/` with an actual workout
+tape and run the same calibration pipeline with no code changes required.
