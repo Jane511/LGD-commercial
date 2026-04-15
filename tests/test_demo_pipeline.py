@@ -9,5 +9,5 @@ def test_demo_pipeline_outputs(tmp_path: Path):
     for name in EXPECTED_OUTPUTS:
         assert name in result["outputs"]
         assert not result["outputs"][name].empty
-        assert (tmp_path/"outputs"/"tables"/name).exists()
+        assert (tmp_path/"outputs"/"portfolio"/name).exists()
     assert result["validation"]["status"].all()

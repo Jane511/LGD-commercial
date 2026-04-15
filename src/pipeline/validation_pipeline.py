@@ -12,8 +12,8 @@ sys.dont_write_bytecode = True
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-TABLE_DIR = PROJECT_ROOT / "outputs" / "tables"
-REPORT_DIR = PROJECT_ROOT / "outputs" / "reports"
+TABLE_DIR = PROJECT_ROOT / "outputs" / "portfolio"
+REPORT_DIR = PROJECT_ROOT / "outputs" / "portfolio" / "reports"
 RUNTIME_SOURCE = "generated"
 RUNTIME_CONTROLLED_ROOT = PROJECT_ROOT / "data" / "controlled"
 RUNTIME_REQUIRE_ALL_PRODUCTS = True
@@ -351,6 +351,7 @@ def _step_aps113_calibration_validation():
     Step 7: APS 113 extended validation suite (Gini, Hosmer-Lemeshow, PSI, OOT).
     """
     from src.validation import run_full_validation_suite
+    from src.product_routing import PRODUCT_TO_FAMILY
 
     PRODUCTS = [
         "mortgage", "commercial_cashflow", "receivables", "trade_contingent",
@@ -360,7 +361,8 @@ def _step_aps113_calibration_validation():
 
     rows = []
     for product in PRODUCTS:
-        cal_path = TABLE_DIR / f"{product}_final_calibrated_lgd.csv"
+        family = PRODUCT_TO_FAMILY.get(product, "portfolio")
+        cal_path = PROJECT_ROOT / "outputs" / family / f"{product}_final_calibrated_lgd.csv"
         if not cal_path.exists():
             rows.append({
                 "product": product, "status": "SKIPPED",

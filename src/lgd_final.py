@@ -14,6 +14,7 @@ import numpy as np
 import pandas as pd
 
 from src.data.data_generation import generate_all_datasets
+from src.product_routing import LEGACY_AMBIGUOUS
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -312,11 +313,22 @@ def assign_base_lgd(row: pd.Series) -> float:
     product = _normalise_label(row["product_type"])
     security = _normalise_label(row["security_type"])
 
-    if product in {"mortgage", "home_loan", "residential_mortgage"}:
-        product, security = "property", "residential"
-    elif product in {"commercial", "commercial_cashflow", "sme"}:
+    # Guard: reject ambiguous legacy labels that must not reach this layer.
+    if product in LEGACY_AMBIGUOUS:
+        raise ValueError(LEGACY_AMBIGUOUS[product])
+
+    if product in {"mortgage", "home_loan", "residential_mortgage", "property_mortgage", "property"}:
+        product, security = "property", security if security in {"residential", "commercial"} else "residential"
+    elif product in {
+        # cashflow_lending sub-types that route through CommercialLGDEngine
+        "commercial_cashflow", "receivables", "trade_contingent", "asset_equipment",
+        # property_backed_lending sub-types that route through CommercialLGDEngine
+        "cre_investment", "bridging", "mezz_second_mortgage",
+        # legacy internal label
+        "sme", "sme_cashflow",
+    }:
         product = "sme_cashflow"
-    elif product in {"development_finance"}:
+    elif product in {"development_finance", "residual_stock", "land_subdivision", "development"}:
         product = "development"
     elif product in {"cashflow", "cashflow_lending", "cash_flow_lending"}:
         product = "cashflow_lending"

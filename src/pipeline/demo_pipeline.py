@@ -218,7 +218,7 @@ def validate_outputs(o: dict[str, pd.DataFrame]) -> pd.DataFrame:
 
 
 def write_outputs(o: dict[str, pd.DataFrame], root: Path) -> dict[str, Path]:
-    out = root / 'outputs' / 'tables'
+    out = root / 'outputs' / 'portfolio'
     out.mkdir(parents=True, exist_ok=True)
     paths = {}
     for n, df in o.items():
@@ -239,12 +239,12 @@ def run_pipeline(project_root: Path | str | None = None, persist: bool = True) -
     paths = {}
     if persist:
         (root / 'data' / 'processed').mkdir(parents=True, exist_ok=True)
-        (root / 'outputs' / 'samples').mkdir(parents=True, exist_ok=True)
-        (root / 'outputs' / 'reports').mkdir(parents=True, exist_ok=True)
+        (root / 'outputs' / 'portfolio' / 'samples').mkdir(parents=True, exist_ok=True)
+        (root / 'outputs' / 'portfolio' / 'reports').mkdir(parents=True, exist_ok=True)
         feat.to_csv(root / 'data' / 'processed' / 'feature_table.csv', index=False)
-        raw.to_csv(root / 'outputs' / 'samples' / 'demo_input.csv', index=False)
+        raw.to_csv(root / 'outputs' / 'portfolio' / 'samples' / 'demo_input.csv', index=False)
         paths = write_outputs(outs, root)
-        (root / 'outputs' / 'reports' / 'pipeline_summary.md').write_text(
+        (root / 'outputs' / 'portfolio' / 'reports' / 'pipeline_summary.md').write_text(
             f'# Pipeline Summary - {REPO_NAME}\n\nWrote {len(paths)} output tables. Validation checks passed: {int(val.status.sum())}/{len(val)}.\n',
             encoding='utf-8',
         )
@@ -270,21 +270,27 @@ def _run_calibration_pipeline() -> None:
 
 
 def _write_core_outputs(results: dict, out_dir: Path) -> None:
-    out_dir.mkdir(parents=True, exist_ok=True)
+    from src.data.data_source_adapter import PRODUCT_DATA_FAMILY
+    outputs_root = out_dir.parent  # e.g. outputs/
     for product in ["mortgage", "commercial", "development", "cashflow_lending"]:
         if product not in results:
             continue
+        family = PRODUCT_DATA_FAMILY.get(product, "portfolio")
+        product_dir = outputs_root / family
+        product_dir.mkdir(parents=True, exist_ok=True)
         block = results[product]
         if "loans_with_overlays" in block:
-            block["loans_with_overlays"].to_csv(out_dir / f"{product}_loan_level_output.csv", index=False)
+            block["loans_with_overlays"].to_csv(product_dir / f"{product}_loan_level_output.csv", index=False)
         if "segment_summary" in block:
-            block["segment_summary"].to_csv(out_dir / f"{product}_segment_summary.csv", index=False)
+            block["segment_summary"].to_csv(product_dir / f"{product}_segment_summary.csv", index=False)
         if "weighted_output" in block:
-            block["weighted_output"].to_csv(out_dir / f"{product}_weighted_output.csv", index=False)
+            block["weighted_output"].to_csv(product_dir / f"{product}_weighted_output.csv", index=False)
     if "reporting_tables" in results:
+        portfolio_dir = outputs_root / "portfolio"
+        portfolio_dir.mkdir(parents=True, exist_ok=True)
         for name, df in results["reporting_tables"].items():
             if isinstance(df, pd.DataFrame):
-                df.to_csv(out_dir / name, index=False)
+                df.to_csv(portfolio_dir / name, index=False)
 
 
 def main() -> None:
@@ -311,7 +317,7 @@ def main() -> None:
     parser.add_argument("--scenario-id", default="baseline")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--include-reporting", action="store_true")
-    parser.add_argument("--out-dir", default="outputs/tables")
+    parser.add_argument("--out-dir", default="outputs/portfolio")
     args = parser.parse_args()
 
     set_global_seed(args.seed)

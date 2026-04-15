@@ -387,9 +387,9 @@ Common generated/internal datasets:
 - Upstream used: `industry_risk_scores` (risk context), `macro_regime_flags` (stress regime context)
 - Generated/internal used: drawn/undrawn balance proxies, staged draw assumptions (development), redraw/utilisation flags
 - Implemented in:
-  - `notebooks/02_residential_mortgage_lgd.ipynb`
-  - `notebooks/07_development_finance_lgd.ipynb`
-  - `notebooks/11_bridging_loan_lgd.ipynb`
+  - `notebooks/mortgage/02_residential_mortgage_lgd.ipynb`
+  - `notebooks/property_backed_lending/07_development_finance_lgd.ipynb`
+  - `notebooks/property_backed_lending/11_bridging_loan_lgd.ipynb`
   - `src/lgd_calculation.py` (`MortgageLGDEngine`, `DevelopmentLGDEngine`)
 - Method: observed EAD where available; utilisation/CCF proxy mapping for redraw/staged exposures
 - Calculation flow:
@@ -402,8 +402,8 @@ Common generated/internal datasets:
 - Upstream used: `industry_risk_scores` and `macro_regime_flags`
 - Generated/internal used: arrears behaviour, LVR bands, borrower strength proxies, hardship flags
 - Implemented in:
-  - `notebooks/02_residential_mortgage_lgd.ipynb` (two-stage cure structure)
-  - `notebooks/07_development_finance_lgd.ipynb` (development cure proxies)
+  - `notebooks/mortgage/02_residential_mortgage_lgd.ipynb` (two-stage cure structure)
+  - `notebooks/property_backed_lending/07_development_finance_lgd.ipynb` (development cure proxies)
   - `src/lgd_calculation.py` (cure overlays in mortgage/development pipelines)
 - Method: segmented cure mapping with proxy/logistic style treatment in current implementation
 - Calculation flow:
@@ -416,9 +416,9 @@ Common generated/internal datasets:
 - Upstream used: `property_market_overlays`, `macro_regime_flags`, `downturn_overlay_table`
 - Generated/internal used: LVR, completion stage, exit-type proxies, debt ranking
 - Implemented in:
-  - `notebooks/08_cre_investment_lgd.ipynb`
-  - `notebooks/11_bridging_loan_lgd.ipynb`
-  - `notebooks/12_mezz_second_mortgage_lgd.ipynb`
+  - `notebooks/property_backed_lending/08_cre_investment_lgd.ipynb`
+  - `notebooks/property_backed_lending/11_bridging_loan_lgd.ipynb`
+  - `notebooks/property_backed_lending/12_mezz_second_mortgage_lgd.ipynb`
   - `src/lgd_calculation.py` (property path and overlay integration)
 - Method: segmented path allocation (refinance/voluntary sale/forced sale/restructure) with rule-based probabilities
 - Calculation flow:
@@ -430,10 +430,10 @@ Common generated/internal datasets:
 - Upstream used: `industry_risk_scores`, `property_market_overlays`
 - Generated/internal used: collateral value proxies, haircut settings, waterfall position, path-specific costs
 - Implemented in:
-  - `notebooks/08_cre_investment_lgd.ipynb`
-  - `notebooks/09_residual_stock_lgd.ipynb`
-  - `notebooks/10_land_subdivision_lgd.ipynb`
-  - `notebooks/12_mezz_second_mortgage_lgd.ipynb`
+  - `notebooks/property_backed_lending/08_cre_investment_lgd.ipynb`
+  - `notebooks/property_backed_lending/09_residual_stock_lgd.ipynb`
+  - `notebooks/property_backed_lending/10_land_subdivision_lgd.ipynb`
+  - `notebooks/property_backed_lending/12_mezz_second_mortgage_lgd.ipynb`
   - `src/lgd_calculation.py` (property severity assembly)
 - Method: path-conditional proxy severity/waterfall logic
 - Calculation flow:
@@ -446,10 +446,10 @@ Common generated/internal datasets:
 - Upstream used: `macro_regime_flags`, `downturn_overlay_table`, `property_market_overlays`
 - Generated/internal used: sale delay, absorption, enforcement lag proxies
 - Implemented in:
-  - `notebooks/09_residual_stock_lgd.ipynb`
-  - `notebooks/10_land_subdivision_lgd.ipynb`
-  - `notebooks/11_bridging_loan_lgd.ipynb`
-  - `notebooks/08_cre_investment_lgd.ipynb`
+  - `notebooks/property_backed_lending/09_residual_stock_lgd.ipynb`
+  - `notebooks/property_backed_lending/10_land_subdivision_lgd.ipynb`
+  - `notebooks/property_backed_lending/11_bridging_loan_lgd.ipynb`
+  - `notebooks/property_backed_lending/08_cre_investment_lgd.ipynb`
   - `src/lgd_calculation.py` (timing-linked overlay impacts)
 - Method: segmented timing assumptions with stress delay factors
 - Calculation flow:
@@ -461,10 +461,10 @@ Common generated/internal datasets:
 - Upstream used: `downturn_overlay_table` (stress cost pressure context)
 - Generated/internal used: legal, holding, disposal and completion-cost proxies by path
 - Implemented in:
-  - `notebooks/07_development_finance_lgd.ipynb`
-  - `notebooks/08_cre_investment_lgd.ipynb`
-  - `notebooks/10_land_subdivision_lgd.ipynb`
-  - `notebooks/12_mezz_second_mortgage_lgd.ipynb`
+  - `notebooks/property_backed_lending/07_development_finance_lgd.ipynb`
+  - `notebooks/property_backed_lending/08_cre_investment_lgd.ipynb`
+  - `notebooks/property_backed_lending/10_land_subdivision_lgd.ipynb`
+  - `notebooks/property_backed_lending/12_mezz_second_mortgage_lgd.ipynb`
   - `src/lgd_calculation.py` (net-recovery cost integration)
 - Method: segmented average cost-rate mapping with stress uplift
 - Calculation flow:
@@ -478,9 +478,9 @@ Common generated/internal datasets:
 - Implemented in:
   - `src/lgd_calculation.py` (`run_full_pipeline`, mortgage/development/commercial property outputs)
   - `src/lgd_final.py` (final-layer portfolio LGD outputs)
-  - `notebooks/02_residential_mortgage_lgd.ipynb`
-  - `notebooks/07_development_finance_lgd.ipynb`
-  - `notebooks/08_cre_investment_lgd.ipynb`
+  - `notebooks/mortgage/02_residential_mortgage_lgd.ipynb`
+  - `notebooks/property_backed_lending/07_development_finance_lgd.ipynb`
+  - `notebooks/property_backed_lending/08_cre_investment_lgd.ipynb`
 - Method: deterministic economic LGD assembly
 - Calculation flow:
   1. Compute path-level recoveries/costs and discount to default date
@@ -508,7 +508,7 @@ Common generated/internal datasets:
 
 What each property-backed notebook's code does:
 
-### 6.1 `notebooks/02_residential_mortgage_lgd.ipynb`
+### 6.1 `notebooks/mortgage/02_residential_mortgage_lgd.ipynb`
 
 - generates/loads mortgage default and workout proxy data
 - constructs mortgage drivers (LVR, LMI, arrears/behaviour proxies, borrower type)
@@ -524,7 +524,7 @@ How this is achieved:
   - `LGD_economic = P(cure)*LGD_cure + (1-P(cure))*LGD_non_cure`
   - `LGD_downturn = clip(LGD_base * DownturnScalar, 0, 1)`
 
-### 6.2 `notebooks/07_development_finance_lgd.ipynb`
+### 6.2 `notebooks/property_backed_lending/07_development_finance_lgd.ipynb`
 
 - builds development-specific drivers (GRV, completion %, cost-to-complete, presale/sell-through proxies)
 - models scenario exits (as-is vs complete-and-sell style logic)
@@ -539,7 +539,7 @@ How this is achieved:
   - `NetRecovery = SaleProceeds - CostToComplete - WorkoutCosts`
   - `LGD = (EAD - NetRecoveryPV) / EAD`
 
-### 6.3 `notebooks/08_cre_investment_lgd.ipynb`
+### 6.3 `notebooks/property_backed_lending/08_cre_investment_lgd.ipynb`
 
 - builds CRE segments (office/retail/industrial/mixed)
 - uses drivers: LVR, DSCR, WALE, vacancy, tenant concentration, cap-rate expansion
@@ -554,7 +554,7 @@ How this is achieved:
   - `LGD_economic = Sum(P(path_j) * LGD_path_j)`
   - `Weighted LGD = Sum(LGD_i * EAD_i) / Sum(EAD_i)`
 
-### 6.4 `notebooks/09_residual_stock_lgd.ipynb`
+### 6.4 `notebooks/property_backed_lending/09_residual_stock_lgd.ipynb`
 
 - models completed-but-unsold stock risk
 - uses drivers: unsold units, absorption speed, discount-to-clear, holding cost, time to sale
@@ -569,7 +569,7 @@ How this is achieved:
   - `Recovery_PV = Recovery / (1 + discount_rate)^t`
   - `LGD = 1 - Recovery_rate_adjusted`
 
-### 6.5 `notebooks/10_land_subdivision_lgd.ipynb`
+### 6.5 `notebooks/property_backed_lending/10_land_subdivision_lgd.ipynb`
 
 - models no-income land/subdivision recovery path
 - uses zoning/stage, liquidity depth, time-to-sell, value haircut and market depth proxies
@@ -584,7 +584,7 @@ How this is achieved:
   - `Timing_factor = 1 / (1 + discount_rate)^months`
   - `LGD = (EAD - (Sale_value_proxy * Timing_factor - Costs)) / EAD`
 
-### 6.6 `notebooks/11_bridging_loan_lgd.ipynb`
+### 6.6 `notebooks/property_backed_lending/11_bridging_loan_lgd.ipynb`
 
 - models exit-risk-driven bridging LGD
 - uses exit type, exit certainty, valuation risk, and time-to-exit drivers
@@ -599,7 +599,7 @@ How this is achieved:
   - `LGD = (EAD - Expected_recovery_PV) / EAD`
   - `Downturn_LGD = LGD_base * stress_multiplier`
 
-### 6.7 `notebooks/12_mezz_second_mortgage_lgd.ipynb`
+### 6.7 `notebooks/property_backed_lending/12_mezz_second_mortgage_lgd.ipynb`
 
 - implements recovery waterfall logic (collateral -> senior debt -> residual to mezzanine)
 - uses total LVR, attachment point, subordination, and value decline drivers
@@ -634,22 +634,27 @@ The former Section 6.9 component addendum has been moved and expanded to Section
 
 ## 7. Key outputs (property-backed)
 
-- `outputs/tables/cre_investment_*.csv`
-- `outputs/tables/residual_stock_*.csv`
-- `outputs/tables/land_subdivision_*.csv`
-- `outputs/tables/bridging_*.csv`
-- `outputs/tables/mezz_second_mortgage_*.csv`
-- `outputs/tables/cross_product_*.csv`
+Product-level outputs (`outputs/property_backed_lending/`):
+
+- `outputs/property_backed_lending/cre_investment_*.csv`
+- `outputs/property_backed_lending/residual_stock_*.csv`
+- `outputs/property_backed_lending/land_subdivision_*.csv`
+- `outputs/property_backed_lending/bridging_*.csv`
+- `outputs/property_backed_lending/mezz_second_mortgage_*.csv`
+
+Portfolio-level outputs (`outputs/portfolio/`):
+
+- `outputs/portfolio/cross_product_*.csv`
 
 ### 7.1 Additional current-version generated datasets (governance and traceability)
 
-1. `outputs/tables/overlay_trace_report.csv`
-2. `outputs/tables/parameter_version_report.csv`
-3. `outputs/tables/segmentation_consistency_report.csv`
-4. `outputs/tables/run_metadata_report.csv`
-5. `outputs/tables/reproducibility_determinism_report.csv`
-6. `outputs/tables/strict_component_gap_matrix.csv`
-7. `outputs/reports/strict_component_gap_matrix.md`
+1. `outputs/portfolio/overlay_trace_report.csv`
+2. `outputs/portfolio/parameter_version_report.csv`
+3. `outputs/portfolio/segmentation_consistency_report.csv`
+4. `outputs/portfolio/run_metadata_report.csv`
+5. `outputs/portfolio/reproducibility_determinism_report.csv`
+6. `outputs/portfolio/strict_component_gap_matrix.csv`
+7. `outputs/portfolio/reports/strict_component_gap_matrix.md`
 
 ## 8. Gaps and future calibration (property-backed portfolio)
 
@@ -666,7 +671,7 @@ This section integrates the provided `gaps_propetybacked.pdf` guidance.
 
 Closed in this repo (proxy-level):
 1. Macro/industry overlay logic is now structured via a shared overlay resolver with deterministic precedence.
-2. Cross-module parameterisation is now versioned and consistent across mortgage/commercial/development/cashflow engines.
+2. Cross-module parameterisation is now versioned and consistent across the three product families (mortgage / cashflow_lending / property_backed_lending).
 3. Segmentation consistency is now centrally enforced with shared standardized segment tags.
 
 Still open (production):
@@ -702,7 +707,7 @@ Still open (production):
 
 ### 8.6 Current strict component status for Section 5
 
-Under strict-all-options assessment (every documented option required for full implementation), property-backed components `5.1` to `5.8` are currently `Proxy-only` in `outputs/tables/strict_component_gap_matrix.csv`.
+Under strict-all-options assessment (every documented option required for full implementation), property-backed components `5.1` to `5.8` are currently `Proxy-only` in `outputs/portfolio/strict_component_gap_matrix.csv`.
 
 Meaning in current version:
 1. Component stages exist and are connected to final LGD outputs.

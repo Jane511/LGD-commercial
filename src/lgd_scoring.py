@@ -17,20 +17,14 @@ from .lgd_calculation import (
     MortgageLGDEngine,
 )
 from .overlay_parameters import OverlayParameterManager
+from .product_routing import _resolve_product
 
+# Subtypes that route to DevelopmentLGDEngine.
+_DEVELOPMENT_SUBTYPES = frozenset({"development_finance", "residual_stock", "land_subdivision"})
 
-CANONICAL_PRODUCTS = ("mortgage", "commercial", "development", "cashflow_lending")
-PRODUCT_ALIASES = {
-    "mortgage": "mortgage",
-    "residential_mortgage": "mortgage",
-    "property_mortgage": "mortgage",
-    "commercial": "commercial",
-    "commercial_lending": "commercial",
-    "development": "development",
-    "development_finance": "development",
-    "cashflow_lending": "cashflow_lending",
-    "cashflow": "cashflow_lending",
-}
+# The single cashflow_lending sub_type that routes to CashFlowLendingLGDEngine.
+# All other cashflow_lending subtypes route to CommercialLGDEngine.
+_CASHFLOW_LENDING_GENERIC = "cashflow_lending"
 
 
 @dataclass(frozen=True)
@@ -133,13 +127,26 @@ NORMALIZED_OUTPUT_COLUMNS = [
 ]
 
 
-def _canonical_product(product_type: str) -> str:
-    key = str(product_type).strip().lower()
-    out = PRODUCT_ALIASES.get(key)
-    if out is None:
-        allowed = ", ".join(sorted(CANONICAL_PRODUCTS))
-        raise ValueError(f"Unsupported product_type '{product_type}'. Allowed: {allowed}")
-    return out
+def _schema_key(family: str, sub_type: str) -> str:
+    """Map (family, sub_type) to a SCHEMAS dict key."""
+    if family == "mortgage":
+        return "mortgage"
+    if sub_type == _CASHFLOW_LENDING_GENERIC:
+        return "cashflow_lending"
+    if sub_type in _DEVELOPMENT_SUBTYPES:
+        return "development"
+    return "commercial"
+
+
+def _dataset_key(family: str, sub_type: str) -> str:
+    """Map (family, sub_type) to the legacy data_source_adapter product key."""
+    if family == "mortgage":
+        return "mortgage"
+    if sub_type == _CASHFLOW_LENDING_GENERIC:
+        return "cashflow_lending"
+    if sub_type in _DEVELOPMENT_SUBTYPES:
+        return "development"
+    return "commercial"
 
 
 def _validate_bounds(df: pd.DataFrame, product: str, schema: ProductSchema) -> None:
@@ -206,8 +213,8 @@ def _apply_explicit_defaults(df: pd.DataFrame, schema: ProductSchema) -> pd.Data
 
 
 def validate_scoring_inputs(df: pd.DataFrame, product_type: str) -> pd.DataFrame:
-    product = _canonical_product(product_type)
-    schema = SCHEMAS[product]
+    family, sub_type = _resolve_product(product_type)
+    schema = SCHEMAS[_schema_key(family, sub_type)]
     if not isinstance(df, pd.DataFrame):
         raise ValueError("Input must be a pandas DataFrame")
     if len(df) == 0:
@@ -215,29 +222,32 @@ def validate_scoring_inputs(df: pd.DataFrame, product_type: str) -> pd.DataFrame
 
     missing = [c for c in schema.required_columns if c not in df.columns]
     if missing:
-        raise ValueError(f"{product}: missing required columns {missing}")
+        raise ValueError(f"{sub_type}: missing required columns {missing}")
 
     out = _apply_explicit_defaults(df, schema)
     if out["loan_id"].isna().any():
-        raise ValueError(f"{product}: 'loan_id' must not contain null values")
+        raise ValueError(f"{sub_type}: 'loan_id' must not contain null values")
 
-    _validate_bounds(out, product, schema)
-    _validate_categories(out, product, schema)
+    _validate_bounds(out, sub_type, schema)
+    _validate_categories(out, sub_type, schema)
     return out
 
 
 def _build_engine(
-    product: str,
+    family: str,
+    sub_type: str,
     parameter_manager: OverlayParameterManager,
     scenario_id: str,
 ):
-    if product == "mortgage":
+    if family == "mortgage":
         return MortgageLGDEngine(parameter_manager=parameter_manager, scenario_id=scenario_id), "apply_apra_overlays"
-    if product == "commercial":
-        return CommercialLGDEngine(parameter_manager=parameter_manager, scenario_id=scenario_id), "apply_overlays"
-    if product == "development":
+    if sub_type == _CASHFLOW_LENDING_GENERIC:
+        return CashFlowLendingLGDEngine(parameter_manager=parameter_manager, scenario_id=scenario_id), "apply_overlays"
+    if sub_type in _DEVELOPMENT_SUBTYPES:
         return DevelopmentLGDEngine(parameter_manager=parameter_manager, scenario_id=scenario_id), "apply_overlays"
-    return CashFlowLendingLGDEngine(parameter_manager=parameter_manager, scenario_id=scenario_id), "apply_overlays"
+    # commercial_cashflow, receivables, trade_contingent, asset_equipment,
+    # cre_investment, bridging, mezz_second_mortgage
+    return CommercialLGDEngine(parameter_manager=parameter_manager, scenario_id=scenario_id), "apply_overlays"
 
 
 def _normalize_scoring_output(
@@ -286,17 +296,17 @@ def score_batch_loans(
     parameter_manager: OverlayParameterManager | None = None,
     return_full: bool = False,
 ) -> pd.DataFrame:
-    product = _canonical_product(product_type)
-    clean = validate_scoring_inputs(df, product)
+    family, sub_type = _resolve_product(product_type)
+    clean = validate_scoring_inputs(df, sub_type)
     pm = parameter_manager or OverlayParameterManager()
 
-    engine, method_name = _build_engine(product, pm, scenario_id=scenario_id)
+    engine, method_name = _build_engine(family, sub_type, pm, scenario_id=scenario_id)
     method = getattr(engine, method_name)
     scored = method(clean)
 
     normalized = _normalize_scoring_output(
         scored=scored,
-        product=product,
+        product=sub_type,
         parameter_manager=pm,
         scenario_id=scenario_id,
         source_mode=source_mode,
@@ -339,17 +349,18 @@ def _product_template_row(
     source_mode: str = "generated",
     controlled_root: str | Path = "data/controlled",
 ) -> pd.DataFrame:
-    product = _canonical_product(product_type)
+    family, sub_type = _resolve_product(product_type)
+    dkey = _dataset_key(family, sub_type)
     datasets = load_datasets(
         source=source_mode,
         controlled_root=controlled_root,
         require_all_products=False,
     )
-    if product not in datasets:
-        raise ValueError(f"{source_mode}: no dataset available for product '{product}'")
-    loans = datasets[product]["loans"]
+    if dkey not in datasets:
+        raise ValueError(f"{source_mode}: no dataset available for product '{sub_type}' (dataset key '{dkey}')")
+    loans = datasets[dkey]["loans"]
     if loans is None or len(loans) == 0:
-        raise ValueError(f"{source_mode}: empty loans table for product '{product}'")
+        raise ValueError(f"{source_mode}: empty loans table for product '{sub_type}' (dataset key '{dkey}')")
     return loans.head(1).copy()
 
 
@@ -393,18 +404,19 @@ def score_batch_from_source(
     parameter_manager: OverlayParameterManager | None = None,
     return_full: bool = False,
 ) -> pd.DataFrame:
-    product = _canonical_product(product_type)
+    family, sub_type = _resolve_product(product_type)
+    dkey = _dataset_key(family, sub_type)
     datasets = load_datasets(
         source=source_mode,
         controlled_root=controlled_root,
         require_all_products=False,
     )
-    if product not in datasets:
-        raise ValueError(f"{source_mode}: no loans dataset for product '{product}'")
-    loans = datasets[product]["loans"]
+    if dkey not in datasets:
+        raise ValueError(f"{source_mode}: no loans dataset for product '{sub_type}' (dataset key '{dkey}')")
+    loans = datasets[dkey]["loans"]
     return score_batch_loans(
         df=loans,
-        product_type=product,
+        product_type=sub_type,
         scenario_id=scenario_id,
         seed=seed,
         source_mode=source_mode,

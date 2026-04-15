@@ -72,7 +72,7 @@ def test_compliance_map_with_calibration_results():
 
 def test_validate_observation_periods_passes_10yr():
     from src.aps113_compliance import validate_observation_periods
-    dates = pd.date_range("2014-01-01", "2024-01-01", periods=200)
+    dates = pd.date_range("2014-01-01", "2024-12-31", periods=200)
     loans = pd.DataFrame({"default_date": dates})
     result = validate_observation_periods(loans, product="mortgage")
     assert result["compliant"] is True

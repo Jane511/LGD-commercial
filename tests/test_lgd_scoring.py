@@ -35,8 +35,8 @@ def test_schema_validation_fails_on_missing_required_column():
 
 def test_determinism_same_input_same_seed():
     row = _sample_row("commercial")
-    first = score_single_loan(row, product_type="commercial", seed=42)
-    second = score_single_loan(row, product_type="commercial", seed=42)
+    first = score_single_loan(row, product_type="commercial_cashflow", seed=42)
+    second = score_single_loan(row, product_type="commercial_cashflow", seed=42)
 
     for col in ["lgd_base", "lgd_downturn", "lgd_final", "combined_downturn_scalar", "parameter_version"]:
         assert first[col] == second[col]
@@ -44,9 +44,17 @@ def test_determinism_same_input_same_seed():
 
 def test_formula_invariants_hold_for_all_products():
     datasets = generate_all_datasets()
-    for product in ["mortgage", "commercial", "development", "cashflow_lending"]:
-        loans = datasets[product]["loans"].head(25)
-        out = score_batch_loans(loans, product_type=product)
+    # (dataset_key, product_type) — dataset keys match generate_all_datasets() keys;
+    # product_type uses canonical sub-types (legacy "commercial" / "development" raise ValueError)
+    product_pairs = [
+        ("mortgage", "mortgage"),
+        ("commercial", "commercial_cashflow"),
+        ("development", "development_finance"),
+        ("cashflow_lending", "cashflow_lending"),
+    ]
+    for dataset_key, product_type in product_pairs:
+        loans = datasets[dataset_key]["loans"].head(25)
+        out = score_batch_loans(loans, product_type=product_type)
         assert set(NORMALIZED_OUTPUT_COLUMNS).issubset(set(out.columns))
         assert (out["lgd_base"].between(0, 1)).all()
         assert (out["lgd_downturn"].between(0, 1)).all()
@@ -78,7 +86,7 @@ def test_adapter_integration_generated_and_controlled(tmp_path: Path):
 
 
 def test_batch_from_source_generated_all_products():
-    for product in ["mortgage", "commercial", "development", "cashflow_lending"]:
+    for product in ["mortgage", "commercial_cashflow", "development_finance", "cashflow_lending"]:
         out = score_batch_from_source(product_type=product, source_mode="generated")
         assert not out.empty
         assert set(NORMALIZED_OUTPUT_COLUMNS).issubset(set(out.columns))
@@ -88,13 +96,21 @@ def test_batch_from_source_controlled_all_products(tmp_path: Path):
     controlled_root = tmp_path / "controlled_all"
     controlled_root.mkdir(parents=True, exist_ok=True)
     datasets = generate_all_datasets()
-    for product in ["mortgage", "commercial", "development", "cashflow_lending"]:
-        datasets[product]["loans"].head(5).to_csv(controlled_root / f"{product}_loans.csv", index=False)
-        datasets[product]["cashflows"].head(10).to_csv(controlled_root / f"{product}_cashflows.csv", index=False)
+    # Write files using generate_all_datasets() keys (legacy dataset names)
+    for dataset_key in ["mortgage", "commercial", "development", "cashflow_lending"]:
+        datasets[dataset_key]["loans"].head(5).to_csv(
+            controlled_root / f"{dataset_key}_loans.csv", index=False
+        )
+        datasets[dataset_key]["cashflows"].head(10).to_csv(
+            controlled_root / f"{dataset_key}_cashflows.csv", index=False
+        )
 
-    for product in ["mortgage", "commercial", "development", "cashflow_lending"]:
+    # Score using canonical sub-type product_type values; _dataset_key() bridges
+    # back to legacy file names (commercial_cashflow → commercial, etc.)
+    product_types = ["mortgage", "commercial_cashflow", "development_finance", "cashflow_lending"]
+    for product_type in product_types:
         out = score_batch_from_source(
-            product_type=product,
+            product_type=product_type,
             source_mode="controlled",
             controlled_root=controlled_root,
         )
@@ -185,3 +201,12 @@ def test_scoring_output_stable_after_calibration_import():
     assert result["lgd_base"] > 0
     assert result["lgd_final"] > 0
     assert result["lgd_downturn"] >= result["lgd_base"]
+
+
+def test_ambiguous_product_types_raise_value_error():
+    """Legacy ambiguous labels must raise ValueError with a helpful message."""
+    from src.product_routing import LEGACY_AMBIGUOUS
+    row = _sample_row("mortgage")
+    for ambiguous_key in LEGACY_AMBIGUOUS:
+        with pytest.raises(ValueError):
+            score_single_loan(row, product_type=ambiguous_key)

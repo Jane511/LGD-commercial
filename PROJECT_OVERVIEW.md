@@ -76,19 +76,33 @@ that is explicitly enforced and tested.
 
 ## Products covered
 
-| Product | LGD drivers | Key risk factors |
-| ------- | ----------- | ---------------- |
-| Residential mortgage | LVR, LMI, cure probability, liquidation path | Arrears stage, borrower behaviour, property market |
-| Commercial cashflow | Collateral coverage, DSCR, seniority | Security type, workout duration |
-| Receivables / invoice finance | Eligible pool, advance rate, dilution | Ageing, concentration |
-| Trade / contingent | Claim conversion, cash backing | Tenor, settlement risk |
-| Asset & equipment finance | Asset type, residual value, repossession | Age, remarketing haircut |
-| Development finance | GRV, completion stage, cost-to-complete | Market absorption, exit scenario |
-| CRE investment | LVR, DSCR, WALE, vacancy | Refinance vs forced sale |
-| Residual stock | Absorption rate, discount-to-clear | Holding cost, time-to-sale |
-| Land subdivision | Liquidity, market depth | Haircut, longer recovery time |
-| Bridging | Exit type/certainty, valuation risk | Failed-exit stress |
-| Mezz / 2nd mortgage | Recovery waterfall position | Senior recovery residual |
+Products are organised into three families. Use the `product_type` strings below when calling the scoring API or CLI. `commercial` and `commercial_lending` are ambiguous and rejected; `development` is deprecated — use `development_finance`.
+
+**Family: `mortgage`**
+
+| Product | `product_type` | LGD drivers | Key risk factors |
+| ------- | -------------- | ----------- | ---------------- |
+| Residential mortgage | `mortgage` | LVR, LMI, cure probability, liquidation path | Arrears stage, borrower behaviour, property market |
+
+**Family: `cashflow_lending`**
+
+| Product | `product_type` | LGD drivers | Key risk factors |
+| ------- | -------------- | ----------- | ---------------- |
+| Commercial cashflow | `commercial_cashflow` | Collateral coverage, DSCR, seniority | Security type, workout duration |
+| Receivables / invoice finance | `receivables` | Eligible pool, advance rate, dilution | Ageing, concentration |
+| Trade / contingent | `trade_contingent` | Claim conversion, cash backing | Tenor, settlement risk |
+| Asset & equipment finance | `asset_equipment` | Asset type, residual value, repossession | Age, remarketing haircut |
+
+**Family: `property_backed_lending`**
+
+| Product | `product_type` | LGD drivers | Key risk factors |
+| ------- | -------------- | ----------- | ---------------- |
+| Development finance | `development_finance` | GRV, completion stage, cost-to-complete | Market absorption, exit scenario |
+| CRE investment | `cre_investment` | LVR, DSCR, WALE, vacancy | Refinance vs forced sale |
+| Residual stock | `residual_stock` | Absorption rate, discount-to-clear | Holding cost, time-to-sale |
+| Land subdivision | `land_subdivision` | Liquidity, market depth | Haircut, longer recovery time |
+| Bridging | `bridging` | Exit type/certainty, valuation risk | Failed-exit stress |
+| Mezz / 2nd mortgage | `mezz_second_mortgage` | Recovery waterfall position | Senior recovery residual |
 
 ---
 
@@ -152,14 +166,18 @@ underlying functions.
 
 ```text
 src/
-├── lgd_calculation.py      Proxy engine — Layer 1
+├── lgd_calculation.py      Proxy engine — Layer 1 (internal engine names: mortgage/commercial/development/cashflow_lending)
 ├── lgd_calculations.py     Calibration engine — Layer 2
 ├── lgd_scoring.py          Loan scoring API
+├── product_routing.py      Product-type validator — enforces 3-family hierarchy; rejects ambiguous/deprecated labels
 ├── validation.py           Full validation suite
 ├── moc_framework.py        MoC register (APS 113 s.65)
 ├── overlay_parameters.py   SHA-256-governed parameter manager
 ├── data/                   Data loaders (RBA rates, regime, source adapter)
-├── generators/             11 synthetic workout data generators
+├── generators/             11 synthetic workout data generators (3-family structure)
+│   ├── mortgage/
+│   ├── cashflow_lending/
+│   └── property_backed_lending/
 ├── pipeline/               CLI entry points
 ├── scoring/                Scoring CLI wrapper
 └── governance/             APS 113 gap matrix
@@ -170,7 +188,17 @@ data/
 ├── external/               RBA B6 rates, APRA ADI statistics
 └── generated/historical/   Synthetic Parquet workout histories
 
-notebooks/02–13             Per-product notebooks + cross-product comparison
+outputs/
+├── mortgage/               Loan-level and segment outputs for mortgage family
+├── cashflow_lending/       Loan-level and segment outputs for cashflow_lending family
+├── property_backed_lending/ Loan-level and segment outputs for property_backed_lending family
+└── portfolio/              Cross-product views, governance audit files, validation reports
+
+notebooks/
+├── mortgage/               Notebook 02 (residential mortgage)
+├── cashflow_lending/       Notebooks 03–06, 19 (commercial cashflow family)
+├── property_backed_lending/ Notebooks 07–12 (property-backed family)
+└── (root)                  Notebooks 00–01, 13–18 (shared pipeline, validation, reporting)
 docs/                       Methodology manuals, data dictionary
 ```
 

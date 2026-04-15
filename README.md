@@ -28,7 +28,7 @@ This is what you do when credit brings in a new facility for LGD assessment.
 ```python
 from src.lgd_scoring import score_single_loan
 
-# Mortgage
+# Mortgage (family: mortgage)
 result = score_single_loan(
     payload={
         "loan_id":        "L-1001",
@@ -42,7 +42,7 @@ result = score_single_loan(
 print(result)
 # {'lgd_base': 0.18, 'lgd_downturn': 0.24, 'lgd_final': 0.24, ...}
 
-# Commercial
+# Commercial cashflow lending (family: cashflow_lending)
 result = score_single_loan(
     payload={
         "loan_id":       "L-2001",
@@ -51,18 +51,23 @@ result = score_single_loan(
         "security_type": "real_property",
         "seniority":     "senior_secured",
     },
-    product_type="commercial",
+    product_type="commercial_cashflow",   # NOT "commercial" — ambiguous and rejected
 )
 ```
 
+> **Product-type rules:**
+> - `commercial` is **ambiguous and rejected** — use a specific sub-type (e.g. `commercial_cashflow`, `cre_investment`)
+> - `commercial_lending` is **ambiguous and rejected** — same reason
+> - `development` is **deprecated and rejected** — use `development_finance` instead
+
 **Required fields by product type:**
 
-| Product | Required fields |
-| ------- | --------------- |
-| `mortgage` | `loan_id`, `ead`, `realised_lgd`, `lmi_eligible` (0/1), `mortgage_class` ("Standard"/"Non-Standard") |
-| `commercial` | `loan_id`, `ead`, `realised_lgd`, `security_type`, `seniority` |
-| `development` | `loan_id`, `ead`, `realised_lgd`, `completion_stage` |
-| `cashflow_lending` | `loan_id`, `ead`, `realised_lgd` |
+| Family | Product type | Required fields |
+| ------ | ------------ | --------------- |
+| `mortgage` | `mortgage` | `loan_id`, `ead`, `realised_lgd`, `lmi_eligible` (0/1), `mortgage_class` ("Standard"/"Non-Standard") |
+| `cashflow_lending` | `commercial_cashflow` | `loan_id`, `ead`, `realised_lgd`, `security_type`, `seniority` |
+| `cashflow_lending` | `cashflow_lending` | `loan_id`, `ead`, `realised_lgd`, `pd_score_band`, `cashflow_product`, `seniority` |
+| `property_backed_lending` | `development_finance` | `loan_id`, `ead`, `realised_lgd`, `completion_stage` |
 
 All other fields default to conservative values if omitted.
 
@@ -86,7 +91,7 @@ Then run:
 python -m src.scoring.scoring \
     --product-type mortgage \
     --single-json data/my_loan.json \
-    --output outputs/tables/my_loan_scored.json
+    --output outputs/mortgage/my_loan_scored.json
 ```
 
 ### Batch of loans — CLI (from a CSV file)
@@ -95,9 +100,9 @@ Prepare a CSV with one row per loan (same column names as the JSON fields above)
 
 ```bash
 python -m src.scoring.scoring \
-    --product-type commercial \
+    --product-type commercial_cashflow \
     --input-csv data/my_loans.csv \
-    --output outputs/tables/my_loans_scored.csv
+    --output outputs/cashflow_lending/my_loans_scored.csv
 ```
 
 ### Scoring output fields
@@ -115,7 +120,7 @@ python -m src.scoring.scoring \
 
 ## 3. Run the demo pipeline (end-to-end check)
 
-Runs the full proxy pipeline on built-in demo data and writes outputs to `outputs/tables/`.
+Runs the full proxy pipeline on built-in demo data and writes outputs to family-scoped folders under `outputs/`.
 Use this to verify the system is working or to see example outputs.
 
 ```bash
@@ -123,10 +128,20 @@ python -m src.pipeline.demo_pipeline
 ```
 
 Key output files produced:
-- `outputs/tables/lgd_segment_summary.csv` — EAD-weighted LGD by product/segment
-- `outputs/tables/downturn_lgd_output.csv` — downturn LGD per facility
-- `outputs/tables/recovery_waterfall.csv` — collateral, recovery, and workout cost breakdown
-- `outputs/tables/policy_parameter_register.csv` — governance register
+
+Product-level outputs (one folder per family):
+
+- `outputs/mortgage/mortgage_loan_level_output.csv`
+- `outputs/mortgage/mortgage_segment_summary.csv`
+- `outputs/cashflow_lending/commercial_loan_level_output.csv`
+- `outputs/cashflow_lending/cashflow_lending_segment_summary.csv`
+- `outputs/property_backed_lending/development_loan_level_output.csv`
+
+Portfolio-level and governance outputs:
+
+- `outputs/portfolio/lgd_segment_summary.csv` — EAD-weighted LGD across all products
+- `outputs/portfolio/recovery_waterfall.csv` — collateral, recovery, and workout cost breakdown
+- `outputs/portfolio/policy_parameter_register.csv` — governance register
 
 ---
 
@@ -148,7 +163,7 @@ python -m src.pipeline.calibration_pipeline --module mortgage
 
 Calibration pipeline order (APS 113 s.43–65):
 
-```
+```text
 Realised LGD → Long-run LGD (vintage EWA) → Downturn overlay
   → Frye-Jacobs LGD-PD correlation → MoC (5 sources) → Regulatory floor
 ```
@@ -165,7 +180,7 @@ python -m src.pipeline.validation_pipeline
 python -m src.pipeline.validation_pipeline --source generated
 ```
 
-Produces `outputs/tables/validation_sequence_report.csv` with PSI, OOT backtest, Gini, Hosmer-Lemeshow, and conservatism checks.
+Produces `outputs/portfolio/validation_sequence_report.csv` with PSI, OOT backtest, Gini, Hosmer-Lemeshow, and conservatism checks.
 
 ---
 
@@ -179,7 +194,7 @@ pytest tests/ -v
 
 ## 7. Repository layout
 
-```
+```text
 src/
 ├── lgd_calculation.py          Proxy engine — Layer 1 (never modify)
 ├── lgd_calculations.py         Calibration engine — Layer 2
@@ -204,10 +219,11 @@ src/
 │   ├── regime_classifier.py    Economic regime classification
 │   └── generator.py            CLI: python -m src.data.generator
 │
-├── generators/                 11 per-product synthetic workout generators
+├── generators/                 11 per-product synthetic workout generators (3-family structure)
 │   ├── base_generator.py
-│   ├── mortgage_generator.py
-│   └── ...
+│   ├── mortgage/               Residential mortgage generator
+│   ├── cashflow_lending/       Commercial cashflow, receivables, trade, asset/equipment generators
+│   └── property_backed_lending/ Development finance, CRE, residual stock, land, bridging, mezz generators
 │
 ├── pipeline/                   CLI entry points
 │   ├── demo_pipeline.py        python -m src.pipeline.demo_pipeline
@@ -245,19 +261,35 @@ docs/
 
 ## 8. Products covered
 
-| # | Product | Notebook |
-| - | ------- | -------- |
-| 1 | Residential Mortgage | `02_residential_mortgage_lgd.ipynb` |
-| 2 | Commercial Cashflow | `03_commercial_cashflow_lgd.ipynb` |
-| 3 | Receivables / Invoice Finance | `04_receivables_invoice_finance_lgd.ipynb` |
-| 4 | Trade / Contingent | `05_trade_contingent_facilities_lgd.ipynb` |
-| 5 | Asset & Equipment Finance | `06_asset_equipment_finance_lgd.ipynb` |
-| 6 | Development Finance | `07_development_finance_lgd.ipynb` |
-| 7 | CRE Investment | `08_cre_investment_lgd.ipynb` |
-| 8 | Residual Stock | `09_residual_stock_lgd.ipynb` |
-| 9 | Land Subdivision | `10_land_subdivision_lgd.ipynb` |
-| 10 | Bridging | `11_bridging_loan_lgd.ipynb` |
-| 11 | Mezz / 2nd Mortgage | `12_mezz_second_mortgage_lgd.ipynb` |
+Products are organised into three families. Use the exact `product_type` strings listed below when scoring.
+
+**Family: `mortgage`**
+
+| # | Product | `product_type` | Notebook |
+| - | ------- | -------------- | -------- |
+| 1 | Residential Mortgage | `mortgage` | `02_residential_mortgage_lgd.ipynb` |
+
+**Family: `cashflow_lending`**
+
+| # | Product | `product_type` | Notebook |
+| - | ------- | -------------- | -------- |
+| 2 | Commercial Cashflow | `commercial_cashflow` | `03_commercial_cashflow_lgd.ipynb` |
+| 3 | Receivables / Invoice Finance | `receivables` | `04_receivables_invoice_finance_lgd.ipynb` |
+| 4 | Trade / Contingent | `trade_contingent` | `05_trade_contingent_facilities_lgd.ipynb` |
+| 5 | Asset & Equipment Finance | `asset_equipment` | `06_asset_equipment_finance_lgd.ipynb` |
+
+**Family: `property_backed_lending`**
+
+| # | Product | `product_type` | Notebook |
+| - | ------- | -------------- | -------- |
+| 6 | Development Finance | `development_finance` | `07_development_finance_lgd.ipynb` |
+| 7 | CRE Investment | `cre_investment` | `08_cre_investment_lgd.ipynb` |
+| 8 | Residual Stock | `residual_stock` | `09_residual_stock_lgd.ipynb` |
+| 9 | Land Subdivision | `land_subdivision` | `10_land_subdivision_lgd.ipynb` |
+| 10 | Bridging | `bridging` | `11_bridging_loan_lgd.ipynb` |
+| 11 | Mezz / 2nd Mortgage | `mezz_second_mortgage` | `12_mezz_second_mortgage_lgd.ipynb` |
+
+> Rejected aliases: `commercial` and `commercial_lending` (ambiguous), `development` (deprecated — use `development_finance`).
 
 Cross-product comparison: `13_cross_product_comparison.ipynb`
 
@@ -273,7 +305,7 @@ The file is hash-guarded — if you edit it you must regenerate the manifest or 
 python -m src.overlay_parameters --regenerate-manifest
 ```
 
-Every pipeline run writes four audit files to `outputs/tables/`:
+Every pipeline run writes four audit files to `outputs/portfolio/`:
 
 - `overlay_trace_report.csv` — which overlay was applied to which loan
 - `parameter_version_report.csv` — version and hash of parameters used
@@ -284,12 +316,21 @@ Every pipeline run writes four audit files to `outputs/tables/`:
 
 ## 10. Switching to real data (controlled source)
 
-When you have real loan data, place files in `data/controlled/` with these names:
+When you have real loan data, place files in `data/controlled/` organised by family, or flat in the root (the adapter checks both locations):
 
-- `mortgage_loans.csv` / `mortgage_cashflows.csv`
-- `commercial_loans.csv` / `commercial_cashflows.csv`
-- `development_loans.csv` / `development_cashflows.csv`
-- `cashflow_lending_loans.csv` / `cashflow_lending_cashflows.csv`
+```text
+data/controlled/
+├── mortgage/
+│   ├── mortgage_loans.csv / mortgage_loans.parquet
+│   └── mortgage_cashflows.csv / mortgage_cashflows.parquet
+├── cashflow_lending/
+│   ├── commercial_loans.csv          (SME/cashflow proxy)
+│   ├── cashflow_lending_loans.csv
+│   └── ...cashflows variants
+└── property_backed_lending/
+    ├── development_finance_loans.csv  (NOT "development_loans" — deprecated name)
+    └── ...cashflows variants
+```
 
 Then run with the controlled source flag:
 

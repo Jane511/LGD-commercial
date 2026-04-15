@@ -34,6 +34,15 @@ from .data_generation import generate_all_datasets
 PRODUCTS = ("mortgage", "commercial", "development", "cashflow_lending")
 SUBSETS = ("loans", "cashflows")
 
+# Maps each legacy 4-product key to its family output/template subdirectory.
+# "commercial" maps to cashflow_lending because the proxy data represents SME/cashflow loans.
+PRODUCT_DATA_FAMILY: dict[str, str] = {
+    "mortgage": "mortgage",
+    "commercial": "cashflow_lending",
+    "development": "property_backed_lending",
+    "cashflow_lending": "cashflow_lending",
+}
+
 
 @dataclass(frozen=True)
 class DataSourceConfig:
@@ -69,10 +78,17 @@ def _read_table(path: Path) -> pd.DataFrame:
 
 
 def _find_table_path(root: Path, product: str, subset: str) -> Path | None:
+    # Check flat root first (backward-compatible), then family subdirectory.
+    family = PRODUCT_DATA_FAMILY.get(product)
     candidates = [
         root / f"{product}_{subset}.parquet",
         root / f"{product}_{subset}.csv",
     ]
+    if family:
+        candidates += [
+            root / family / f"{product}_{subset}.parquet",
+            root / family / f"{product}_{subset}.csv",
+        ]
     for candidate in candidates:
         if candidate.exists():
             return candidate
@@ -177,10 +193,13 @@ def export_controlled_input_templates(
 
     written: list[str] = []
     for product in PRODUCTS:
+        family = PRODUCT_DATA_FAMILY.get(product, product)
+        product_dir = output / family
+        product_dir.mkdir(parents=True, exist_ok=True)
         for subset in SUBSETS:
             cols = list(datasets[product][subset].columns)
             template = pd.DataFrame(columns=cols)
-            path = output / f"{product}_{subset}.csv"
+            path = product_dir / f"{product}_{subset}.csv"
             template.to_csv(path, index=False)
             written.append(str(path))
 

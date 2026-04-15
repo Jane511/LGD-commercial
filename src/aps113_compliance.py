@@ -1,7 +1,7 @@
 """
 APS 113 Compliance Map Generator.
 
-Produces outputs/tables/aps113_compliance_map.csv — a section-by-section
+Produces outputs/portfolio/aps113_compliance_map.csv — a section-by-section
 assessment of this repo's implementation against APRA APS 113 requirements.
 
 For each product module and major methodology step, records:
@@ -21,7 +21,18 @@ from pathlib import Path
 
 import pandas as pd
 
+from src.product_routing import PRODUCT_TO_FAMILY
+
 logger = logging.getLogger(__name__)
+
+
+def _product_dir(product: str) -> str:
+    """Return the relative output directory prefix for a product."""
+    family = PRODUCT_TO_FAMILY.get(product, "portfolio")
+    return f"outputs/{family}"
+
+
+_PORTFOLIO_DIR = "outputs/portfolio"
 
 # ---------------------------------------------------------------------------
 # APS 113 requirement registry
@@ -192,18 +203,19 @@ def _assess_requirement(
     """Return (status, evidence_file, reviewer_note) for a requirement."""
 
     cal = calibration_results.get(product, {}) if calibration_results else {}
+    pdir = _product_dir(product)
 
     if req_key == "s32_lip_costs":
         return (
             "met",
-            f"outputs/tables/{product}_historical_workouts.csv",
+            f"{pdir}/{product}_historical_workouts.csv",
             "lip_costs column present in all generators. Auto-detection in compute_realised_lgd().",
         )
 
     if req_key == "s37_ead_definition":
         return (
             "met",
-            f"outputs/tables/{product}_historical_workouts.csv",
+            f"{pdir}/{product}_historical_workouts.csv",
             "ead_at_default computed at default date in all generators.",
         )
 
@@ -211,7 +223,7 @@ def _assess_requirement(
         has_lr = "long_run_lgd_by_segment" in cal
         return (
             "met" if has_lr else "partial",
-            f"outputs/tables/{product}_long_run_lgd_by_segment.csv",
+            f"{pdir}/{product}_long_run_lgd_by_segment.csv",
             "vintage_ewa method averages through cycle. 10-year window used."
             if has_lr else "Calibration pipeline not yet run for this product.",
         )
@@ -227,7 +239,7 @@ def _assess_requirement(
         has_dt = "calibration_steps" in cal
         return (
             "met" if has_dt else "partial",
-            f"outputs/tables/{product}_downturn_lgd_by_segment.csv",
+            f"{pdir}/{product}_downturn_lgd_by_segment.csv",
             "Downturn overlay applied via product-specific scalar from overlay_parameters.csv.",
         )
 
@@ -235,7 +247,7 @@ def _assess_requirement(
         status = "met" if regime_data_source == "rba_abs_real" else "partial"
         return (
             status,
-            "outputs/tables/rba_discount_rate_register.csv",
+            f"{_PORTFOLIO_DIR}/rba_discount_rate_register.csv",
             "RBA B6 indicator lending rates used as primary discount rate proxy. "
             "Fallback: RBA cash rate + 300bps. "
             + ("Real RBA data in use." if status == "met" else "Synthetic fallback in use."),
@@ -244,7 +256,7 @@ def _assess_requirement(
     if req_key == "s52_segmentation":
         return (
             "met",
-            f"outputs/tables/{product}_long_run_lgd_by_segment.csv",
+            f"{pdir}/{product}_long_run_lgd_by_segment.csv",
             "Product-specific segment keys defined. Segments < 20 obs flagged as low_count.",
         )
 
@@ -252,7 +264,7 @@ def _assess_requirement(
         has_floors = "calibration_steps" in cal
         return (
             "met" if has_floors else "partial",
-            f"outputs/tables/{product}_final_calibrated_lgd.csv",
+            f"{pdir}/{product}_final_calibrated_lgd.csv",
             "Policy floors applied in run_calibration_pipeline() step 4. "
             "Floors sourced from overlay_parameters.csv.",
         )
@@ -260,7 +272,7 @@ def _assess_requirement(
     if req_key == "s60_model_vs_actual":
         return (
             "partial",
-            f"outputs/tables/{product}_model_vs_actual_comparison.csv",
+            f"{pdir}/{product}_model_vs_actual_comparison.csv",
             "Comparison is synthetic-data-vs-synthetic-model (no real workout tape). "
             "Directional only. Partial compliance for demonstration repo.",
         )
@@ -269,7 +281,7 @@ def _assess_requirement(
         has_moc = moc_registers and product in moc_registers and not moc_registers[product].empty
         return (
             "met" if has_moc else "partial",
-            f"outputs/tables/{product}_moc_register.csv",
+            f"{pdir}/{product}_moc_register.csv",
             "Correct order: downturn → MoC → floor. MoC applied to downturn LGD per s.63.",
         )
 
@@ -277,14 +289,14 @@ def _assess_requirement(
         has_moc = moc_registers and product in moc_registers and not moc_registers[product].empty
         return (
             "met" if has_moc else "partial",
-            f"outputs/tables/{product}_moc_register.csv",
+            f"{pdir}/{product}_moc_register.csv",
             "All 5 APS 113 s.65 sources evaluated with individual bps add-ons.",
         )
 
     if req_key == "s66_validation":
         return (
             "partial",
-            f"outputs/tables/{product}_backtest_results.csv",
+            f"{pdir}/{product}_backtest_results.csv",
             "Gini, HL, PSI, OOT, conservatism implemented in validation_suite.py. "
             "Partial (not 'met') because workout data is synthetic — not independent.",
         )

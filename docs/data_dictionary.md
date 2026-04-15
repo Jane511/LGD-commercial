@@ -43,34 +43,49 @@ This dictionary captures the key fields used by the integrated LGD framework, wi
 ## Segment-specific commercial proxy fields
 
 ### Receivables / invoice finance
+
 `eligible_receivables_balance`, `ineligible_receivables_pct`, `ageing_over_90d_pct`, `dilution_pct`, `collections_control_score`, `advance_rate`.
 
 ### Trade / contingent facilities
+
 `is_contingent_flag`, `claim_probability_base`, `claim_probability_downturn`, `cash_security_pct`, `contingent_commitment_amount`, `ead_from_contingent_base`.
 
 ### Asset / equipment finance
+
 `asset_type`, `asset_age_years`, `residual_balloon_pct`, `remarketing_discount_pct`, `secondary_market_liquidity`, `repossession_months`, `sale_timing_months`, `asset_haircut_proxy`.
 
 ## Output contracts
 
-Core outputs:
+Outputs are written to family-scoped folders. Portfolio-wide and governance files go to `outputs/portfolio/`.
 
-- `outputs/tables/lgd_segment_summary.csv`
-- `outputs/tables/recovery_waterfall.csv`
-- `outputs/tables/downturn_lgd_output.csv`
-- `outputs/tables/lgd_validation_report.csv`
+Core portfolio outputs:
 
-Commercial parent outputs:
+- `outputs/portfolio/lgd_segment_summary.csv`
+- `outputs/portfolio/recovery_waterfall.csv`
+- `outputs/portfolio/downturn_lgd_output.csv`
+- `outputs/portfolio/lgd_validation_report.csv`
+- `outputs/portfolio/validation_sequence_report.csv`
+- `outputs/portfolio/overlay_trace_report.csv`
+- `outputs/portfolio/parameter_version_report.csv`
+- `outputs/portfolio/segmentation_consistency_report.csv`
+- `outputs/portfolio/run_metadata_report.csv`
 
-- `outputs/tables/commercial_framework_loan_level_output.csv`
-- `outputs/tables/commercial_framework_weighted_lgd_by_segment.csv`
-- `outputs/tables/commercial_framework_base_vs_downturn_comparison.csv`
-- `outputs/tables/commercial_framework_weighted_lgd_by_vintage.csv`
-- `outputs/tables/commercial_framework_estimate_vs_realised_by_segment.csv`
-- `outputs/tables/commercial_framework_validation_checks.csv`
+Mortgage family outputs (`outputs/mortgage/`):
 
-Commercial segment outputs:
+- `outputs/mortgage/mortgage_loan_level_output.csv`
+- `outputs/mortgage/mortgage_segment_summary.csv`
+- `outputs/mortgage/mortgage_weighted_output.csv`
 
-- `outputs/tables/receivables_invoice_finance_*.csv`
-- `outputs/tables/trade_contingent_*.csv`
-- `outputs/tables/asset_equipment_finance_*.csv`
+Cashflow lending family outputs (`outputs/cashflow_lending/`):
+
+- `outputs/cashflow_lending/commercial_loan_level_output.csv`
+- `outputs/cashflow_lending/commercial_segment_summary.csv`
+- `outputs/cashflow_lending/cashflow_lending_loan_level_output.csv`
+- `outputs/cashflow_lending/receivables_invoice_finance_*.csv`
+- `outputs/cashflow_lending/trade_contingent_*.csv`
+- `outputs/cashflow_lending/asset_equipment_finance_*.csv`
+
+Property-backed lending family outputs (`outputs/property_backed_lending/`):
+
+- `outputs/property_backed_lending/development_loan_level_output.csv`
+- `outputs/property_backed_lending/development_segment_summary.csv`

@@ -5,8 +5,16 @@ import pandas as pd
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-TABLE_DIR = PROJECT_ROOT / "outputs" / "tables"
-REPORT_DIR = PROJECT_ROOT / "outputs" / "reports"
+TABLE_DIR = PROJECT_ROOT / "outputs" / "portfolio"
+REPORT_DIR = PROJECT_ROOT / "outputs" / "portfolio" / "reports"
+
+# All output directories to search when checking evidence table existence.
+_OUTPUT_SEARCH_DIRS = (
+    "outputs/portfolio",
+    "outputs/mortgage",
+    "outputs/cashflow_lending",
+    "outputs/property_backed_lending",
+)
 
 
 def _exists(path: str) -> bool:
@@ -18,7 +26,7 @@ def _fmt_paths(paths: list[str]) -> str:
 
 
 def _fmt_tables(tables: list[str]) -> str:
-    present = [t for t in tables if _exists(f"outputs/tables/{t}")]
+    present = [t for t in tables if any(_exists(f"{d}/{t}") for d in _OUTPUT_SEARCH_DIRS)]
     missing = [t for t in tables if t not in present]
     parts = [f"present:{','.join(present)}" if present else "present:none"]
     if missing:
@@ -176,10 +184,10 @@ def build_matrix() -> pd.DataFrame:
             "glm_or_logistic_bounded_conversion",
         ], {1, 2}),
         "evidence_code_paths": _fmt_paths([
-            "notebooks/03_commercial_cashflow_lgd.ipynb",
-            "notebooks/04_receivables_invoice_finance_lgd.ipynb",
-            "notebooks/05_trade_contingent_facilities_lgd.ipynb",
-            "notebooks/06_asset_equipment_finance_lgd.ipynb",
+            "notebooks/cashflow_lending/03_commercial_cashflow_lgd.ipynb",
+            "notebooks/cashflow_lending/04_receivables_invoice_finance_lgd.ipynb",
+            "notebooks/cashflow_lending/05_trade_contingent_facilities_lgd.ipynb",
+            "notebooks/cashflow_lending/06_asset_equipment_finance_lgd.ipynb",
             "src/demo_pipeline.py",
         ]),
         "evidence_output_tables": _fmt_tables([
@@ -205,8 +213,8 @@ def build_matrix() -> pd.DataFrame:
         ], {2, 3}),
         "evidence_code_paths": _fmt_paths([
             "src/lgd_calculation.py",
-            "notebooks/02_residential_mortgage_lgd.ipynb",
-            "notebooks/07_development_finance_lgd.ipynb",
+            "notebooks/mortgage/02_residential_mortgage_lgd.ipynb",
+            "notebooks/property_backed_lending/07_development_finance_lgd.ipynb",
         ]),
         "evidence_output_tables": _fmt_tables([
             "cure_overlay_report.csv",
@@ -229,8 +237,8 @@ def build_matrix() -> pd.DataFrame:
         ], {3}),
         "evidence_code_paths": _fmt_paths([
             "src/lgd_calculation.py",
-            "notebooks/03_commercial_cashflow_lgd.ipynb",
-            "notebooks/19_cashflow_lending_pd_alignment.ipynb",
+            "notebooks/cashflow_lending/03_commercial_cashflow_lgd.ipynb",
+            "notebooks/cashflow_lending/19_cashflow_lending_pd_alignment.ipynb",
         ]),
         "evidence_output_tables": _fmt_tables([
             "commercial_framework_segment_summary.csv",
@@ -253,8 +261,8 @@ def build_matrix() -> pd.DataFrame:
         ], {3}),
         "evidence_code_paths": _fmt_paths([
             "src/lgd_calculation.py",
-            "notebooks/03_commercial_cashflow_lgd.ipynb",
-            "notebooks/04_receivables_invoice_finance_lgd.ipynb",
+            "notebooks/cashflow_lending/03_commercial_cashflow_lgd.ipynb",
+            "notebooks/cashflow_lending/04_receivables_invoice_finance_lgd.ipynb",
         ]),
         "evidence_output_tables": _fmt_tables([
             "commercial_framework_loan_level_output.csv",
@@ -276,8 +284,8 @@ def build_matrix() -> pd.DataFrame:
         ], {1}),
         "evidence_code_paths": _fmt_paths([
             "src/demo_pipeline.py",
-            "notebooks/03_commercial_cashflow_lgd.ipynb",
-            "notebooks/06_asset_equipment_finance_lgd.ipynb",
+            "notebooks/cashflow_lending/03_commercial_cashflow_lgd.ipynb",
+            "notebooks/cashflow_lending/06_asset_equipment_finance_lgd.ipynb",
         ]),
         "evidence_output_tables": _fmt_tables([
             "recovery_waterfall.csv",
@@ -300,7 +308,7 @@ def build_matrix() -> pd.DataFrame:
         "evidence_code_paths": _fmt_paths([
             "src/lgd_calculation.py",
             "src/lgd_final.py",
-            "notebooks/03_commercial_cashflow_lgd.ipynb",
+            "notebooks/cashflow_lending/03_commercial_cashflow_lgd.ipynb",
         ]),
         "evidence_output_tables": _fmt_tables([
             "commercial_framework_loan_level_output.csv",
@@ -347,7 +355,7 @@ def build_matrix() -> pd.DataFrame:
         "evidence_code_paths": _fmt_paths([
             "src/lgd_calculation.py",
             "src/pipeline/validation_pipeline.py",
-            "outputs/tables/validation_sequence_report.csv",
+            "outputs/portfolio/validation_sequence_report.csv",
         ]),
         "evidence_output_tables": _fmt_tables([
             "lgd_segment_summary.csv",
@@ -370,8 +378,8 @@ def build_matrix() -> pd.DataFrame:
             "segmented_or_glm",
         ], {1, 2}),
         "evidence_code_paths": _fmt_paths([
-            "notebooks/07_development_finance_lgd.ipynb",
-            "notebooks/11_bridging_loan_lgd.ipynb",
+            "notebooks/property_backed_lending/07_development_finance_lgd.ipynb",
+            "notebooks/property_backed_lending/11_bridging_loan_lgd.ipynb",
             "src/lgd_calculation.py",
         ]),
         "evidence_output_tables": _fmt_tables([
@@ -381,7 +389,7 @@ def build_matrix() -> pd.DataFrame:
         ]),
         "logic_trace": "Property modules use observed/proxy EAD patterns; development notebook exports expected outputs but files currently missing.",
         "status": "Proxy-only",
-        "gap_reason": "Segmented/GLM option absent; required development output evidence currently missing in outputs/tables.",
+        "gap_reason": "Segmented/GLM option absent; required development output evidence currently missing in outputs/property_backed_lending.",
     })
 
     rows.append({
@@ -395,8 +403,8 @@ def build_matrix() -> pd.DataFrame:
             "tree_challenger",
         ], {1, 2}),
         "evidence_code_paths": _fmt_paths([
-            "notebooks/02_residential_mortgage_lgd.ipynb",
-            "notebooks/07_development_finance_lgd.ipynb",
+            "notebooks/mortgage/02_residential_mortgage_lgd.ipynb",
+            "notebooks/property_backed_lending/07_development_finance_lgd.ipynb",
             "src/lgd_calculation.py",
         ]),
         "evidence_output_tables": _fmt_tables([
@@ -419,8 +427,8 @@ def build_matrix() -> pd.DataFrame:
             "tree_challenger",
         ], {2}),
         "evidence_code_paths": _fmt_paths([
-            "notebooks/08_cre_investment_lgd.ipynb",
-            "notebooks/12_mezz_second_mortgage_lgd.ipynb",
+            "notebooks/property_backed_lending/08_cre_investment_lgd.ipynb",
+            "notebooks/property_backed_lending/12_mezz_second_mortgage_lgd.ipynb",
             "src/lgd_calculation.py",
         ]),
         "evidence_output_tables": _fmt_tables([
@@ -444,8 +452,8 @@ def build_matrix() -> pd.DataFrame:
         ], {3}),
         "evidence_code_paths": _fmt_paths([
             "src/lgd_calculation.py",
-            "notebooks/08_cre_investment_lgd.ipynb",
-            "notebooks/12_mezz_second_mortgage_lgd.ipynb",
+            "notebooks/property_backed_lending/08_cre_investment_lgd.ipynb",
+            "notebooks/property_backed_lending/12_mezz_second_mortgage_lgd.ipynb",
         ]),
         "evidence_output_tables": _fmt_tables([
             "cre_investment_scenario_summary.csv",
@@ -468,8 +476,8 @@ def build_matrix() -> pd.DataFrame:
         ], {3}),
         "evidence_code_paths": _fmt_paths([
             "src/lgd_calculation.py",
-            "notebooks/09_residual_stock_lgd.ipynb",
-            "notebooks/11_bridging_loan_lgd.ipynb",
+            "notebooks/property_backed_lending/09_residual_stock_lgd.ipynb",
+            "notebooks/property_backed_lending/11_bridging_loan_lgd.ipynb",
         ]),
         "evidence_output_tables": _fmt_tables([
             "bridging_delay_summary.csv",
@@ -491,8 +499,8 @@ def build_matrix() -> pd.DataFrame:
             "regression_by_path_or_property_type",
         ], {1}),
         "evidence_code_paths": _fmt_paths([
-            "notebooks/08_cre_investment_lgd.ipynb",
-            "notebooks/10_land_subdivision_lgd.ipynb",
+            "notebooks/property_backed_lending/08_cre_investment_lgd.ipynb",
+            "notebooks/property_backed_lending/10_land_subdivision_lgd.ipynb",
             "src/lgd_calculation.py",
         ]),
         "evidence_output_tables": _fmt_tables([
@@ -515,8 +523,8 @@ def build_matrix() -> pd.DataFrame:
         ], {1}),
         "evidence_code_paths": _fmt_paths([
             "src/lgd_calculation.py",
-            "notebooks/07_development_finance_lgd.ipynb",
-            "notebooks/08_cre_investment_lgd.ipynb",
+            "notebooks/property_backed_lending/07_development_finance_lgd.ipynb",
+            "notebooks/property_backed_lending/08_cre_investment_lgd.ipynb",
         ]),
         "evidence_output_tables": _fmt_tables([
             "cre_investment_loan_level_output.csv",

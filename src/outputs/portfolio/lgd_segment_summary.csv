@@ -1,0 +1,7 @@
+segment,product_type,facilities,exposure,ead_weighted_lgd,ead_weighted_downturn_lgd
+Contingent,guarantee,1.0,285000.0,0.1,0.1048
+Property Backed,commercial_mortgage,1.0,2220000.0,0.1,0.1106
+SME Cash Flow,overdraft,1.0,742000.0,0.4333,0.4727
+SME Cash Flow,term_loan,1.0,1040000.0,0.1,0.1067
+Trade Finance,trade_finance,1.0,420000.0,0.2371,0.2571
+Working Capital,revolving_working_capital,1.0,1100000.0,0.2018,0.2139

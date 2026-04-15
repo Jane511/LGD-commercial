@@ -1030,18 +1030,18 @@ python -m src.pipeline.calibration_pipeline --products mortgage --compliance-rep
 
 ### Output Tables
 
-Key outputs in `outputs/tables/`:
+Key outputs — product-level files go to `outputs/{family}/`, portfolio-wide and governance files go to `outputs/portfolio/`:
 
-| File | Audience | Content |
-|------|----------|---------|
-| `lgd_final.csv` | Portfolio managers | Loan-level LGD (base, downturn, final) |
-| `lgd_final_summary_by_product.csv` | Risk committee | Exposure-weighted summary |
-| `policy_parameter_register.csv` | Governance | All parameters used (version, values, hash) |
-| `validation_sequence_report.csv` | Model risk | Validation test results (Gini, HosL, PSI) |
-| `moc_summary_all_products.csv` | Governance | MoC breakdown (5 sources, per product) |
-| `aps113_compliance_map.csv` | Regulator | Which APS 113 standards are met (yes/partial/no) |
-| `lgd_pd_correlation_report.csv` | Modellers | LGD-PD correlation estimates (by product) |
-| `rba_discount_rate_register.csv` | Audit | Discount rates used (source, tier, fallback) |
+| File | Location | Audience | Content |
+| ---- | -------- | -------- | ------- |
+| `lgd_final.csv` | `outputs/portfolio/` | Portfolio managers | Loan-level LGD (base, downturn, final) |
+| `lgd_final_summary_by_product.csv` | `outputs/portfolio/` | Risk committee | Exposure-weighted summary |
+| `policy_parameter_register.csv` | `outputs/portfolio/` | Governance | All parameters used (version, values, hash) |
+| `validation_sequence_report.csv` | `outputs/portfolio/` | Model risk | Validation test results (Gini, HosL, PSI) |
+| `moc_summary_all_products.csv` | `outputs/portfolio/` | Governance | MoC breakdown (5 sources, per product) |
+| `aps113_compliance_map.csv` | `outputs/portfolio/` | Regulator | Which APS 113 standards are met (yes/partial/no) |
+| `lgd_pd_correlation_report.csv` | `outputs/portfolio/` | Modellers | LGD-PD correlation estimates (by product) |
+| `rba_discount_rate_register.csv` | `outputs/portfolio/` | Audit | Discount rates used (source, tier, fallback) |
 
 ---
 

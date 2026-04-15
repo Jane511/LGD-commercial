@@ -15,7 +15,9 @@ Runs the complete calibration sequence for each product:
     11. Export all outputs (9 CSV files per module)
     12. Run full validation suite
 
-Outputs to outputs/tables/. Parquet source data in data/generated/historical/.
+Per-product outputs to outputs/{family}/ (e.g. outputs/mortgage/, outputs/cashflow_lending/).
+Cross-product summaries to outputs/portfolio/.
+Parquet source data in data/generated/historical/.
 
 Usage:
     python -m src.pipeline.calibration_pipeline
@@ -57,6 +59,7 @@ from src.calibration_utils import (
     export_discount_rate_register,
 )
 from src.generators import GENERATOR_MAP, generate_all_historical_workouts
+from src.product_routing import PRODUCT_TO_FAMILY
 
 import pandas as pd
 
@@ -83,7 +86,15 @@ PRODUCT_SEGMENT_KEYS: dict[str, list[str]] = {
 }
 
 HISTORY_DIR = REPO_ROOT / "data" / "generated" / "historical"
-OUTPUTS_DIR = REPO_ROOT / "outputs" / "tables"
+PORTFOLIO_DIR = REPO_ROOT / "outputs" / "portfolio"
+
+
+def _product_output_dir(product: str) -> Path:
+    """Return the family-specific output directory for a calibration product."""
+    family = PRODUCT_TO_FAMILY.get(product, "portfolio")
+    out = REPO_ROOT / "outputs" / family
+    out.mkdir(parents=True, exist_ok=True)
+    return out
 
 
 def parse_args() -> argparse.Namespace:
@@ -208,7 +219,7 @@ def run_product_calibration(
     """Run the 11-step calibration pipeline for a single product."""
     t0 = time.time()
     logger.info("--- Starting calibration: %s ---", product)
-    OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
+    product_dir = _product_output_dir(product)
 
     # Step 1: Validate observation period
     from src.aps113_compliance import validate_observation_periods
@@ -225,9 +236,10 @@ def run_product_calibration(
     # Step 3: Assign regime
     loans = assign_regime_to_workouts(loans, regimes)
 
-    # Export discount rate register
+    # Export discount rate register (written once to portfolio dir)
     regime_source = regimes["data_source"].iloc[0] if len(regimes) > 0 else "synthetic"
-    dr_path = OUTPUTS_DIR / "rba_discount_rate_register.csv"
+    PORTFOLIO_DIR.mkdir(parents=True, exist_ok=True)
+    dr_path = PORTFOLIO_DIR / "rba_discount_rate_register.csv"
     if not dr_path.exists():
         export_discount_rate_register(
             loans, rates_df, product, dr_path
@@ -263,51 +275,51 @@ def run_product_calibration(
             segment_col=None,
         )
 
-    # ---- Export all 9 per-module CSV files ----
+    # ---- Export all 9 per-module CSV files to family output dir ----
     prefix = product
     exports = {}
 
-    hw_path = OUTPUTS_DIR / f"{prefix}_historical_workouts.csv"
+    hw_path = product_dir / f"{prefix}_historical_workouts.csv"
     loans.to_csv(hw_path, index=False)
     exports["historical_workouts"] = hw_path
 
     lr_df = cal_results["long_run_lgd_by_segment"]
-    lr_path = OUTPUTS_DIR / f"{prefix}_long_run_lgd_by_segment.csv"
+    lr_path = product_dir / f"{prefix}_long_run_lgd_by_segment.csv"
     lr_df.to_csv(lr_path, index=False)
     exports["long_run_lgd_by_segment"] = lr_path
 
-    mv_path = OUTPUTS_DIR / f"{prefix}_model_vs_actual_comparison.csv"
+    mv_path = product_dir / f"{prefix}_model_vs_actual_comparison.csv"
     backtest_df.to_csv(mv_path, index=False)
     exports["model_vs_actual_comparison"] = mv_path
 
     cal_steps = cal_results["calibration_steps"]
-    ca_path = OUTPUTS_DIR / f"{prefix}_calibration_adjustments.csv"
+    ca_path = product_dir / f"{prefix}_calibration_adjustments.csv"
     cal_steps.to_csv(ca_path, index=False)
     exports["calibration_adjustments"] = ca_path
 
     moc_df = cal_results["moc_register"]
-    moc_path = OUTPUTS_DIR / f"{prefix}_moc_register.csv"
+    moc_path = product_dir / f"{prefix}_moc_register.csv"
     moc_df.to_csv(moc_path, index=False)
     exports["moc_register"] = moc_path
 
-    dt_path = OUTPUTS_DIR / f"{prefix}_downturn_lgd_by_segment.csv"
+    dt_path = product_dir / f"{prefix}_downturn_lgd_by_segment.csv"
     lr_df[["segment_key_concat", "long_run_lgd", "downturn_lgd"]].to_csv(dt_path, index=False)
     exports["downturn_lgd_by_segment"] = dt_path
 
-    fc_path = OUTPUTS_DIR / f"{prefix}_final_calibrated_lgd.csv"
+    fc_path = product_dir / f"{prefix}_final_calibrated_lgd.csv"
     lr_df[["segment_key_concat", "long_run_lgd", "downturn_lgd",
            "total_moc", "lgd_with_moc", "policy_floor", "final_lgd",
            "aps113_pipeline"]].to_csv(fc_path, index=False)
     exports["final_calibrated_lgd"] = fc_path
 
-    bt_path = OUTPUTS_DIR / f"{prefix}_backtest_results.csv"
+    bt_path = product_dir / f"{prefix}_backtest_results.csv"
     if val_results and "summary_table" in val_results:
         val_results["summary_table"].to_csv(bt_path, index=False)
     else:
         pd.DataFrame([{"note": "Validation skipped or insufficient data"}]).to_csv(bt_path, index=False)
     exports["backtest_results"] = bt_path
 
-    vr_path = OUTPUTS_DIR / f"{prefix}_validation_report.csv"
+    vr_path = product_dir / f"{prefix}_validation_report.csv"
     if val_results and "validation_report" in val_results:
         val_results["validation_report"].to_csv(vr_path, index=False)
     else:
@@ -386,16 +398,16 @@ def main() -> None:
             logger.error("Pipeline failed for %s: %s", product, exc, exc_info=True)
             sys.exit(1)
 
-    OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
+    PORTFOLIO_DIR.mkdir(parents=True, exist_ok=True)
 
     if all_final_lgd:
         consolidated = pd.concat(all_final_lgd, ignore_index=True)
-        consolidated.to_csv(OUTPUTS_DIR / "lgd_final_calibrated.csv", index=False)
+        consolidated.to_csv(PORTFOLIO_DIR / "lgd_final_calibrated.csv", index=False)
         logger.info("Written: lgd_final_calibrated.csv (%d rows)", len(consolidated))
 
     if all_moc_registers:
         moc_all = pd.concat(all_moc_registers.values(), ignore_index=True)
-        moc_all.to_csv(OUTPUTS_DIR / "moc_summary_all_products.csv", index=False)
+        moc_all.to_csv(PORTFOLIO_DIR / "moc_summary_all_products.csv", index=False)
         logger.info("Written: moc_summary_all_products.csv (%d rows)", len(moc_all))
 
     try:
@@ -409,7 +421,7 @@ def main() -> None:
             bench_df = generate_benchmark_comparison(
                 all_cal, apra_benchmarks, product_col="product", lgd_col="final_lgd"
             )
-            export_benchmark_comparison(bench_df, OUTPUTS_DIR / "apra_benchmark_comparison.csv")
+            export_benchmark_comparison(bench_df, PORTFOLIO_DIR / "apra_benchmark_comparison.csv")
     except Exception as e:
         logger.warning("APRA benchmark comparison skipped: %s", e)
 
@@ -420,7 +432,7 @@ def main() -> None:
         regime_data_source=regime_source,
         products=products,
     )
-    export_compliance_map(compliance_df, OUTPUTS_DIR / "aps113_compliance_map.csv")
+    export_compliance_map(compliance_df, PORTFOLIO_DIR / "aps113_compliance_map.csv")
 
     summary_rows = []
     for product, result in all_results.items():
@@ -440,18 +452,18 @@ def main() -> None:
         })
 
     dashboard = pd.DataFrame(summary_rows)
-    dashboard.to_csv(OUTPUTS_DIR / "calibration_summary_dashboard.csv", index=False)
+    dashboard.to_csv(PORTFOLIO_DIR / "calibration_summary_dashboard.csv", index=False)
     logger.info("Written: calibration_summary_dashboard.csv")
 
     logger.info("")
     logger.info("=" * 70)
     logger.info("Calibration complete. Key outputs:")
-    logger.info("  outputs/tables/lgd_final_calibrated.csv")
-    logger.info("  outputs/tables/aps113_compliance_map.csv")
-    logger.info("  outputs/tables/calibration_summary_dashboard.csv")
-    logger.info("  outputs/tables/apra_benchmark_comparison.csv")
+    logger.info("  outputs/portfolio/lgd_final_calibrated.csv")
+    logger.info("  outputs/portfolio/aps113_compliance_map.csv")
+    logger.info("  outputs/portfolio/calibration_summary_dashboard.csv")
+    logger.info("  outputs/portfolio/apra_benchmark_comparison.csv")
     n_csv = sum(len(r["exports"]) for r in all_results.values())
-    logger.info("  + %d per-module CSV files (9 per product)", n_csv)
+    logger.info("  + %d per-module CSV files (9 per product) in outputs/{family}/", n_csv)
     logger.info("=" * 70)
 
 

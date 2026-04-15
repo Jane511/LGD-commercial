@@ -10,17 +10,21 @@ from pathlib import Path
 
 import pandas as pd
 
-from .mortgage_generator import MortgageWorkoutGenerator
-from .commercial_cashflow_generator import CommercialCashflowWorkoutGenerator
-from .receivables_generator import ReceivablesWorkoutGenerator
-from .trade_contingent_generator import TradeContingentWorkoutGenerator
-from .asset_equipment_generator import AssetEquipmentWorkoutGenerator
-from .development_finance_generator import DevelopmentFinanceWorkoutGenerator
-from .cre_investment_generator import CREInvestmentWorkoutGenerator
-from .residual_stock_generator import ResidualStockWorkoutGenerator
-from .land_subdivision_generator import LandSubdivisionWorkoutGenerator
-from .bridging_generator import BridgingWorkoutGenerator
-from .mezz_second_mortgage_generator import MezzSecondMortgageWorkoutGenerator
+from .mortgage import MortgageWorkoutGenerator
+from .cashflow_lending import (
+    CommercialCashflowWorkoutGenerator,
+    ReceivablesWorkoutGenerator,
+    TradeContingentWorkoutGenerator,
+    AssetEquipmentWorkoutGenerator,
+)
+from .property_backed_lending import (
+    DevelopmentFinanceWorkoutGenerator,
+    CREInvestmentWorkoutGenerator,
+    ResidualStockWorkoutGenerator,
+    LandSubdivisionWorkoutGenerator,
+    BridgingWorkoutGenerator,
+    MezzSecondMortgageWorkoutGenerator,
+)
 
 logger = logging.getLogger(__name__)
 
