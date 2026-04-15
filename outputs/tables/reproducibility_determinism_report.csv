@@ -1,7 +1,0 @@
-target,is_equal
-mortgage.weighted_output,True
-commercial.weighted_output,True
-development.weighted_output,True
-reporting.overlay_trace_report.csv,True
-reporting.parameter_version_report.csv,True
-reporting.segmentation_consistency_report.csv,True

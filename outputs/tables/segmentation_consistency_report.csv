@@ -1,5 +1,0 @@
-product,loan_count,segment_cols_present,missing_segment_cols,unique_std_product_segment,unique_std_security_or_stage_band,unique_std_industry_risk_band
-cashflow_lending,400,True,none,8,5,3
-commercial,300,True,none,5,1,3
-development,200,True,none,5,1,3
-mortgage,500,True,none,2,1,1

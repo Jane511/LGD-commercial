@@ -1,8 +1,0 @@
-product,topic,usage_value,loan_count,total_ead,ead_share
-commercial,cure_overlay_applied_flag,True,300,2290984728.06,1.0
-commercial,cure_overlay_source,dampened_unsecured_proxy,49,373984365.13,0.16324175388401171
-commercial,cure_overlay_source,secured_proxy,251,1917000362.93,0.8367582461159884
-development,cure_overlay_applied_flag,True,200,4154640674.45,1.0
-development,cure_overlay_source,development_stage_presale_lvr_proxy,200,4154640674.45,1.0
-mortgage,cure_overlay_applied_flag,True,500,444486089.71,1.0
-mortgage,cure_overlay_source,mortgage_proxy_two_stage,500,444486089.71,1.0

@@ -1,7 +1,0 @@
-product,topic,usage_value,loan_count,total_ead,ead_share
-commercial,discount_rate_fallback,max_contract_vs_cost_of_funds,300,2290984728.06,1.0
-development,discount_rate_fallback,max_contract_vs_cost_of_funds,200,4154640674.45,1.0
-mortgage,discount_rate_fallback,max_contract_vs_cost_of_funds,500,444486089.71,1.0
-mortgage,house_price_fallback,observed_house_price_decline,500,444486089.71,1.0
-mortgage,rate_shock_fallback,observed_rate_shock,500,444486089.71,1.0
-mortgage,unemployment_fallback,observed_unemployment_shock,500,444486089.71,1.0

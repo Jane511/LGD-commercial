@@ -36,3 +36,10 @@ outputs/figures/.gitkeep
 # Claude Code
 .claude/
 CLAUDE.md
+# outputs
+outputs/*
+!outputs/**/.gitkeep
+
+# raw data
+data/raw/*
+!data/raw/**/.gitkeep

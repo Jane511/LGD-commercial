@@ -1,7 +1,0 @@
-check_name,passed
-lgd_base_between_0_and_1,True
-lgd_downturn_between_0_and_1,True
-lgd_final_between_0_and_1,True
-downturn_not_below_base,True
-final_not_below_downturn,True
-delay_stress_has_longer_exit_time,True

@@ -1,6 +1,0 @@
-check_name,passed
-lgd_base_between_zero_and_one,True
-downturn_not_below_base,True
-final_not_below_downturn,True
-final_lgd_below_one,True
-recovery_time_positive,True

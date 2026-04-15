@@ -1,7 +1,0 @@
-check_name,passed
-eligible_balance_not_above_gross,True
-ineligible_pct_between_0_and_1,True
-ead_base_not_below_drawn,True
-ead_downturn_not_below_drawn,True
-time_to_collect_positive,True
-downturn_collection_time_longer,True

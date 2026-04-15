@@ -1,7 +1,0 @@
-artifact_type,artifact_name,exists,size_bytes
-table,bridging_loan_level_output.csv,True,94987
-table,bridging_segment_summary.csv,True,1046
-table,bridging_delay_summary.csv,True,296
-table,bridging_scenario_summary.csv,True,258
-table,bridging_validation_checks.csv,True,155
-figure,bridging_delay_vs_lgd.png,True,33151

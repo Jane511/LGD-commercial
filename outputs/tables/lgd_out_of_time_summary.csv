@@ -1,4 +1,0 @@
-product,holdout_start,train_period_start,train_period_end,test_period_start,test_period_end,train_size,test_size,train_weighted_actual_lgd,test_weighted_actual_lgd,weighted_actual_shift_test_minus_train,weighted_actual_shift_pct
-mortgage,2023-01-01,2018-01-01,2022-12-31,2023-01-13,2024-06-22,383,117,0.072626,0.073943,0.001317,0.018137
-commercial,2023-01-01,2018-01-01,2022-12-28,2023-01-03,2024-06-27,233,67,0.602297,0.582224,-0.020073,-0.033328
-development,2023-01-01,2018-01-05,2022-12-30,2023-01-03,2024-05-08,156,44,0.176265,0.250036,0.073772,0.418528
