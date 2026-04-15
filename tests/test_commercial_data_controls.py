@@ -10,7 +10,7 @@ from src.commercial_data_controls import (  # noqa: E402
     assign_framework_segment,
     run_commercial_data_controls,
 )
-from src.data_generation import generate_commercial_data  # noqa: E402
+from src.data.data_generation import generate_commercial_data  # noqa: E402
 
 
 def _check_row(df: pd.DataFrame, check_name: str) -> pd.Series:

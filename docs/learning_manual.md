@@ -982,17 +982,17 @@ pip install -r requirements.txt
 
 **2. Run demo pipeline (proxy baseline):**
 ```bash
-python scripts/run_demo_pipeline.py
+python -m src.pipeline.demo_pipeline
 ```
 
 **3. Run full calibration pipeline:**
 ```bash
-python scripts/run_calibration_pipeline.py --products all
+python -m src.pipeline.calibration_pipeline --products all
 ```
 
 **4. Run validation sequence:**
 ```bash
-python scripts/run_validation_sequence.py
+python -m src.pipeline.validation_pipeline
 ```
 
 ---
@@ -1001,12 +1001,7 @@ python scripts/run_validation_sequence.py
 
 **Generate synthetic workout data:**
 ```bash
-python scripts/generate_historical_workout_data.py --seed 42
-```
-
-**Classify economic regimes:**
-```bash
-python scripts/classify_economic_regimes.py
+python -m src.data.generator --seed 42
 ```
 
 **Score a single new loan (API):**
@@ -1023,12 +1018,12 @@ print(result)  # {'lgd_base': 0.12, 'lgd_downturn': 0.18, 'lgd_final': 0.18}
 
 **Score a batch of loans (CLI):**
 ```bash
-python scripts/score_new_loan.py --product-type mortgage --input-csv data/sample_loans.csv --output outputs/scored.csv
+python -m src.scoring.scoring --product-type mortgage --input-csv data/sample_loans.csv --output outputs/scored.csv
 ```
 
 **Generate APS 113 compliance map:**
 ```bash
-python scripts/run_calibration_pipeline.py --products mortgage --compliance-report-only
+python -m src.pipeline.calibration_pipeline --products mortgage --compliance-report-only
 ```
 
 ---
@@ -1056,7 +1051,7 @@ Key outputs in `outputs/tables/`:
 A: Check logs for numeric coercion warnings. A required column may be missing or misnamed. Verify input CSV against `docs/data_dictionary.md`.
 
 **Q: Downturn scalar is unrealistic (too high or too low)**
-A: Check `overlay_parameters.csv` for the downturn overlay entry for your product. Verify macro regime classification is correct. Run `python scripts/classify_economic_regimes.py` to update regime flags.
+A: Check `overlay_parameters.csv` for the downturn overlay entry for your product. Verify macro regime classification is correct. `src.regime_classifier` can be imported directly to inspect or regenerate regime flags.
 
 **Q: MoC is very high**
 A: Check `src/moc_framework.py` for the MoC scoring. Data quality may be flagged as high-risk because workout data is synthetic. In production, update with real workout data to lower MoC.

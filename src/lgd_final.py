@@ -13,7 +13,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from .data_generation import generate_all_datasets
+from src.data.data_generation import generate_all_datasets
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]

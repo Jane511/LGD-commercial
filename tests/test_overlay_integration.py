@@ -9,7 +9,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from src.data_generation import generate_all_datasets  # noqa: E402
+from src.data.data_generation import generate_all_datasets  # noqa: E402
 from src.lgd_calculation import run_full_pipeline  # noqa: E402
 from src.overlay_parameters import OverlayParameterManager  # noqa: E402
 from src.reproducibility import set_global_seed  # noqa: E402

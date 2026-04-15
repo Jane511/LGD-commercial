@@ -2,8 +2,8 @@ from pathlib import Path
 import sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
-from src.demo_config import EXPECTED_OUTPUTS
-from src.demo_pipeline import run_pipeline
+from src.pipeline.demo_config import EXPECTED_OUTPUTS
+from src.pipeline.demo_pipeline import run_pipeline
 def test_demo_pipeline_outputs(tmp_path: Path):
     result=run_pipeline(project_root=tmp_path,persist=True)
     for name in EXPECTED_OUTPUTS:

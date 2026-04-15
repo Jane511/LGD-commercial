@@ -495,7 +495,7 @@ Common generated/internal datasets:
   - `src/lgd_calculation.py` (`resolve_overlay_contract`, product overlay application)
   - `src/overlay_parameters.py`
   - `data/config/overlay_parameters.csv`
-  - `scripts/run_validation_sequence.py` (governance and determinism checks)
+  - `src/pipeline/validation_pipeline.py` (governance and determinism checks)
 - Method: shared resolver with deterministic order (`base -> macro -> industry/property -> MoC -> floor`)
 - Calculation flow:
   1. Start `LGD_base` / `LGD_economic`

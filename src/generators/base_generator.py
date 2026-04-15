@@ -30,14 +30,14 @@ import numpy as np
 import pandas as pd
 
 # Import shared helpers from existing data_generation module (do not duplicate)
-from src.data_generation import (
+from src.data.data_generation import (
     STATES,
     STATE_WEIGHTS,
     _build_discount_rate,
     _discount,
     _random_dates,
 )
-from src.rba_rates_loader import load_rba_lending_rates, build_discount_rate_register
+from src.data.rba_rates_loader import load_rba_lending_rates, build_discount_rate_register
 
 logger = logging.getLogger(__name__)
 

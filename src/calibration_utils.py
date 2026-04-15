@@ -66,13 +66,13 @@ from src.moc_framework import (
     PRODUCT_MOC_CAPS,
 )
 
-from src.regime_classifier import (
+from src.data.regime_classifier import (
     classify_economic_regime,
     assign_regime_to_workouts,
     export_regime_classification,
 )
 
-from src.validation_suite import (
+from src.validation import (
     run_full_validation_suite,
     compute_gini_coefficient,
     hosmer_lemeshow_test,
@@ -85,7 +85,7 @@ from src.aps113_compliance import (
     APS113_REQUIREMENTS,
 )
 
-from src.rba_rates_loader import (
+from src.data.rba_rates_loader import (
     load_rba_lending_rates,
     get_discount_rate_for_loan,
     build_discount_rate_register,

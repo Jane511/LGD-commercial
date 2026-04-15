@@ -9,7 +9,7 @@ import pandas as pd
 
 logger = logging.getLogger(__name__)
 
-from .data_source_adapter import load_datasets
+from src.data.data_source_adapter import load_datasets
 from .lgd_calculation import (
     CashFlowLendingLGDEngine,
     CommercialLGDEngine,

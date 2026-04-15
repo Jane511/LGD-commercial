@@ -11,7 +11,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from src.data_generation import generate_all_datasets  # noqa: E402
+from src.data.data_generation import generate_all_datasets  # noqa: E402
 from src.lgd_scoring import (  # noqa: E402
     NORMALIZED_OUTPUT_COLUMNS,
     score_batch_from_source,
@@ -120,7 +120,7 @@ def test_cli_and_api_parity_single_payload(tmp_path: Path):
 
     cmd = [
         sys.executable,
-        str(ROOT / "scripts" / "score_new_loan.py"),
+        "-m", "src.scoring.scoring",
         "--product-type",
         "mortgage",
         "--single-json",

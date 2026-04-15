@@ -54,7 +54,7 @@ RBA_RATE_MAP: dict[str, str] = {
     "personal":                          "personal_variable",
 }
 
-DEFAULT_RATES_PATH = Path(__file__).parent.parent / "data" / "external" / "rba_b6_rates.csv"
+DEFAULT_RATES_PATH = Path(__file__).resolve().parents[2] / "data" / "external" / "rba_b6_rates.csv"
 FALLBACK_SPREAD_BPS = 300   # RBA cash rate + 300bps when no B6 rate available
 
 

@@ -9,7 +9,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from src.data_source_adapter import (
+from src.data.data_source_adapter import (
     PRODUCTS,
     SUBSETS,
     load_controlled_datasets,

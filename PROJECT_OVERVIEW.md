@@ -121,10 +121,8 @@ This repo avoids “run all notebook cells” as a validation standard. The base
 Commands:
 
 ```powershell
-python scripts/run_demo_pipeline.py
-python scripts/run_validation_sequence.py
-python scripts/run_stage7_bridging_validation.py
-python scripts/run_stage9_cross_product_validation.py
+python -m src.pipeline.demo_pipeline
+python -m src.pipeline.validation_pipeline
 ```
 
 Validation outputs include:

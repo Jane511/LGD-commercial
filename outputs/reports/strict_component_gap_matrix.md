@@ -69,7 +69,7 @@ Rules applied:
 ### 5.7 Downturn LGD and conservatism — Proxy-only
 - Documented options: stress_window_calibration | macro_linked_overlay | policy_floor_and_moc
 - Strict option audit: 1:FAIL:stress_window_calibration | 2:PASS:macro_linked_overlay | 3:PASS:policy_floor_and_moc
-- Evidence code paths: src/lgd_calculation.py | src/overlay_parameters.py | scripts/run_validation_sequence.py
+- Evidence code paths: src/lgd_calculation.py | src/overlay_parameters.py | src/pipeline/validation_pipeline.py
 - Evidence outputs: present:downturn_lgd_output.csv,overlay_trace_report.csv,parameter_version_report.csv
 - Logic trace: Macro-linked overlay + MoC/floor chain exists and is governed; stress-window calibration mode not implemented.
 - Gap reason: One documented option (stress-window calibration) missing.
@@ -79,7 +79,7 @@ Rules applied:
 ### 5.8 End-to-end component assembly — Proxy-only
 - Documented options: component_chain_with_option_coverage_across_all_5_1_to_5_7
 - Strict option audit: 1:FAIL:all_upstream_component_options_implemented
-- Evidence code paths: src/lgd_calculation.py | scripts/run_validation_sequence.py | outputs/tables/validation_sequence_report.csv
+- Evidence code paths: src/lgd_calculation.py | src/pipeline/validation_pipeline.py | outputs/tables/validation_sequence_report.csv
 - Evidence outputs: present:lgd_segment_summary.csv,validation_sequence_report.csv
 - Logic trace: Assembly exists, but strict-all-options fails due to component-level option gaps upstream.
 - Gap reason: End-to-end chain is functional but not option-complete under strict-all-options rule.
@@ -161,7 +161,7 @@ Rules applied:
 ### 5.8 Downturn LGD and conservatism — Proxy-only
 - Documented options: stress_window_calibration | macro_linked_overlay | policy_floor_moc
 - Strict option audit: 1:FAIL:stress_window_calibration | 2:PASS:macro_linked_overlay | 3:PASS:policy_floor_moc
-- Evidence code paths: src/lgd_calculation.py | src/overlay_parameters.py | scripts/run_stage9_cross_product_validation.py
+- Evidence code paths: src/lgd_calculation.py | src/overlay_parameters.py | src/pipeline/validation_pipeline.py
 - Evidence outputs: present:overlay_trace_report.csv,cre_investment_scenario_summary.csv,stage9_cross_product_validation_report.csv
 - Logic trace: Macro-linked downturn and MoC/floor logic present across property outputs; stress-window calibration mode missing.
 - Gap reason: Not all documented options implemented.

@@ -40,7 +40,7 @@ def _run_step(step_name: str, fn):
 
 
 def _load_runtime_datasets():
-    from src.data_source_adapter import load_datasets
+    from src.data.data_source_adapter import load_datasets
 
     return load_datasets(
         source=RUNTIME_SOURCE,
@@ -350,7 +350,7 @@ def _step_aps113_calibration_validation():
     """
     Step 7: APS 113 extended validation suite (Gini, Hosmer-Lemeshow, PSI, OOT).
     """
-    from src.validation_suite import run_full_validation_suite
+    from src.validation import run_full_validation_suite
 
     PRODUCTS = [
         "mortgage", "commercial_cashflow", "receivables", "trade_contingent",

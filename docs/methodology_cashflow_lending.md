@@ -575,8 +575,8 @@ Common generated/internal datasets used by cash-flow modules:
 - Generated/internal used: product loan/cashflow panels, segment tags, governance reporting tables
 - Implemented in:
   - `src/lgd_calculation.py` (`run_full_pipeline`, `build_governance_reporting_tables`)
-  - `scripts/run_validation_sequence.py` (validation and reproducibility reporting)
-  - `scripts/build_strict_component_gap_matrix.py` (strict component evidence matrix)
+  - `src/pipeline/validation_pipeline.py` (validation and reproducibility reporting)
+  - `src/governance/gap_matrix.py` (strict component evidence matrix)
 - Method: pipeline orchestration with additive governance outputs
 - Calculation flow:
   1. Build base component outputs (EAD, cure, severity, timing, costs)

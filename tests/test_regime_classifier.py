@@ -14,7 +14,7 @@ import pytest
 
 
 def test_classify_returns_dataframe():
-    from src.regime_classifier import classify_economic_regime
+    from src.data.regime_classifier import classify_economic_regime
     result = classify_economic_regime()
     assert isinstance(result, pd.DataFrame)
     assert "year" in result.columns
@@ -22,14 +22,14 @@ def test_classify_returns_dataframe():
 
 
 def test_classify_covers_2014_to_2024():
-    from src.regime_classifier import classify_economic_regime
+    from src.data.regime_classifier import classify_economic_regime
     result = classify_economic_regime()
     assert result["year"].min() <= 2014
     assert result["year"].max() >= 2024
 
 
 def test_classify_valid_regime_labels():
-    from src.regime_classifier import classify_economic_regime
+    from src.data.regime_classifier import classify_economic_regime
     result = classify_economic_regime()
     valid = {"expansion", "mild_stress", "moderate_stress", "severe_stress"}
     assert set(result["regime"].unique()).issubset(valid), \
@@ -38,7 +38,7 @@ def test_classify_valid_regime_labels():
 
 def test_covid_years_classified_as_severe_stress():
     """2020 and 2021 must be severe_stress — APS 113 requires downturn years in sample."""
-    from src.regime_classifier import classify_economic_regime
+    from src.data.regime_classifier import classify_economic_regime
     result = classify_economic_regime()
     covid = result[result["year"].isin([2020, 2021])]
     assert not covid.empty, "2020-2021 must appear in regime classification"
@@ -47,14 +47,14 @@ def test_covid_years_classified_as_severe_stress():
 
 
 def test_data_source_column_present():
-    from src.regime_classifier import classify_economic_regime
+    from src.data.regime_classifier import classify_economic_regime
     result = classify_economic_regime()
     assert "data_source" in result.columns
     assert result["data_source"].iloc[0] in ("rba_abs_real", "synthetic")
 
 
 def test_is_downturn_period_column():
-    from src.regime_classifier import classify_economic_regime
+    from src.data.regime_classifier import classify_economic_regime
     result = classify_economic_regime()
     assert "is_downturn_period" in result.columns
     # 2020-2021 should be marked as downturn
@@ -65,7 +65,7 @@ def test_is_downturn_period_column():
 
 def test_upstream_first_falls_back_to_synthetic():
     """When upstream parquet doesn't exist, must gracefully use synthetic."""
-    from src.regime_classifier import classify_economic_regime
+    from src.data.regime_classifier import classify_economic_regime
     result = classify_economic_regime(
         upstream_parquet_path="/nonexistent/macro_regime_flags.parquet",
         method="upstream_first",
@@ -75,7 +75,7 @@ def test_upstream_first_falls_back_to_synthetic():
 
 
 def test_assign_regime_to_workouts():
-    from src.regime_classifier import classify_economic_regime, assign_regime_to_workouts
+    from src.data.regime_classifier import classify_economic_regime, assign_regime_to_workouts
     import numpy as np
 
     regimes = classify_economic_regime()
@@ -94,7 +94,7 @@ def test_assign_regime_to_workouts():
 
 def test_at_least_one_downturn_year_in_synthetic():
     """Synthetic data must include at least one downturn year to pass APS 113 s.43."""
-    from src.regime_classifier import classify_economic_regime
+    from src.data.regime_classifier import classify_economic_regime
     result = classify_economic_regime()
     n_downturn = result["is_downturn_period"].sum()
     assert n_downturn >= 1, \

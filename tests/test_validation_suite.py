@@ -33,7 +33,7 @@ def _make_validation_df(n=200, seed=42):
 # ── compute_gini_coefficient ─────────────────────────────────────────────────
 
 def test_gini_returns_float():
-    from src.validation_suite import compute_gini_coefficient
+    from src.validation import compute_gini_coefficient
     df = _make_validation_df()
     result = compute_gini_coefficient(df, actual_col="realised_lgd",
                                       predicted_col="lgd_final_calibrated")
@@ -43,7 +43,7 @@ def test_gini_returns_float():
 
 
 def test_gini_in_valid_range():
-    from src.validation_suite import compute_gini_coefficient
+    from src.validation import compute_gini_coefficient
     df = _make_validation_df()
     result = compute_gini_coefficient(df, actual_col="realised_lgd",
                                       predicted_col="lgd_final_calibrated")
@@ -51,7 +51,7 @@ def test_gini_in_valid_range():
 
 
 def test_gini_lorenz_curve_present():
-    from src.validation_suite import compute_gini_coefficient
+    from src.validation import compute_gini_coefficient
     df = _make_validation_df()
     result = compute_gini_coefficient(df, actual_col="realised_lgd",
                                       predicted_col="lgd_final_calibrated")
@@ -61,7 +61,7 @@ def test_gini_lorenz_curve_present():
 
 def test_perfect_gini():
     """Perfect predictor should have Gini ≈ 1."""
-    from src.validation_suite import compute_gini_coefficient
+    from src.validation import compute_gini_coefficient
     n = 100
     actual = np.linspace(0.01, 0.99, n)
     df = pd.DataFrame({
@@ -77,7 +77,7 @@ def test_perfect_gini():
 # ── hosmer_lemeshow_test ──────────────────────────────────────────────────────
 
 def test_hl_returns_statistic_and_pvalue():
-    from src.validation_suite import hosmer_lemeshow_test
+    from src.validation import hosmer_lemeshow_test
     df = _make_validation_df()
     result = hosmer_lemeshow_test(df, actual_col="realised_lgd",
                                   predicted_col="lgd_final_calibrated")
@@ -87,7 +87,7 @@ def test_hl_returns_statistic_and_pvalue():
 
 
 def test_hl_statistic_non_negative():
-    from src.validation_suite import hosmer_lemeshow_test
+    from src.validation import hosmer_lemeshow_test
     df = _make_validation_df()
     result = hosmer_lemeshow_test(df, actual_col="realised_lgd",
                                   predicted_col="lgd_final_calibrated")
@@ -95,7 +95,7 @@ def test_hl_statistic_non_negative():
 
 
 def test_hl_pvalue_in_unit_interval():
-    from src.validation_suite import hosmer_lemeshow_test
+    from src.validation import hosmer_lemeshow_test
     df = _make_validation_df()
     result = hosmer_lemeshow_test(df, actual_col="realised_lgd",
                                   predicted_col="lgd_final_calibrated")
@@ -103,7 +103,7 @@ def test_hl_pvalue_in_unit_interval():
 
 
 def test_hl_raises_on_too_few_bins():
-    from src.validation_suite import hosmer_lemeshow_test
+    from src.validation import hosmer_lemeshow_test
     df = _make_validation_df(10)  # too few for 10 bins
     with pytest.raises(ValueError):
         hosmer_lemeshow_test(df, actual_col="realised_lgd",
@@ -113,7 +113,7 @@ def test_hl_raises_on_too_few_bins():
 # ── run_full_validation_suite ─────────────────────────────────────────────────
 
 def test_full_suite_returns_expected_keys():
-    from src.validation_suite import run_full_validation_suite
+    from src.validation import run_full_validation_suite
     df = _make_validation_df()
     result = run_full_validation_suite(
         loans=df,
@@ -127,7 +127,7 @@ def test_full_suite_returns_expected_keys():
 
 
 def test_full_suite_summary_table():
-    from src.validation_suite import run_full_validation_suite
+    from src.validation import run_full_validation_suite
     df = _make_validation_df()
     result = run_full_validation_suite(
         loans=df,
@@ -142,7 +142,7 @@ def test_full_suite_summary_table():
 
 def test_full_suite_calibration_ratio_reasonable():
     """Calibration ratio = mean(predicted) / mean(actual) should be near 1 for good model."""
-    from src.validation_suite import run_full_validation_suite
+    from src.validation import run_full_validation_suite
     df = _make_validation_df(300)
     result = run_full_validation_suite(
         loans=df, predicted_col="lgd_final_calibrated",

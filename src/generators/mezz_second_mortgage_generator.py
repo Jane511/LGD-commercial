@@ -40,7 +40,7 @@ from src.generators.base_generator import (
     DATE_RANGE_START,
     DATE_RANGE_END,
 )
-from src.data_generation import _random_dates, _discount, STATES, STATE_WEIGHTS
+from src.data.data_generation import _random_dates, _discount, STATES, STATE_WEIGHTS
 
 
 class MezzSecondMortgageWorkoutGenerator(BaseWorkoutGenerator):
